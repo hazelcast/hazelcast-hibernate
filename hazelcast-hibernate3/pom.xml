@@ -31,7 +31,7 @@
 
     <properties>
         <!-- needed for checkstyle/findbugs -->
-        <main.basedir>${project.parent.parent.basedir}</main.basedir>
+        <main.basedir>${project.parent.basedir}</main.basedir>
 
         <hibernate.core.version>3.6.10.Final</hibernate.core.version>
     </properties>
