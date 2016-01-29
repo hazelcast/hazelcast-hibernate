@@ -43,7 +43,7 @@
         <!-- Not using 3.1 at the moment since it recompiles all classes every time -->
         <!-- https://jira.codehaus.org/browse/MCOMPILER-205 -->
         <!--<maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>-->
-        <maven.compiler.plugin.version>2.5.1</maven.compiler.plugin.version>
+        <hazelcast.version>3.6</hazelcast.version>
         <maven.jar.plugin.version>2.4</maven.jar.plugin.version>
         <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
@@ -85,7 +85,7 @@
 
         <hsqldb.version>2.2.9</hsqldb.version>
         <javaassist.version>3.12.1.GA</javaassist.version>
-        <project.parent.version>3.6</project.parent.version>
+        <hazelcast.version>3.6</hazelcast.version>
     </properties>
 
     <build>
@@ -185,12 +185,12 @@
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${hazelcast.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-client</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${hazelcast.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -216,14 +216,14 @@
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast</artifactId>
             <scope>test</scope>
-            <version>${project.parent.version}</version>
+            <version>${hazelcast.version}</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-client</artifactId>
             <scope>test</scope>
-            <version>${project.parent.version}</version>
+            <version>${hazelcast.version}</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
@@ -322,12 +322,6 @@
                     -Dhazelcast.mancenter.enabled=false
                     -Dhazelcast.logging.type=none
                     -Dhazelcast.test.use.network=false
-                    -Djavax.management.builder.initial=${javax.management.builder.initial}
-                    -DCacheManagerImpl=${CacheManagerImpl}
-                    -Djavax.cache.Cache=${CacheImpl}
-                    -Djavax.cache.Cache.Entry=${CacheEntryImpl}
-                    -Dorg.jsr107.tck.management.agentId=${org.jsr107.tck.management.agentId}
-                    -Djavax.cache.annotation.CacheInvocationContext=${javax.cache.annotation.CacheInvocationContext}
                 </argLine>
             </properties>
             <build>
