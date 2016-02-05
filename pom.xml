@@ -18,7 +18,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    
     <name>hazelcast-hibernate</name>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-hibernate</artifactId>
@@ -39,11 +38,12 @@
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
+        <hazelcast.version>3.6</hazelcast.version>
 
         <!-- Not using 3.1 at the moment since it recompiles all classes every time -->
         <!-- https://jira.codehaus.org/browse/MCOMPILER-205 -->
         <!--<maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>-->
-        <hazelcast.version>3.6</hazelcast.version>
+        <maven.compiler.plugin.version>2.5.1</maven.compiler.plugin.version>
         <maven.jar.plugin.version>2.4</maven.jar.plugin.version>
         <maven.source.plugin.version>2.2.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
@@ -90,6 +90,17 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
