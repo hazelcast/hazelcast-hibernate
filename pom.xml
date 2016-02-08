@@ -23,6 +23,8 @@
     <artifactId>hazelcast-hibernate</artifactId>
     <version>3.7-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
+    <url>http://www.hazelcast.com/</url>
     
     <modules>
         <module>hazelcast-hibernate3</module>
@@ -88,6 +90,21 @@
         <hazelcast.version>3.6</hazelcast.version>
     </properties>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate.git</connection>
+        <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate.git</developerConnection>
+        <url>https://github.com/hazelcast/hazelcast/</url>
+    </scm>
+    <developers>
+    </developers>
+    
     <build>
         <plugins>
             <plugin>
