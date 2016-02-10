@@ -103,8 +103,17 @@
         <url>https://github.com/hazelcast/hazelcast/</url>
     </scm>
     <developers>
+        <developer>
+            <id>oztalip</id>
+            <name>talip ozturk</name>
+            <email>talip@hazelcast.com</email>
+        </developer>
+        <developer>
+            <id>fuad</id>
+            <name>fuad malikov</name>
+            <email>fuad@hazelcast.com</email>
+        </developer>
     </developers>
-    
     <build>
         <plugins>
             <plugin>
