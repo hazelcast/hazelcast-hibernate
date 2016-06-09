@@ -16,6 +16,7 @@
 
 package com.hazelcast.hibernate.serialization;
 
+import com.hazelcast.internal.serialization.impl.SerializationConstants;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.StreamSerializer;
@@ -56,8 +57,7 @@ class Hibernate51CacheEntrySerializer
 
     @Override
     public int getTypeId() {
-        // SerializationConstants.HIBERNATE5_TYPE_HIBERNATE_CACHE_ENTRY
-        return -205;
+       return SerializationConstants.HIBERNATE5_TYPE_HIBERNATE_CACHE_ENTRY;
     }
 
     @Override
