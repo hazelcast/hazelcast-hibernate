@@ -29,6 +29,7 @@
     <modules>
         <module>hazelcast-hibernate3</module>
         <module>hazelcast-hibernate4</module>
+        <module>hazelcast-hibernate5</module>
     </modules>
 
     <properties>
@@ -40,10 +41,10 @@
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
-        <hazelcast.version>3.6</hazelcast.version>
+        <hazelcast.version>3.6.3</hazelcast.version>
 
         <hsqldb.version>2.2.9</hsqldb.version>
-        <javaassist.version>3.12.1.GA</javaassist.version>
+        <javassist.version>3.18.1-GA</javassist.version>
 
         <log4j.version>1.2.12</log4j.version>
         <log4j2.version>2.0.1</log4j2.version>
@@ -323,9 +324,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javassist</groupId>
+            <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>${javaassist.version}</version>
+            <version>${javassist.version}</version>
             <type>jar</type>
             <scope>test</scope>
         </dependency>
