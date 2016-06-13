@@ -10,9 +10,9 @@ import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.DuplicateInstanceNameException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
+import com.hazelcast.instance.GroupProperty;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
-import com.hazelcast.spi.properties.GroupProperty;
 import org.hibernate.cache.CacheException;
 import org.hibernate.util.PropertiesHelper;
 
@@ -122,7 +122,7 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
             if (!shutDown) {
                 LOGGER.warning(CacheEnvironment.SHUTDOWN_ON_STOP + " property is set to 'false'. "
                         + "Leaving current HazelcastInstance active! (Warning: Do not disable Hazelcast "
-                        + GroupProperty.SHUTDOWNHOOK_ENABLED.getName() + " property!)");
+                        + GroupProperty.SHUTDOWNHOOK_ENABLED + " property!)");
                 return;
             }
             try {
