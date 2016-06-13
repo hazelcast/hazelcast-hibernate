@@ -16,6 +16,7 @@
 
 package com.hazelcast.hibernate.serialization;
 
+import com.hazelcast.internal.serialization.impl.SerializationConstants;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.StreamSerializer;
@@ -110,8 +111,7 @@ class Hibernate5NaturalIdKeySerializer
 
     @Override
     public int getTypeId() {
-        // SerializationConstants.HIBERNATE5_TYPE_HIBERNATE_NATURAL_ID_KEY
-        return -206;
+        return SerializationConstants.HIBERNATE5_TYPE_HIBERNATE_NATURAL_ID_KEY;
     }
 
     @Override

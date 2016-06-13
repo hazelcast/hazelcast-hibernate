@@ -25,7 +25,7 @@
     <packaging>pom</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
-    
+
     <modules>
         <module>hazelcast-hibernate3</module>
         <module>hazelcast-hibernate4</module>
@@ -41,7 +41,7 @@
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
-        <hazelcast.version>3.6</hazelcast.version>
+        <hazelcast.version>3.7-EA</hazelcast.version>
 
         <!-- Not using 3.1 at the moment since it recompiles all classes every time -->
         <!-- https://jira.codehaus.org/browse/MCOMPILER-205 -->
@@ -239,6 +239,14 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>snapshot-repository</id>
+            <name>Maven2 Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <repository>
             <id>release-repository</id>
@@ -251,7 +259,7 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.hazelcast</groupId>
@@ -296,6 +304,13 @@
             <scope>test</scope>
             <version>${hazelcast.version}</version>
             <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-tests</artifactId>
+            <classifier>tests</classifier>
+            <version>1.0.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>

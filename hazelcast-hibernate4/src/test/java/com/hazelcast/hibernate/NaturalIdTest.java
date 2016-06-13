@@ -1,7 +1,7 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
-import com.hazelcast.test.HazelcastTestRunner;
+import com.hazelcast.test.HazelcastParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -22,7 +22,8 @@ import java.util.Properties;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-@RunWith(HazelcastTestRunner.class)
+@RunWith(Parameterized.class)
+@Parameterized.UseParametersRunnerFactory(HazelcastParametersRunnerFactory.class)
 @Category(SlowTest.class)
 public class NaturalIdTest extends HibernateStatisticsTestSupport {
 
