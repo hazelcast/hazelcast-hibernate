@@ -19,8 +19,8 @@ package com.hazelcast.hibernate;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.instance.GroupProperty;
 import com.hazelcast.logging.Logger;
+import com.hazelcast.spi.properties.GroupProperty;
 
 /**
  * Helper class to create timestamps and calculate timeouts based on either Hazelcast
@@ -56,7 +56,7 @@ public final class HazelcastTimestamper {
         String maxOpTimeoutProp = null;
         try {
             Config config = instance.getConfig();
-            maxOpTimeoutProp = config.getProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS);
+            maxOpTimeoutProp = config.getProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName());
         } catch (UnsupportedOperationException e) {
             // HazelcastInstance is instance of HazelcastClient.
             Logger.getLogger(HazelcastTimestamper.class).finest(e);

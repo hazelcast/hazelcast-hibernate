@@ -1,0 +1,3 @@
+com.hazelcast.hibernate.serialization.Hibernate5CacheKeySerializerHook
+com.hazelcast.hibernate.serialization.Hibernate5CacheEntrySerializerHook
+com.hazelcast.hibernate.serialization.Hibernate5NaturalIdKeySerializerHook
