@@ -20,17 +20,11 @@
 
     <name>hazelcast-hibernate</name>
     <groupId>com.hazelcast</groupId>
-    <artifactId>hazelcast-hibernate</artifactId>
-    <version>3.7-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <artifactId>hazelcast-hibernate5</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
-
-    <modules>
-        <module>hazelcast-hibernate3</module>
-        <module>hazelcast-hibernate4</module>
-        <module>hazelcast-hibernate5</module>
-    </modules>
 
     <properties>
         <main.basedir>${project.basedir}</main.basedir>
@@ -87,6 +81,7 @@
 
         <hsqldb.version>2.2.9</hsqldb.version>
         <javassist.version>3.18.1-GA</javassist.version>
+        <hibernate.core.version>5.0.7.Final</hibernate.core.version>
     </properties>
 
     <licenses>
@@ -338,6 +333,24 @@
             <artifactId>javassist</artifactId>
             <version>${javassist.version}</version>
             <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.core.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+            <version>1.0.0.Final</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
