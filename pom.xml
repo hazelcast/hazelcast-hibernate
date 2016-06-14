@@ -107,6 +107,11 @@
             <name>fuad malikov</name>
             <email>fuad@hazelcast.com</email>
         </developer>
+        <developer>
+            <id>bturner</id>
+            <name>bryan turner</name>
+            <email>bturner@atlassian.com</email>
+        </developer>
     </developers>
     <build>
         <plugins>
