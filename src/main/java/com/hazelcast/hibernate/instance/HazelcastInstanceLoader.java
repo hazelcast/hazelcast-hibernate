@@ -24,7 +24,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
-import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.util.StringUtil;
 import org.hibernate.cache.CacheException;
 
@@ -89,7 +88,7 @@ class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
         if (!shutDown) {
             LOGGER.warning(CacheEnvironment.SHUTDOWN_ON_STOP + " property is set to 'false'. "
                     + "Leaving current HazelcastInstance active! (Warning: Do not disable Hazelcast "
-                    + GroupProperty.SHUTDOWNHOOK_ENABLED.getName() + " property!)");
+                    + CacheEnvironment.HAZELCAST_SHUTDOWN_HOOK_ENABLED + " property!)");
             return;
         }
         try {
