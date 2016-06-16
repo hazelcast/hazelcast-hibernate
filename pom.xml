@@ -29,7 +29,6 @@
     <modules>
         <module>hazelcast-hibernate3</module>
         <module>hazelcast-hibernate4</module>
-        <module>hazelcast-hibernate5</module>
     </modules>
 
     <properties>
