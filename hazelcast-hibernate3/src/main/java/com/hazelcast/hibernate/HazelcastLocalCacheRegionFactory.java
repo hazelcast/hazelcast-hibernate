@@ -36,13 +36,16 @@ import java.util.Properties;
  */
 public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegionFactory implements RegionFactory {
 
+    @SuppressWarnings("unused")
     public HazelcastLocalCacheRegionFactory() {
     }
 
+    @SuppressWarnings("unused")
     public HazelcastLocalCacheRegionFactory(final HazelcastInstance instance) {
         super(instance);
     }
 
+    @SuppressWarnings("unused")
     public HazelcastLocalCacheRegionFactory(final Properties properties) {
         super(properties);
     }
@@ -71,5 +74,4 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         return new HazelcastTimestampsRegion<LocalRegionCache>(instance, regionName, properties,
                 new TimestampsRegionCache(regionName, instance));
     }
-
 }

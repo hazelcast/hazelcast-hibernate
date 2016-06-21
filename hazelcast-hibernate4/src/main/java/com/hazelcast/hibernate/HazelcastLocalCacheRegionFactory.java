@@ -24,7 +24,12 @@ import com.hazelcast.hibernate.region.HazelcastEntityRegion;
 import com.hazelcast.hibernate.region.HazelcastNaturalIdRegion;
 import com.hazelcast.hibernate.region.HazelcastTimestampsRegion;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.spi.*;
+import org.hibernate.cache.spi.CacheDataDescription;
+import org.hibernate.cache.spi.CollectionRegion;
+import org.hibernate.cache.spi.EntityRegion;
+import org.hibernate.cache.spi.NaturalIdRegion;
+import org.hibernate.cache.spi.RegionFactory;
+import org.hibernate.cache.spi.TimestampsRegion;
 
 import java.util.Properties;
 
@@ -35,13 +40,16 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
 
     private static final int serialVersionUID = 1;
 
+    @SuppressWarnings("unused")
     public HazelcastLocalCacheRegionFactory() {
     }
 
+    @SuppressWarnings("unused")
     public HazelcastLocalCacheRegionFactory(final HazelcastInstance instance) {
         super(instance);
     }
 
+    @SuppressWarnings("unused")
     public HazelcastLocalCacheRegionFactory(final Properties properties) {
         super(properties);
     }

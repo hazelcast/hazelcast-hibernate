@@ -31,6 +31,8 @@ import java.util.Properties;
 
 /**
  * Hazelcast based implementation used to store NaturalIds
+ *
+ * @param <Cache> type of Cache
  */
 public class HazelcastNaturalIdRegion<Cache extends RegionCache>
         extends AbstractTransactionalDataRegion<Cache>

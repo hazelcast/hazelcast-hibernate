@@ -30,19 +30,21 @@ import org.hibernate.cache.TimestampsRegion;
 
 import java.util.Properties;
 
-
 /**
  * Simple RegionFactory implementation to return Hazelcast based Region implementations
  */
 public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFactory implements RegionFactory {
 
+    @SuppressWarnings("unused")
     public HazelcastCacheRegionFactory() {
     }
 
+    @SuppressWarnings("unused")
     public HazelcastCacheRegionFactory(final HazelcastInstance instance) {
         super(instance);
     }
 
+    @SuppressWarnings("unused")
     public HazelcastCacheRegionFactory(final Properties properties) {
         super(properties);
     }
