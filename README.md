@@ -1,3 +1,20 @@
+# Table of Contents
+
+* [Hibernate Second Level Cache](#hibernate-second-level-cache)
+  * [Sample Code for Hibernate](#sample-code-for-hibernate)
+  * [Supported Hibernate Versions](#supported-hibernate-versions)
+  * [Configuring Hibernate for Hazelcast](#configuring-hibernate-for-hazelcast)
+    * [Enabling Second Level Cache](#enabling-second-level-cache)
+    * [Configuring RegionFactory](#configuring-regionfactory)
+      * [HazelcastCacheRegionFactory](#hazelcastcacheregionfactory)
+      * [HazelcastLocalCacheRegionFactory](#hazelcastlocalcacheregionfactory)
+    * [Configuring Query Cache and Other Settings](#configuring query-cache-and-other-settings)
+  * [Configuring Hazelcast for Hibernate](#configuring-hazelcast-for-hibernate)
+  * [Setting P2P for Hibernate](#setting-p2p-for-hibernate)
+  * [Setting Client/Server for Hibernate](#setting-client-server-for-hibernate)
+  * [Configuring Cache Concurrency Strategy](#configuring-cache-concurrency-strategy)
+  * [Advanced Settings](#advanced-settings)
+
 # Hibernate Second Level Cache
 
 Hazelcast provides distributed second level cache for your Hibernate entities, collections and queries.
@@ -124,7 +141,7 @@ You can define a custom-named Hazelcast configuration XML file with one of these
 
 Hazelcast creates a separate distributed map for each Hibernate cache region. You can easily configure these regions via Hazelcast map configuration. You can define **backup**, **eviction**, **TTL** and **Near Cache** properties.
 
-## Setting P2P (Peer-to-Peer) for Hibernate
+## Setting P2P for Hibernate
 
 Hibernate Second Level Cache can use Hazelcast in two modes: Peer-to-Peer (P2P) and Client/Server (next section).
 
@@ -206,5 +223,8 @@ Please refer to the <a href="http://docs.hazelcast.org/docs/latest-dev/manual/ht
 
 You can set a lock timeout value using the `hibernate.cache.hazelcast.lock_timeout_in_seconds` Hibernate property. The value should be in seconds. The default value is 300 seconds.
 
+## Compatibilities
+
+???
 
 
