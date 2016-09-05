@@ -225,8 +225,5 @@ Please refer to the <a href="http://docs.hazelcast.org/docs/latest-dev/manual/ht
 
 You can set a lock timeout value using the `hibernate.cache.hazelcast.lock_timeout_in_seconds` Hibernate property. The value should be in seconds. The default value is 300 seconds.
 
-## Compatibilities
-
-???
 
 
