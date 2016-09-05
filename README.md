@@ -173,6 +173,8 @@ To set up Native Client, add the Hazelcast **group-name**, **group-password** an
 
 ![image](images/NoteSmall.jpg) ***NOTE***: *To use Native Client, add `hazelcast-<version>.jar`,`hazelcast-hibernate(3,4)-<version>.jar` and `hibernate-core-<version>.jar` into your remote cluster's classpath.*
 
+![image](images/NoteSmall.jpg) ***NOTE***: *If your domain(persisted) classes only have Java primitive type fields you don't need to add your domain classes into your remote cluster's classpath but if your classes have non-primitive type fields you need to add these classes to your cluster's classpath.*
+
 ## Configuring Cache Concurrency Strategy
 
 Hibernate has four cache concurrency strategies: *read-only*, *read-write*, *nonstrict-read-write* and *transactional*. Hibernate does not force cache providers to support all those strategies. Hazelcast supports the first three: *read-only*, *read-write*, and *nonstrict-read-write*. It does not yet support *transactional* strategy.
