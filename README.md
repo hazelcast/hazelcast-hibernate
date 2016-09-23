@@ -26,7 +26,7 @@ Please see our <a href="https://github.com/hazelcast/hazelcast-code-samples/tree
 ## Supported Hibernate and Hazelcast Versions
 
 - Hibernate 3.3.x+
-- Hibernate 4.x and 5.x
+- Hibernate 4.x
 - Hazelcast 3.6.x+
 
 ## Configuring Hibernate for Hazelcast
