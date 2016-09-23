@@ -23,10 +23,11 @@ Hazelcast provides distributed second level cache for your Hibernate entities, c
 
 Please see our <a href="https://github.com/hazelcast/hazelcast-code-samples/tree/master/hazelcast-integration/hibernate-2ndlevel-cache" target="_blank">sample application</a> for Hibernate Second Level Cache.
 
-## Supported Hibernate Versions
+## Supported Hibernate and Hazelcast Versions
 
 - Hibernate 3.3.x+
 - Hibernate 4.x and 5.x
+- Hazelcast 3.6.x+
 
 ## Configuring Hibernate for Hazelcast
 
