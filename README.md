@@ -2,7 +2,7 @@
 
 * [Hibernate Second Level Cache](#hibernate-second-level-cache)
   * [Sample Code for Hibernate](#sample-code-for-hibernate)
-  * [Supported Hibernate Versions](#supported-hibernate-and-hazelcast-versions)
+  * [Supported Hibernate and Hazelcast Versions](#supported-hibernate-and-hazelcast-versions)
   * [Configuring Hibernate for Hazelcast](#configuring-hibernate-for-hazelcast)
     * [Enabling Second Level Cache](#enabling-second-level-cache)
     * [Configuring RegionFactory](#configuring-regionfactory)
