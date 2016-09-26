@@ -20,11 +20,16 @@
 
     <name>hazelcast-hibernate</name>
     <groupId>com.hazelcast</groupId>
-    <artifactId>hazelcast-hibernate5</artifactId>
+    <artifactId>hazelcast-hibernate5-parent</artifactId>
     <version>1.0.2-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
+
+    <modules>
+        <module>hazelcast-hibernate5</module>
+        <module>hazelcast-hibernate52</module>
+    </modules>
 
     <properties>
         <main.basedir>${project.basedir}</main.basedir>

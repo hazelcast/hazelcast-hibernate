@@ -14,3 +14,4 @@ reports/
 .directory
 atlassian-ide-plugin.xml
 performance*.log
+dependency-reduced-pom.xml
