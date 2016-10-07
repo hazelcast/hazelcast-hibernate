@@ -17,7 +17,6 @@
 package com.hazelcast.hibernate.serialization;
 
 import com.hazelcast.test.HazelcastSerialClassRunner;
-import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.util.FilteringClassLoader;
 import org.hibernate.cache.CacheKey;
@@ -28,14 +27,14 @@ import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.junit.Assert.assertFalse;
 
 @RunWith(HazelcastSerialClassRunner.class)
-@Category({QuickTest.class, ParallelTest.class})
+@Category({QuickTest.class})
 public class HibernateSerializationHookNonAvailableTest {
 
     private static final Field ORIGINAL;
@@ -46,7 +45,7 @@ public class HibernateSerializationHookNonAvailableTest {
 
     static {
         try {
-            List<String> excludes = Arrays.asList(new String[]{"org.hibernate"});
+            List<String> excludes = Collections.singletonList("org.hibernate");
             FILTERING_CLASS_LOADER = new FilteringClassLoader(excludes, "com.hazelcast");
 
             String hazelcastInstanceImplClassName = "com.hazelcast.instance.HazelcastInstanceImpl";
@@ -74,12 +73,14 @@ public class HibernateSerializationHookNonAvailableTest {
         Thread thread = Thread.currentThread();
         ClassLoader tccl = thread.getContextClassLoader();
 
+        Object config = null;
+        Method setClassLoader = null;
         try {
             thread.setContextClassLoader(FILTERING_CLASS_LOADER);
 
             Class<?> configClazz = FILTERING_CLASS_LOADER.loadClass("com.hazelcast.config.Config");
-            Object config = configClazz.newInstance();
-            Method setClassLoader = configClazz.getDeclaredMethod("setClassLoader", ClassLoader.class);
+            config = configClazz.newInstance();
+            setClassLoader = configClazz.getDeclaredMethod("setClassLoader", ClassLoader.class);
 
             setClassLoader.invoke(config, FILTERING_CLASS_LOADER);
 
@@ -89,6 +90,7 @@ public class HibernateSerializationHookNonAvailableTest {
             Object hz = newHazelcastInstance.invoke(hazelcastClazz, config);
             Object impl = ORIGINAL.get(hz);
             Object serializationService = GET_SERIALIZATION_SERVICE.invoke(impl);
+            //noinspection unchecked
             ConcurrentMap<Class, ?> typeMap = (ConcurrentMap<Class, ?>) TYPE_MAP.get(serializationService);
             boolean cacheKeySerializerFound = false;
             boolean cacheEntrySerializerFound = false;
@@ -100,9 +102,15 @@ public class HibernateSerializationHookNonAvailableTest {
                 }
             }
 
+            hazelcastClazz.getDeclaredMethod("shutdownAll").invoke(impl);
+
             assertFalse("CacheKey serializer found", cacheKeySerializerFound);
             assertFalse("CacheEntry serializer found", cacheEntrySerializerFound);
         } finally {
+            if (config != null && setClassLoader != null) {
+                setClassLoader.invoke(config, tccl);
+            }
+
             thread.setContextClassLoader(tccl);
         }
     }
