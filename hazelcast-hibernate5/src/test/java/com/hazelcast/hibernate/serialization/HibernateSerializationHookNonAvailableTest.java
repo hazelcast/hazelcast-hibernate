@@ -72,12 +72,14 @@ public class HibernateSerializationHookNonAvailableTest {
         Thread thread = Thread.currentThread();
         ClassLoader tccl = thread.getContextClassLoader();
 
+        Object config = null;
+        Method setClassLoader = null;
         try {
             thread.setContextClassLoader(FILTERING_CLASS_LOADER);
 
             Class<?> configClazz = FILTERING_CLASS_LOADER.loadClass("com.hazelcast.config.Config");
-            Object config = configClazz.newInstance();
-            Method setClassLoader = configClazz.getDeclaredMethod("setClassLoader", ClassLoader.class);
+            config = configClazz.newInstance();
+            setClassLoader = configClazz.getDeclaredMethod("setClassLoader", ClassLoader.class);
 
             setClassLoader.invoke(config, FILTERING_CLASS_LOADER);
 
@@ -87,6 +89,7 @@ public class HibernateSerializationHookNonAvailableTest {
             Object hz = newHazelcastInstance.invoke(hazelcastClazz, config);
             Object impl = ORIGINAL.get(hz);
             Object serializationService = GET_SERIALIZATION_SERVICE.invoke(impl);
+            //noinspection unchecked
             ConcurrentMap<Class, ?> typeMap = (ConcurrentMap<Class, ?>) TYPE_MAP.get(serializationService);
             boolean cacheKeySerializerFound = false;
             boolean cacheEntrySerializerFound = false;
@@ -103,10 +106,16 @@ public class HibernateSerializationHookNonAvailableTest {
                 }
             }
 
+            hazelcastClazz.getDeclaredMethod("shutdownAll").invoke(impl);
+
             assertFalse("CacheKey serializer found", cacheKeySerializerFound);
             assertFalse("CacheEntry serializer found", cacheEntrySerializerFound);
             assertFalse("NaturalIdCacheKey serializer found", naturalIdKeySerializerFound);
         } finally {
+            if (config != null && setClassLoader != null) {
+                setClassLoader.invoke(config, tccl);
+            }
+
             thread.setContextClassLoader(tccl);
         }
     }
