@@ -24,12 +24,10 @@ import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceLoader;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +39,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public abstract class HibernateStatisticsTestSupport extends HibernateTestSupport {
 
@@ -50,8 +47,8 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
 
     protected final String CACHE_ENTITY = DummyEntity.class.getName();
     protected final String CACHE_PROPERTY = DummyProperty.class.getName();
-    protected final String ANNOTATED_ENTITY = AnnotatedEntity.class.getName();
-    private static  TestHazelcastFactory factory;
+
+    private TestHazelcastFactory factory;
 
     @Before
     public void postConstruct() {

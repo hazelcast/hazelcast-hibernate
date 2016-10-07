@@ -43,13 +43,11 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
 
     protected final String CACHE_ENTITY = DummyEntity.class.getName();
     protected final String CACHE_PROPERTY = DummyProperty.class.getName();
-    private static TestHazelcastFactory factory;
 
     @Before
     public void postConstruct() {
         HazelcastMockInstanceLoader loader = new HazelcastMockInstanceLoader();
-        factory = new TestHazelcastFactory();
-        loader.setInstanceFactory(factory);
+        loader.setInstanceFactory(new TestHazelcastFactory());
         sf = createSessionFactory(getCacheProperties(),  loader);
         sf2 = createSessionFactory(getCacheProperties(), loader);
     }
