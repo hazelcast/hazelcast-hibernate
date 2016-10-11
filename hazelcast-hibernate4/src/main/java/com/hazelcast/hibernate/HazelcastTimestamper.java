@@ -33,6 +33,12 @@ public final class HazelcastTimestamper {
     }
 
     public static long nextTimestamp(HazelcastInstance instance) {
+        if (instance == null) {
+            throw new RuntimeException("No Hazelcast instance!");
+        } else if (instance.getCluster() == null) {
+            throw new RuntimeException("Hazelcast instance has no cluster!");
+        }
+
         // System time in ms.
         return instance.getCluster().getClusterTime();
     }
