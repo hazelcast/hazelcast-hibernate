@@ -21,41 +21,24 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.StreamSerializer;
 import org.hibernate.cache.spi.entry.CacheEntry;
-import org.hibernate.cache.spi.entry.StandardCacheEntryImpl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
- * A {@code CacheEntry} serializer compatible with the SPI interface introduced in Hibernate 4.2 and still present
- * in 5. For reference entries the {@code CacheEntry} is serialized directly to avoid relying on too many Hibernate
- * implementation details. Entity entries (the most common type) are serialized by accessing the fields using the
- * interface's methods.
+ * A {@code CacheEntry} serializer compatible with the SPI interface as updated for Hibernate 5.1. For reference
+ * entries the {@code CacheEntry} is serialized directly to avoid relying on too many Hibernate implementation
+ * details. Entity entries (the most common type) are serialized by accessing the fields using the interface's
+ * methods. Note that the {@code areLazyPropertiesUnfetched()} method was removed in 5.1.
  */
-class Hibernate5CacheEntrySerializer
-        implements StreamSerializer<CacheEntry> {
-
-    private static final Constructor<StandardCacheEntryImpl> CACHE_ENTRY_CONSTRUCTOR;
-    private static final Class<?>[] CONSTRUCTOR_ARG_TYPES = {Serializable[].class, String.class, boolean.class, Object.class};
-
-    static {
-        try {
-            CACHE_ENTRY_CONSTRUCTOR = StandardCacheEntryImpl.class.getDeclaredConstructor(CONSTRUCTOR_ARG_TYPES);
-            CACHE_ENTRY_CONSTRUCTOR.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+class Hibernate52CacheEntrySerializer implements StreamSerializer<CacheEntry> {
+    @Override
+    public int getTypeId() {
+        return SerializationConstants.HIBERNATE5_TYPE_HIBERNATE_CACHE_ENTRY;
     }
 
     @Override
     public void destroy() {
-    }
-
-    @Override
-    public int getTypeId() {
-        return SerializationConstants.HIBERNATE5_TYPE_HIBERNATE_CACHE_ENTRY;
     }
 
     @Override
@@ -93,7 +76,7 @@ class Hibernate5CacheEntrySerializer
     }
 
     private static CacheEntry readDisassembled(final ObjectDataInput in)
-            throws IOException, IllegalAccessException, InvocationTargetException, InstantiationException {
+            throws IOException, IllegalAccessException, InstantiationException {
 
         int length = in.readInt();
         Serializable[] disassembledState = new Serializable[length];
@@ -102,10 +85,9 @@ class Hibernate5CacheEntrySerializer
         }
 
         String subclass = in.readUTF();
-        boolean lazyPropertiesAreUnfetched = in.readBoolean();
         Object version = in.readObject();
 
-        return CACHE_ENTRY_CONSTRUCTOR.newInstance(disassembledState, subclass, lazyPropertiesAreUnfetched, version);
+        return new CacheEntryImpl(disassembledState, subclass, version);
     }
 
     private static CacheEntry readReference(final ObjectDataInput in) throws IOException {
@@ -131,7 +113,6 @@ class Hibernate5CacheEntrySerializer
         }
 
         out.writeUTF(object.getSubclass());
-        out.writeBoolean(object.areLazyPropertiesUnfetched());
         out.writeObject(object.getVersion());
     }
 

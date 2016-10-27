@@ -26,8 +26,6 @@ import java.io.IOException;
 
 /**
  * An invalidation messages
- *
- * @since 3.7
  */
 public class Invalidation implements IdentifiedDataSerializable {
 

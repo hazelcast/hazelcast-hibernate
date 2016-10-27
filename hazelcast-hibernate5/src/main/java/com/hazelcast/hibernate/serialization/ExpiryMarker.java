@@ -34,8 +34,6 @@ import java.util.Comparator;
  *     <li>It can be marked by multiple transactions at the same time and will not expire until all transactions complete</li>
  *     <li>It should not be expired unless {@link #matches(ExpiryMarker)} is true</li>
  * </ul>
- *
- * @since 3.7
  */
 public class ExpiryMarker extends Expirable implements Serializable {
 

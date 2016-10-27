@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * An internal service to clean cache regions
- *
- * @since 3.7
  */
 public final class CleanupService {
 

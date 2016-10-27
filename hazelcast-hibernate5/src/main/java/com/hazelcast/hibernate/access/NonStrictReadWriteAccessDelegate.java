@@ -28,7 +28,6 @@ import java.util.Properties;
  * is not configured appropriately.
  *
  * @param <T> implementation type of HazelcastRegion
- * @since 3.7
  */
 public class NonStrictReadWriteAccessDelegate<T extends HazelcastRegion> extends AbstractAccessDelegate<T> {
 

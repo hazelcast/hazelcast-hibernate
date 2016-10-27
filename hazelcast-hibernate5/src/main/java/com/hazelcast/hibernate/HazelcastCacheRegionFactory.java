@@ -34,8 +34,6 @@ import java.util.Properties;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based Region implementations
- *
- * @since 3.7
  */
 public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFactory implements RegionFactory {
 

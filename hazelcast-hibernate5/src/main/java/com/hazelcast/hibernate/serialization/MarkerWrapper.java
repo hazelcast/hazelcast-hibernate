@@ -21,8 +21,6 @@ import org.hibernate.cache.spi.access.SoftLock;
 /**
  * A wrapper class for ExpiryMarker for returning copy of marker object with
  * {@link org.hibernate.cache.spi.access.SoftLock} marker interface.
- *
- * @since 3.7
  */
 public class MarkerWrapper implements SoftLock {
 

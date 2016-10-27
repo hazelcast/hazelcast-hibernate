@@ -23,8 +23,6 @@ import java.util.Comparator;
 
 /**
  * A value within a region cache
- *
- * @since 3.7
  */
 public class Value extends Expirable {
 

@@ -25,7 +25,6 @@ import org.hibernate.cache.spi.Region;
  * Hazelcast specific interface version of Hibernate's Region
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 public interface HazelcastRegion<Cache extends RegionCache> extends Region {
 

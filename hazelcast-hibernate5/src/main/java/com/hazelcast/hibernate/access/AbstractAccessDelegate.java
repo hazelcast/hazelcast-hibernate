@@ -31,7 +31,6 @@ import java.util.Properties;
  * Base implementation for consistency guarantees
  *
  * @param <T> implementation type of HazelcastRegion
- * @since 3.7
  */
 public abstract class AbstractAccessDelegate<T extends HazelcastRegion> implements AccessDelegate<T> {
 

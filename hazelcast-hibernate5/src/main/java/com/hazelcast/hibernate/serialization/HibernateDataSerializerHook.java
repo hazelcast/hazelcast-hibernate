@@ -30,8 +30,6 @@ import com.hazelcast.internal.serialization.impl.FactoryIdHelper;
  * An implementation of {@link DataSerializerHook} which constructs any of the
  * {@link com.hazelcast.nio.serialization.DataSerializable} objects for the
  * hibernate module
- *
- * @since 3.7
  */
 public class HibernateDataSerializerHook implements DataSerializerHook {
 

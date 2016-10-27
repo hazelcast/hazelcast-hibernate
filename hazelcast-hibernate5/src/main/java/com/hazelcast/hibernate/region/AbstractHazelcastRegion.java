@@ -30,7 +30,6 @@ import java.util.Properties;
  * Abstract superclass of Hazelcast region of Hibernate caches
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 abstract class AbstractHazelcastRegion<Cache extends RegionCache> implements HazelcastRegion<Cache> {
 

@@ -27,8 +27,6 @@ import java.util.Map;
 /**
  * An abstract implementation of {@link EntryProcessor} which acts on a hibernate region cache
  * {@link com.hazelcast.core.IMap}
- *
- * @since 3.7
  */
 public abstract class AbstractRegionCacheEntryProcessor implements EntryProcessor<Object, Expirable>,
         EntryBackupProcessor<Object, Expirable>, IdentifiedDataSerializable {

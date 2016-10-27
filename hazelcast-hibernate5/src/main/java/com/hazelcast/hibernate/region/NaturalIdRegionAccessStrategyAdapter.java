@@ -27,8 +27,6 @@ import org.hibernate.persister.entity.EntityPersister;
 
 /**
  * Simple adapter implementation for transactional / concurrent access control on natural ids
- *
- * @since 3.7
  */
 public final class NaturalIdRegionAccessStrategyAdapter implements NaturalIdRegionAccessStrategy {
 

@@ -27,8 +27,6 @@ import java.io.IOException;
 /**
  * A merge policy implementation to handle split brain remerges based on the timestamps stored in
  * the values.
- *
- * @since 3.7
  */
 public class VersionAwareMapMergePolicy implements MapMergePolicy {
 

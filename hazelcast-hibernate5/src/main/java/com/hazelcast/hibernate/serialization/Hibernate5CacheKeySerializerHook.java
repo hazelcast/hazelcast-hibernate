@@ -24,8 +24,6 @@ import com.hazelcast.nio.serialization.SerializerHook;
 /**
  * This class is used to register a special serializer to not loose
  * power over serialization in Hibernate 5
- *
- * @since 3.7
  */
 public class Hibernate5CacheKeySerializerHook
         implements SerializerHook {

@@ -25,8 +25,6 @@ import java.io.IOException;
 
 /**
  * Hazelcast compatible implementation of a timestamp for internal eviction
- *
- * @since 3.7
  */
 public class Timestamp implements IdentifiedDataSerializable {
 

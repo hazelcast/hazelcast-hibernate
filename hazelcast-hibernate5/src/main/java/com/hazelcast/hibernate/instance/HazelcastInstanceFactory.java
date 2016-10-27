@@ -25,8 +25,6 @@ import java.util.Properties;
  * A factory class to build up implementations of {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader}
  * that returns a {@link com.hazelcast.core.HazelcastInstance} depending on configuration either backed by Hazelcast
  * client or node implementation.
- *
- * @since 3.7
  */
 public final class HazelcastInstanceFactory {
 

@@ -23,8 +23,6 @@ import java.util.Map;
 /**
  * This interface defines an internal cached region implementation as well as a mechanism
  * to unmap the cache to an underlying Map data-structure
- *
- * @since 3.7
  */
 public interface RegionCache {
 

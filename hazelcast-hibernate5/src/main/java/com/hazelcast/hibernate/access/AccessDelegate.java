@@ -24,7 +24,6 @@ import org.hibernate.cache.spi.access.SoftLock;
  * This interface is used to implement basic transactional guarantees
  *
  * @param <T> implementation type of HazelcastRegion
- * @since 3.7
  */
 public interface AccessDelegate<T extends HazelcastRegion> {
 

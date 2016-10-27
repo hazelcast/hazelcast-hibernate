@@ -34,7 +34,6 @@ import java.util.Properties;
  * by supplying CollectionRegionAccessStrategy
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 public final class HazelcastCollectionRegion<Cache extends RegionCache> extends AbstractTransactionalDataRegion<Cache>
         implements CollectionRegion {

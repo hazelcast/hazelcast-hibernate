@@ -33,8 +33,6 @@ import java.util.Properties;
 
 /**
  * Abstract superclass of Hazelcast based {@link RegionFactory} implementations
- *
- * @since 3.7
  */
 public abstract class AbstractHazelcastCacheRegionFactory implements RegionFactory {
 

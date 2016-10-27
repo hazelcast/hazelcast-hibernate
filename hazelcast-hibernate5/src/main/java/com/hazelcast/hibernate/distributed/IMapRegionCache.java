@@ -48,8 +48,6 @@ import static com.hazelcast.hibernate.HazelcastTimestamper.nextTimestamp;
  *     <li>An entry is unlocked if it reaches the configured lock timeout</li>
  * </ul>
  * These requirements are incompatible with IMap locks
- *
- * @since 3.7
  */
 public class IMapRegionCache implements RegionCache {
 

@@ -29,8 +29,6 @@ import java.util.Map;
 /**
  * A concrete implementation of {@link com.hazelcast.map.EntryProcessor} which attempts
  * to update a region cache entry
- *
- * @since 3.7
  */
 public class UpdateEntryProcessor extends AbstractRegionCacheEntryProcessor {
 

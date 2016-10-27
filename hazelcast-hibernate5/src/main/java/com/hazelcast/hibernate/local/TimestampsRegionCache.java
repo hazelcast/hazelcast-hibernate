@@ -24,8 +24,6 @@ import com.hazelcast.util.Clock;
 
 /**
  * A timestamp based local RegionCache
- *
- * @since 3.7
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
 

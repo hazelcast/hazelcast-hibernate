@@ -28,8 +28,6 @@ import org.hibernate.persister.collection.CollectionPersister;
 
 /**
  * Simple adapter implementation for transactional / concurrent access control on collections
- *
- * @since 3.7
  */
 public final class CollectionRegionAccessStrategyAdapter implements CollectionRegionAccessStrategy {
 

@@ -27,7 +27,6 @@ import java.util.Properties;
  * Makes <b>READ COMMITTED</b> consistency guarantees even in a clustered environment.
  *
  * @param <T> implementation type of HazelcastRegion
- * @since 3.7
  */
 public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends AbstractAccessDelegate<T> {
 

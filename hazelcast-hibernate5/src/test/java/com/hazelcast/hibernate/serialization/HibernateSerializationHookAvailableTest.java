@@ -79,7 +79,8 @@ public class HibernateSerializationHookAvailableTest {
                 cacheKeySerializerFound = true;
             } else if ("org.hibernate.cache.internal.OldNaturalIdCacheKey".equals(clazz.getName())) {
                 naturalIdKeySerializerFound = true;
-            } else if (StandardCacheEntryImpl.class.equals(clazz)) {
+            } else if (StandardCacheEntryImpl.class.equals(clazz)
+                    || "com.hazelcast.hibernate.serialization.CacheEntryImpl".equals(clazz.getName())) {
                 cacheEntrySerializerFound = true;
             }
         }
