@@ -26,7 +26,6 @@ import java.util.Properties;
  * Guarantees that view is read-only and no updates can be made
  *
  * @param <T> implementation type of HazelcastRegion
- * @since 3.7
  */
 public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrictReadWriteAccessDelegate<T> {
 

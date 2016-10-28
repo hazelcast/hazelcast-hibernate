@@ -33,8 +33,6 @@ import java.util.Properties;
 /**
  * A factory implementation to build up a {@link com.hazelcast.core.HazelcastInstance}
  * implementation using {@link com.hazelcast.core.Hazelcast}.
- *
- * @since 3.7
  */
 class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
 

@@ -24,8 +24,6 @@ import java.util.Properties;
 
 /**
  * Hazelcast based implementation of a storage region for query results
- *
- * @since 3.7
  */
 public class HazelcastQueryResultsRegion extends AbstractGeneralRegion<LocalRegionCache> implements QueryResultsRegion {
 

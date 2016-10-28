@@ -28,8 +28,6 @@ import org.hibernate.persister.entity.EntityPersister;
 
 /**
  * Simple adapter implementation for transactional / concurrent access control on entities
- *
- * @since 3.7
  */
 public final class EntityRegionAccessStrategyAdapter implements EntityRegionAccessStrategy {
 

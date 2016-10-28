@@ -28,8 +28,6 @@ import java.util.Map;
 /**
  * A concrete implementation of {@link com.hazelcast.map.EntryProcessor} which soft-locks
  * a region cached entry
- *
- * @since 3.7
  */
 public class LockEntryProcessor extends AbstractRegionCacheEntryProcessor {
 

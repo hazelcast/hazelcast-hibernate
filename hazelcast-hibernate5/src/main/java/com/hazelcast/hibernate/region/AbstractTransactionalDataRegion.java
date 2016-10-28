@@ -27,7 +27,6 @@ import java.util.Properties;
  * Abstract base class of all regions
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 public abstract class AbstractTransactionalDataRegion<Cache extends RegionCache>
         extends AbstractHazelcastRegion<Cache>

@@ -33,8 +33,6 @@ import java.lang.reflect.InvocationTargetException;
  * entries the {@code CacheEntry} is serialized directly to avoid relying on too many Hibernate implementation
  * details. Entity entries (the most common type) are serialized by accessing the fields using the interface's
  * methods. Note that the {@code areLazyPropertiesUnfetched()} method was removed in 5.1.
- *
- * @since 3.7
  */
 class Hibernate51CacheEntrySerializer
         implements StreamSerializer<CacheEntry> {
@@ -149,8 +147,6 @@ class Hibernate51CacheEntrySerializer
      * to look up the serializer and route the entry right back here again, forming an infinite loop. This wrapper
      * type, which has no explicit mapping, should fall back on the {@code ObjectSerializer} and be serialized by
      * a standard {@code ObjectOutputStream}.
-     *
-     * @since 3.7
      */
     private static final class CacheEntryWrapper implements Serializable {
 

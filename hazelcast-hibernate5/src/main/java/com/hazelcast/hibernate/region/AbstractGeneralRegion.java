@@ -30,7 +30,6 @@ import java.util.Properties;
  * Basic implementation of a IMap based cache without any special security checks
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 abstract class AbstractGeneralRegion<Cache extends RegionCache>
         extends AbstractHazelcastRegion<Cache>

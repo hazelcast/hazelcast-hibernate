@@ -28,8 +28,6 @@ import static com.hazelcast.nio.UnsafeHelper.UNSAFE;
 
 /**
  * The actual CacheKey serializer implementation
- *
- * @since 3.7
  */
 class Hibernate5CacheKeySerializer
         implements StreamSerializer<Object> {

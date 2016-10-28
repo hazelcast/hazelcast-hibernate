@@ -34,7 +34,6 @@ import java.util.Properties;
  * by supplying EntityRegionAccessStrategy
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 public final class HazelcastEntityRegion<Cache extends RegionCache>
         extends AbstractTransactionalDataRegion<Cache> implements EntityRegion {

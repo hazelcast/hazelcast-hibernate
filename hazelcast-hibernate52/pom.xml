@@ -29,7 +29,7 @@
     <url>http://www.hazelcast.com/</url>
 
     <properties>
-        <hibernate.core.version>5.2.2.Final</hibernate.core.version>
+        <hibernate.core.version>5.2.3.Final</hibernate.core.version>
         <jdk.version>1.8</jdk.version>
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
@@ -72,6 +72,9 @@
                                         <exclude>com/hazelcast/hibernate/region/CollectionRegionAccessStrategyAdapter.*</exclude>
                                         <exclude>com/hazelcast/hibernate/region/NaturalIdRegionAccessStrategyAdapter.*</exclude>
                                         <exclude>com/hazelcast/hibernate/region/EntityRegionAccessStrategyAdapter.*</exclude>
+                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializerHook.*</exclude>
+                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializer.*</exclude>
+                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate51CacheEntrySerializer.*</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

@@ -25,8 +25,6 @@ import java.util.Comparator;
 
 /**
  * A container class which represents an entry in a region cache which can be marked for expiration
- *
- * @since 3.7
  */
 public abstract class Expirable implements IdentifiedDataSerializable {
 

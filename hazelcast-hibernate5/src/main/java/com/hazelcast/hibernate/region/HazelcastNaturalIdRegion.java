@@ -34,8 +34,6 @@ import java.util.Properties;
  * The type Hazelcast natural id region.
  *
  * @param <Cache> NaturalIdRegionCache
- *
- * @since 3.7
  */
 public class HazelcastNaturalIdRegion<Cache extends RegionCache>
         extends AbstractTransactionalDataRegion<Cache>

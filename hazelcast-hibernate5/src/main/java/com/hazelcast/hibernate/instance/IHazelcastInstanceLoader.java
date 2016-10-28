@@ -24,8 +24,6 @@ import java.util.Properties;
 /**
  * Factory interface to build Hazelcast instances and configure them depending
  * on configuration.
- *
- * @since 3.7
  */
 public interface IHazelcastInstanceLoader {
 

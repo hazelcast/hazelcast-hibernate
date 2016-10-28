@@ -24,8 +24,6 @@ import com.hazelcast.logging.Logger;
 /**
  * Helper class to create timestamps and calculate timeouts based on either Hazelcast
  * configuration of by requesting values on the cluster.
- *
- * @since 3.7
  */
 public final class HazelcastTimestamper {
 

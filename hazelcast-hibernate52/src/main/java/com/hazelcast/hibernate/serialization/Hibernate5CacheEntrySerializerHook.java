@@ -25,8 +25,7 @@ import com.hazelcast.nio.serialization.SerializerHook;
  * This class is used to register a special serializer to not loose
  * power over serialization in Hibernate 5.
  */
-public class Hibernate5CacheEntrySerializerHook
-        implements SerializerHook {
+public class Hibernate5CacheEntrySerializerHook implements SerializerHook {
 
     private static final String SKIP_INIT_MSG = "Hibernate 5 not available, skipping serializer initialization";
 
@@ -36,7 +35,9 @@ public class Hibernate5CacheEntrySerializerHook
         Class<?> cacheEntryClass = null;
         if (UnsafeHelper.UNSAFE_AVAILABLE) {
             try {
-                cacheEntryClass = Class.forName("org.hibernate.cache.spi.entry.StandardCacheEntryImpl");
+                // check if Hibernate is available
+                Class.forName("org.hibernate.cache.spi.entry.CacheEntry");
+                cacheEntryClass = CacheEntryImpl.class;
             } catch (Exception e) {
                 Logger.getLogger(Hibernate5CacheEntrySerializerHook.class).finest(SKIP_INIT_MSG);
             }
@@ -51,19 +52,7 @@ public class Hibernate5CacheEntrySerializerHook
 
     @Override
     public Serializer createSerializer() {
-        if (cacheEntryClass == null) {
-            return null;
-        }
-
-        try {
-            cacheEntryClass.getMethod("areLazyPropertiesUnfetched");
-
-            // If CacheEntry.areLazyPropertiesUnfetched() exists, we're on Hibernate 5
-            return new Hibernate5CacheEntrySerializer();
-        } catch (NoSuchMethodException e) {
-            // Otherwise, if there's no such method, we're on Hibernate 5.1+
-            return new Hibernate51CacheEntrySerializer();
-        }
+        return new Hibernate52CacheEntrySerializer();
     }
 
     @Override

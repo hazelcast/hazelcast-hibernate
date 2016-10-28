@@ -30,7 +30,6 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
  *
  * @deprecated Set instanceName for your Hazelcast instance and use
  *             {@link com.hazelcast.core.Hazelcast#getHazelcastInstanceByName(String instanceName)} instead
- * @since 3.7
  */
 @Deprecated
 @SuppressWarnings("deprecation")

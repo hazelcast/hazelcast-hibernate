@@ -29,8 +29,6 @@ import static com.hazelcast.nio.UnsafeHelper.UNSAFE;
 
 /**
  * Handles serialization for Hibernate's {@code OldNaturalIdCacheKey}, used for the keys in natural ID regions.
- *
- * @since 3.7
  */
 class Hibernate5NaturalIdKeySerializer
         implements StreamSerializer<Object> {

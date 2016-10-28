@@ -48,8 +48,6 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Local only {@link com.hazelcast.hibernate.RegionCache} implementation
  * based on a topic to distribute cache updates.
- *
- * @since 3.7
  */
 public class LocalRegionCache implements RegionCache {
 

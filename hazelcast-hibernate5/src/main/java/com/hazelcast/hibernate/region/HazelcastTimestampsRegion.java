@@ -26,7 +26,6 @@ import java.util.Properties;
  * Hazelcast based timestamp using region implementation
  *
  * @param <Cache> implementation type of RegionCache
- * @since 3.7
  */
 public class HazelcastTimestampsRegion<Cache extends RegionCache>
         extends AbstractGeneralRegion<Cache> implements TimestampsRegion {
