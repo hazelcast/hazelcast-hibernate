@@ -155,7 +155,7 @@ You can disable shutting down `HazelcastInstance` during `SessionFactory.close()
 
 ## Setting Client/Server for Hibernate
 
-You can set up Hazelcast to connect to the cluster as Native Client. Native client is not a member; it connects to one of the cluster members and delegates all cluster wide operations to it. Client instance started in the Native Client mode uses Smart Routing: when the relied cluster member dies, the client transparently switches to another live member. All client operations are Retry-able, meaning that the client resends the request as many as 10 times in case of a failure. After the 10th retry, it throws an exception. You cannot change the routing mode and retry-able operation configurations of the Native Client instance used by Hibernate 2nd Level Cache. Please see the <a href="http://docs.hazelcast.org/docs/latest-dev/manual/html-single/index.html#setting-smart-routing" target="_blank">Smart Routing section</a> and <a href="http://docs.hazelcast.org/docs/latest-dev/manual/html-single/index.html##handling-retry-able-operation-failure" target="_blank">Retry-able Operation Failure section</a> for more details.
+You can set up Hazelcast to connect to the cluster as Native Client. Native client is not a member; it connects to one of the cluster members and delegates all cluster wide operations to it. Client instance started in the Native Client mode uses Smart Routing: when the relied cluster member dies, the client transparently switches to another live member. All client operations are Retry-able, meaning that the client resends the request as many as 10 times in case of a failure. After the 10th retry, it throws an exception. You cannot change the routing mode and retry-able operation configurations of the Native Client instance used by Hibernate 2nd Level Cache. Please see the <a href="http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#setting-smart-routing" target="_blank">Smart Routing section</a> and <a href="http://docs.hazelcast.org/docs/latest-dev/manual/html-single/index.html##handling-retry-able-operation-failure" target="_blank">Retry-able Operation Failure section</a> for more details.
 
 ```xml   
 <property name="hibernate.cache.hazelcast.use_native_client">true</property>
@@ -169,7 +169,7 @@ To set up Native Client, add the Hazelcast **group-name**, **group-password** an
 <property name="hibernate.cache.hazelcast.native_client_password">dev-pass</property>
 ```
 
-![image](images/NoteSmall.jpg) ***NOTE***: *To use Native Client, add `hazelcast-client-<version>.jar` into your classpath. Refer to [Hazelcast Java Client chapter](#hazelcast-java-client) for more information.*
+![image](images/NoteSmall.jpg) ***NOTE***: *To use Native Client, add `hazelcast-client-<version>.jar` into your classpath. Refer to <a href="http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#hazelcast-java-client" target="_blank">Hazelcast Java Client chapter</a> for more information.*
 
 
 ![image](images/NoteSmall.jpg) ***NOTE***: *To use Native Client, add `hazelcast-<version>.jar`,`hazelcast-hibernate(3,4)-<version>.jar` and `hibernate-core-<version>.jar` into your remote cluster's classpath.*
