@@ -35,14 +35,6 @@
         <main.basedir>${project.parent.basedir}</main.basedir>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-hibernate5</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <!-- Reuse tests from hibernate5 module -->
         <testSourceDirectory>../hazelcast-hibernate5/src/test/java</testSourceDirectory>
@@ -55,34 +47,66 @@
         <!-- Overlay code onto hibernate5 module -->
         <plugins>
             <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven.shade.plugin.version}</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.plugin.version}</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>copy-sources</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <filters>
-                                <filter>
-                                    <artifact>com.hazelcast:hazelcast-hibernate5</artifact>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <overwrite>false</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>../hazelcast-hibernate5/src/main/java</directory>
                                     <excludes>
-                                        <exclude>com/hazelcast/hibernate/region/AbstractGeneralRegion.*</exclude>
-                                        <exclude>com/hazelcast/hibernate/region/CollectionRegionAccessStrategyAdapter.*</exclude>
-                                        <exclude>com/hazelcast/hibernate/region/NaturalIdRegionAccessStrategyAdapter.*</exclude>
-                                        <exclude>com/hazelcast/hibernate/region/EntityRegionAccessStrategyAdapter.*</exclude>
-                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializerHook.*</exclude>
-                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializer.*</exclude>
-                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate51CacheEntrySerializer.*</exclude>
+                                        <exclude>com/hazelcast/hibernate/region/AbstractGeneralRegion.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/region/CollectionRegionAccessStrategyAdapter.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/region/NaturalIdRegionAccessStrategyAdapter.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/region/EntityRegionAccessStrategyAdapter.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializerHook.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializer.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate51CacheEntrySerializer.java</exclude>
                                     </excludes>
-                                </filter>
-                            </filters>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.hazelcast:hazelcast-hibernate5</include>
-                                </includes>
-                            </artifactSet>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <overwrite>false</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>../hazelcast-hibernate5/src/main/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build.helper.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
