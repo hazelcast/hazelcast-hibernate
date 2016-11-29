@@ -277,6 +277,7 @@
             <groupId>com.hazelcast</groupId>
             <artifactId>hazelcast-client</artifactId>
             <version>${hazelcast.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
