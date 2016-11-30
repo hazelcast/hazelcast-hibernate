@@ -18,7 +18,6 @@ package com.hazelcast.hibernate.region;
 
 import com.hazelcast.hibernate.access.AccessDelegate;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.internal.DefaultCacheKeysFactory;
 import org.hibernate.cache.spi.NaturalIdRegion;
 import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
 import org.hibernate.cache.spi.access.SoftLock;
@@ -61,7 +60,8 @@ public final class NaturalIdRegionAccessStrategyAdapter implements NaturalIdRegi
     @Override
     public Object generateCacheKey(final Object[] naturalIdValues, final EntityPersister persister,
                                    final SharedSessionContractImplementor session) {
-        return DefaultCacheKeysFactory.createNaturalIdKey(naturalIdValues, persister, session);
+        return new NaturalIdCacheKey(naturalIdValues,  persister.getPropertyTypes(),
+                persister.getNaturalIdentifierProperties(), persister.getRootEntityName(), session);
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class NaturalIdRegionAccessStrategyAdapter implements NaturalIdRegi
 
     @Override
     public Object[] getNaturalIdValues(final Object cacheKey) {
-        return DefaultCacheKeysFactory.getNaturalIdValues(cacheKey);
+        return ((NaturalIdCacheKey) cacheKey).getNaturalIdValues();
     }
 
     @Override
