@@ -25,12 +25,11 @@ import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.hibernate.HazelcastTimestamper;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
-import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
+import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.Value;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
 import com.hazelcast.util.Clock;
+import com.hazelcast.util.EmptyStatement;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.access.SoftLock;
 
@@ -63,8 +62,6 @@ public class LocalRegionCache implements RegionCache {
     protected final AtomicLong markerIdCounter;
     protected MapConfig config;
 
-    private final ILogger log = Logger.getLogger(LocalRegionCache.class);
-
     /**
      * @param name              the name for this region cache, which is also used to retrieve configuration/topic
      * @param hazelcastInstance the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
@@ -94,8 +91,8 @@ public class LocalRegionCache implements RegionCache {
         this.hazelcastInstance = hazelcastInstance;
         try {
             config = hazelcastInstance != null ? hazelcastInstance.getConfig().findMapConfig(name) : null;
-        } catch (UnsupportedOperationException e) {
-            log.finest(e);
+        } catch (UnsupportedOperationException ignored) {
+            EmptyStatement.ignore(ignored);
         }
         versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
         cache = new ConcurrentHashMap<Object, Expirable>();
