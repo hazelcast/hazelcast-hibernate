@@ -169,6 +169,12 @@ To set up Native Client, add the Hazelcast **group-name**, **group-password** an
 <property name="hibernate.cache.hazelcast.native_client_password">dev-pass</property>
 ```
 
+You can use an existing client instead of creating a new one by adding the following property.
+
+```xml
+<property name="hibernate.cache.hazelcast.native_client_instance_name">my-client</property>
+```
+
 ![image](images/NoteSmall.jpg) ***NOTE***: *To use Native Client, add `hazelcast-client-<version>.jar` into your classpath. Refer to <a href="http://docs.hazelcast.org/docs/latest/manual/html-single/index.html#hazelcast-java-client" target="_blank">Hazelcast Java Client chapter</a> for more information. Moreover, to configure a Hazelcast Native Client for Hibernate, put the configuration file named `hazelcast-client.xml` into the root of your classpath.*
 
 

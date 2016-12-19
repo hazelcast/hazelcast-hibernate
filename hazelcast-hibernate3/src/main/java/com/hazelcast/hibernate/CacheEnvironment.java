@@ -67,6 +67,11 @@ public final class CacheEnvironment {
     public static final String NATIVE_CLIENT_PASSWORD = "hibernate.cache.hazelcast.native_client_password";
 
     /**
+     * Property to configure Hazelcast client instance name
+     */
+    public static final String NATIVE_CLIENT_INSTANCE_NAME = "hibernate.cache.hazelcast.native_client_instance_name";
+
+    /**
      * Property to configure if the HazelcastInstance should going to shutdown when the RegionFactory is being stopped
      */
     public static final String SHUTDOWN_ON_STOP = "hibernate.cache.hazelcast.shutdown_on_session_factory_close";

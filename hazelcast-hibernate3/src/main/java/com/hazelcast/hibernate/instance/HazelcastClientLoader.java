@@ -22,8 +22,6 @@ import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
 import org.hibernate.cache.CacheException;
 import org.hibernate.util.PropertiesHelper;
 
@@ -38,13 +36,16 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     private static final int CONNECTION_ATTEMPT_LIMIT = 10;
 
-    private static final ILogger LOGGER = Logger.getLogger(HazelcastInstanceFactory.class);
-
     private HazelcastInstance client;
     private ClientConfig clientConfig;
+    private String instanceName;
 
     @Override
     public void configure(Properties props) {
+        instanceName = PropertiesHelper.getString(CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME, props, null);
+        if (instanceName != null) {
+            return;
+        }
 
         String address = PropertiesHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
         String group = PropertiesHelper.getString(CacheEnvironment.NATIVE_CLIENT_GROUP, props, null);
@@ -78,7 +79,14 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     @Override
     public HazelcastInstance loadInstance() throws CacheException {
-        client = HazelcastClient.newHazelcastClient(clientConfig);
+        if (instanceName != null) {
+            client = HazelcastClient.getHazelcastClientByName(instanceName);
+            if (client == null) {
+                throw new CacheException("No client with name [" + instanceName + "] could be found.");
+            }
+        } else {
+            client = HazelcastClient.newHazelcastClient(clientConfig);
+        }
         return client;
     }
 
