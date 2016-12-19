@@ -38,9 +38,14 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     private HazelcastInstance client;
     private ClientConfig clientConfig;
+    private String instanceName;
 
     @Override
     public void configure(final Properties props) {
+        instanceName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME, props, null);
+        if (instanceName != null) {
+            return;
+        }
 
         String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
         String group = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_GROUP, props, null);
@@ -74,7 +79,14 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     @Override
     public HazelcastInstance loadInstance() throws CacheException {
-        client = HazelcastClient.newHazelcastClient(clientConfig);
+        if (instanceName != null) {
+            client = HazelcastClient.getHazelcastClientByName(instanceName);
+            if (client == null) {
+                throw new CacheException("No client with name [" + instanceName + "] could be found.");
+            }
+        } else {
+            client = HazelcastClient.newHazelcastClient(clientConfig);
+        }
         return client;
     }
 
