@@ -41,39 +41,43 @@ class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
     private HazelcastInstance instance;
     private Config config;
     private boolean shutDown;
+    private String existingInstanceName;
 
     @Override
     public void configure(Properties props) {
-        String configResourcePath = CacheEnvironment.getConfigFilePath(props);
-        if (!StringUtil.isNullOrEmptyAfterTrim(configResourcePath)) {
-            try {
-                this.config = ConfigLoader.load(configResourcePath);
-            } catch (IOException e) {
-                LOGGER.warning("IOException: " + e.getMessage());
-            }
-            if (config == null) {
-                throw new CacheException("Could not find configuration file: " + configResourcePath);
-            }
-        } else {
-            this.config = new XmlConfigBuilder().build();
-        }
-
         String instanceName = CacheEnvironment.getInstanceName(props);
 
-        if (instanceName != null) {
-            config.setInstanceName(instanceName);
+        if (!StringUtil.isNullOrEmptyAfterTrim(instanceName)) {
+            LOGGER.info("Using existing HazelcastInstance [" + instanceName + "].");
+            this.existingInstanceName = instanceName;
+        } else {
+            String configResourcePath = CacheEnvironment.getConfigFilePath(props);
+            if (!StringUtil.isNullOrEmptyAfterTrim(configResourcePath)) {
+                try {
+                    this.config = ConfigLoader.load(configResourcePath);
+                } catch (IOException e) {
+                    LOGGER.warning("IOException: " + e.getMessage());
+                }
+                if (config == null) {
+                    throw new CacheException("Could not find configuration file: " + configResourcePath);
+                }
+            } else {
+                this.config = new XmlConfigBuilder().build();
+            }
         }
 
         this.shutDown = CacheEnvironment.shutdownOnStop(props, (instanceName == null));
-
     }
 
     @Override
     public HazelcastInstance loadInstance() throws CacheException {
-        if (config.getInstanceName() == null) {
+        if (existingInstanceName != null) {
+            instance = Hazelcast.getHazelcastInstanceByName(existingInstanceName);
+            if (instance == null) {
+                throw new CacheException("No instance with name [" + existingInstanceName + "] could be found.");
+            }
+        } else  {
             instance = Hazelcast.newHazelcastInstance(config);
-        } else {
-            instance = Hazelcast.getOrCreateHazelcastInstance(config);
         }
         return instance;
     }

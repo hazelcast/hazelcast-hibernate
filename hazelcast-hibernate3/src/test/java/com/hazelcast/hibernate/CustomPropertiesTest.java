@@ -30,12 +30,14 @@ import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.cache.CacheException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.hibernate.cache.CacheException;
 
 import java.util.Date;
 import java.util.Properties;
@@ -47,10 +49,11 @@ import static org.junit.Assert.assertTrue;
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
 public class CustomPropertiesTest extends HibernateTestSupport {
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testNativeClient() throws Exception {
-
         TestHazelcastFactory factory = new TestHazelcastFactory();
         Config config = new ClasspathXmlConfig("hazelcast-custom.xml");
         HazelcastInstance main = factory.newHazelcastInstance(config);
@@ -109,6 +112,45 @@ public class CustomPropertiesTest extends HibernateTestSupport {
         sf.close();
         assertTrue(hz.getLifecycleService().isRunning());
         factory.shutdownAll();
+    }
+
+    @Test
+    public void testNamedInstance_noInstance() {
+        exception.expect(CacheException.class);
+        exception.expectMessage("No instance with name [hibernate] could be found.");
+
+        Config config = new Config();
+        config.setInstanceName("hibernate");
+
+        Properties props = new Properties();
+        props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
+        props.put(CacheEnvironment.HAZELCAST_INSTANCE_NAME, "hibernate");
+        props.put(CacheEnvironment.SHUTDOWN_ON_STOP, "false");
+        props.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+
+        Configuration configuration = new Configuration();
+        configuration.addProperties(props);
+
+        SessionFactory sf = configuration.buildSessionFactory();
+        sf.close();
+    }
+
+    @Test
+    public void testNamedClient_noInstance() throws Exception {
+        exception.expect(CacheException.class);
+        exception.expectMessage("No client with name [dev-custom] could be found.");
+
+        Properties props = new Properties();
+        props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
+        props.setProperty(CacheEnvironment.USE_NATIVE_CLIENT, "true");
+        props.setProperty(CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME, "dev-custom");
+        props.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+
+        Configuration configuration = new Configuration();
+        configuration.addProperties(props);
+
+        SessionFactory sf = configuration.buildSessionFactory();
+        sf.close();
     }
 
     @Test

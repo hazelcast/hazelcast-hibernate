@@ -51,17 +51,11 @@ public final class HazelcastInstanceFactory {
     }
 
     private static Class getInstanceLoaderClass(Properties props) throws ClassNotFoundException {
-        boolean useNativeClient = false;
-        if (props != null) {
-            useNativeClient = CacheEnvironment.isNativeClient(props);
-        }
-        Class loaderClass = null;
         ClassLoader cl = HazelcastInstanceFactory.class.getClassLoader();
-        if (useNativeClient) {
-            loaderClass = cl.loadClass(HZ_CLIENT_LOADER_CLASSNAME);
+        if (props != null && CacheEnvironment.isNativeClient(props)) {
+            return cl.loadClass(HZ_CLIENT_LOADER_CLASSNAME);
         } else {
-            loaderClass = cl.loadClass(HZ_INSTANCE_LOADER_CLASSNAME);
+            return cl.loadClass(HZ_INSTANCE_LOADER_CLASSNAME);
         }
-        return loaderClass;
     }
 }
