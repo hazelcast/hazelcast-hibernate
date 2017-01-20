@@ -8,11 +8,8 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.annotation.QuickTest;
-import org.apache.log4j.Level;
 import org.hibernate.cache.access.SoftLock;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -28,17 +25,6 @@ public class ReadWriteAccessDelegateTest extends HibernateTestSupport {
 
     private RegionCache cache;
     private ReadWriteAccessDelegate<HazelcastRegion> delegate;
-
-    @BeforeClass
-    public static void setLogging() {
-        setLoggingLog4j();
-        setLogLevel(Level.TRACE);
-    }
-
-    @AfterClass
-    public static void resetLogging() {
-        resetLogLevel();
-    }
 
     @Before
     public void setUp() {
