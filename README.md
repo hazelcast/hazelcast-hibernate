@@ -222,12 +222,6 @@ public class Cat implements Serializable {
 
 ## Advanced Settings
 
-**Accessing underlying HazelcastInstance**
-
-If you need to access `HazelcastInstance` used by Hibernate `SessionFactory`, you can give a name to the `HazelcastInstance` while configuring Hazelcast. Then it is possible to retrieve the instance using `getHazelcastInstanceByName` static method of `Hazelcast`.
-
-Please refer to the <a href="http://docs.hazelcast.org/docs/latest-dev/manual/html-single/index.html##configuring-programmatically" target="_blank">Configuring Programmatically</a> to learn how to create a named Hazelcast instance.
-
 **Changing/setting lock timeout value of *read-write* strategy**
 
 You can set a lock timeout value using the `hibernate.cache.hazelcast.lock_timeout_in_seconds` Hibernate property. The value should be in seconds. The default value is 300 seconds.
