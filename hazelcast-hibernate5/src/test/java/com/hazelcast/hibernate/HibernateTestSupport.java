@@ -20,6 +20,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.hibernate.instance.HazelcastAccessor;
+import com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -76,10 +77,11 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
                                                   final IHazelcastInstanceLoader customInstanceLoader) {
         props.put(CacheEnvironment.EXPLICIT_VERSION_CHECK, "true");
         if (customInstanceLoader != null) {
-            props.put("com.hazelcast.hibernate.instance.loader", customInstanceLoader);
+            HazelcastMockInstanceFactory.setThreadLocalLoader(customInstanceLoader);
+            props.setProperty("hibernate.cache.hazelcast.factory", "com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory");
             customInstanceLoader.configure(props);
         } else {
-            props.remove("com.hazelcast.hibernate.instance.loader");
+            props.remove("hibernate.cache.hazelcast.factory");
         }
 
         final Configuration conf = new Configuration();
