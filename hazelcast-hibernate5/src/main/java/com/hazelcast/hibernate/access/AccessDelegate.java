@@ -178,7 +178,7 @@ public interface AccessDelegate<T extends HazelcastRegion> {
     /**
      * We are going to attempt to update/delete the keyed object. This
      * method is used by "asynchronous" concurrency strategies.
-     * <p/>
+     * <p>
      * The returned object must be passed back to release(), to release the
      * lock. Concurrency strategies which do not support client-visible
      * locks may silently return null.

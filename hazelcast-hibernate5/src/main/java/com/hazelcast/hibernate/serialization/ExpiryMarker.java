@@ -26,7 +26,7 @@ import java.util.Comparator;
 /**
  * An entry which is marked for expiration. This can occur when Hibernate is expecting to update an entry as a result
  * of changes being made in an in-progress transaction
- * <p/>
+ * <p>
  * Such an entry has the following properties
  * <ul>
  *     <li>It will always return a null value, resulting in a cache miss</li>

@@ -38,7 +38,7 @@ import static com.hazelcast.hibernate.HazelcastTimestamper.nextTimestamp;
 
 /**
  * A {@link RegionCache} implementation based on the underlying IMap
- * <p/>
+ * <p>
  * Note, IMap locks are intentionally not used in this class. Hibernate region caches make use of a concept
  * called soft-locking which has the following properties:
  * <ul>
