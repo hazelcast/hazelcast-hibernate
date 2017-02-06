@@ -17,7 +17,7 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.hibernate.instance.HazelcastInstanceFactory;
+import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.hibernate.local.CleanupService;
 import com.hazelcast.hibernate.region.HazelcastQueryResultsRegion;
@@ -79,7 +79,21 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
     public void start(final SessionFactoryOptions options, final Properties properties) throws CacheException {
         log.info("Starting up " + getClass().getSimpleName());
         if (instance == null || !instance.getLifecycleService().isRunning()) {
-            instanceLoader = HazelcastInstanceFactory.createInstanceLoader(properties);
+            String factory = properties.getProperty("hibernate.cache.hazelcast.factory", "com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory");
+            try
+            {
+                Class<IHazelcastInstanceFactory> factoryClazz = (Class<IHazelcastInstanceFactory>) Class.forName(factory, true, Thread.currentThread().getContextClassLoader());
+                instanceLoader = factoryClazz.newInstance().createInstanceLoader(properties);
+            } catch (ClassNotFoundException e)
+            {
+                throw new CacheException("Failed to set up hazelcast instance factory", e);
+            } catch (InstantiationException e)
+            {
+                throw new CacheException("Failed to set up hazelcast instance factory", e);
+            } catch (IllegalAccessException e)
+            {
+                throw new CacheException("Failed to set up hazelcast instance factory", e);
+            }
             instance = instanceLoader.loadInstance();
         }
         cleanupService = new CleanupService(instance.getName());

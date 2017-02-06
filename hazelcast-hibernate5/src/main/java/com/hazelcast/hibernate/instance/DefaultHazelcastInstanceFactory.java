@@ -22,27 +22,18 @@ import org.hibernate.cache.CacheException;
 import java.util.Properties;
 
 /**
- * A factory class to build up implementations of {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader}
- * that returns a {@link com.hazelcast.core.HazelcastInstance} depending on configuration either backed by Hazelcast
+ * A factory that returns a {@link com.hazelcast.core.HazelcastInstance} depending on configuration either backed by Hazelcast
  * client or node implementation.
  */
-public final class HazelcastInstanceFactory {
-
+public final class DefaultHazelcastInstanceFactory implements IHazelcastInstanceFactory
+{
     private static final String HZ_CLIENT_LOADER_CLASSNAME = "com.hazelcast.hibernate.instance.HazelcastClientLoader";
     private static final String HZ_INSTANCE_LOADER_CLASSNAME = "com.hazelcast.hibernate.instance.HazelcastInstanceLoader";
 
-    private HazelcastInstanceFactory() {
-    }
-
-    public static IHazelcastInstanceLoader createInstanceLoader(final Properties props) throws CacheException {
+    public IHazelcastInstanceLoader createInstanceLoader(final Properties props) throws CacheException {
         try {
-            IHazelcastInstanceLoader instanceLoader = (IHazelcastInstanceLoader) props.
-                    get("com.hazelcast.hibernate.instance.loader");
-            if (instanceLoader != null) {
-                return instanceLoader;
-            }
             Class loaderClass = getInstanceLoaderClass(props);
-            instanceLoader = (IHazelcastInstanceLoader) loaderClass.newInstance();
+            IHazelcastInstanceLoader instanceLoader = (IHazelcastInstanceLoader) loaderClass.newInstance();
             instanceLoader.configure(props);
             return instanceLoader;
         } catch (Exception e) {
@@ -51,7 +42,7 @@ public final class HazelcastInstanceFactory {
     }
 
     private static Class getInstanceLoaderClass(final Properties props) throws ClassNotFoundException {
-        ClassLoader cl = HazelcastInstanceFactory.class.getClassLoader();
+        ClassLoader cl = DefaultHazelcastInstanceFactory.class.getClassLoader();
         if (props != null && CacheEnvironment.isNativeClient(props)) {
             return cl.loadClass(HZ_CLIENT_LOADER_CLASSNAME);
         } else {
