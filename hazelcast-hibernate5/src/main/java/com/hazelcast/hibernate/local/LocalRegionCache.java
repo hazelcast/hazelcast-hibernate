@@ -205,9 +205,7 @@ public class LocalRegionCache implements RegionCache {
 
             @Override
             public void onMessage(final Message<Object> message) {
-                if (!message.getPublishingMember().localMember()) {
                     maybeInvalidate(message.getMessageObject());
-                }
             }
         };
     }
