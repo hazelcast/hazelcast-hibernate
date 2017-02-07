@@ -20,7 +20,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
-import com.hazelcast.util.Clock;
 
 /**
  * A timestamp based local RegionCache
@@ -33,7 +32,10 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
 
     @Override
     public boolean put(Object key, Object value, long txTimestamp, Object version) {
-        boolean succeed = super.put(key, value, (Long) value, version);
+        // use the value in txTimestamp as the timestamp instead of the value, since
+        // hibernate pre-invalidates with a large value, and then invalidates with
+        //the actual time, which can cause queries to not be cached.
+        boolean succeed = super.put(key, value, txTimestamp, version);
         if (succeed) {
             maybeNotifyTopic(key, value, version);
         }
@@ -50,16 +52,14 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    if (cache.replace(key, value, new Value(value.getVersion(),
-                            Clock.currentTimeMillis(), ts.getTimestamp()))) {
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
                         return;
                     }
                 } else {
                     return;
                 }
             } else {
-                if (cache.putIfAbsent(key, new Value(null, Clock.currentTimeMillis(),
-                        ts.getTimestamp())) == null) {
+                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
                     return;
                 }
             }
