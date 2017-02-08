@@ -23,7 +23,6 @@ import java.util.Properties;
 /**
  * A hookable factory class to build up implementations of {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader}
  */
-public interface IHazelcastInstanceFactory
-{
+public interface IHazelcastInstanceFactory {
     IHazelcastInstanceLoader createInstanceLoader(final Properties props) throws CacheException;
 }
