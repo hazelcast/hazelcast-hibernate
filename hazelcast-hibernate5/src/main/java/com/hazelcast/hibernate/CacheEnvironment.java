@@ -99,7 +99,7 @@ public final class CacheEnvironment {
     /**
      * Property to configure which {@link com.hazelcast.hibernate.instance.IHazelcastInstanceFactory}
      * that shall be used for creating
-     * {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader hazelcast instance loaders}
+     * {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader hazelcast instance loaders}.
      */
     public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
 
