@@ -21,6 +21,12 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -99,7 +105,7 @@ public final class CacheEnvironment {
     /**
      * Property to configure which {@link com.hazelcast.hibernate.instance.IHazelcastInstanceFactory}
      * that shall be used for creating
-     * {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader hazelcast instance loaders}
+     * {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader hazelcast instance loaders}.
      */
     public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
 
