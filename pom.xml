@@ -18,7 +18,7 @@
     <name>hazelcast-hibernate5</name>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-hibernate5-parent</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.1.INTERNAL-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
@@ -253,14 +253,14 @@
 
     <distributionManagement>
         <repository>
-            <id>release-repository</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://10.98.32.25:8081/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
-            <id>snapshot-repository</id>
-            <name>Maven2 Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://10.98.32.25:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
