@@ -96,6 +96,13 @@ public final class CacheEnvironment {
      */
     public static final String HAZELCAST_SHUTDOWN_HOOK_ENABLED = "hazelcast.shutdownhook.enabled";
 
+    /**
+     * Property to configure which {@link com.hazelcast.hibernate.instance.IHazelcastInstanceFactory}
+     * that shall be used for creating
+     * {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader hazelcast instance loaders}.
+     */
+    public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
+
     // milliseconds
     private static final int MAXIMUM_LOCK_TIMEOUT = 10000;
 

@@ -36,7 +36,7 @@ import java.util.Properties;
  */
 class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
 
-    private static final ILogger LOGGER = Logger.getLogger(HazelcastInstanceFactory.class);
+    private static final ILogger LOGGER = Logger.getLogger(IHazelcastInstanceFactory.class);
 
     private HazelcastInstance instance;
     private Config config;
