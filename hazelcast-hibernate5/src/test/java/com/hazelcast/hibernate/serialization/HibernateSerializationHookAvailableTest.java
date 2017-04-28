@@ -69,24 +69,14 @@ public class HibernateSerializationHookAvailableTest {
         @SuppressWarnings("unchecked")
         ConcurrentMap<Class, ?> typeMap = (ConcurrentMap) TYPE_MAP.get(ss);
 
-        boolean cacheKeySerializerFound = false;
         boolean cacheEntrySerializerFound = false;
-        boolean naturalIdKeySerializerFound = false;
         for (Class clazz : typeMap.keySet()) {
-            // The Old* implementations are matched by class name here just to avoid the Reflection hassle
-            // of retrieving their classes, since they're package-private
-            if ("org.hibernate.cache.internal.OldCacheKeyImplementation".equals(clazz.getName())) {
-                cacheKeySerializerFound = true;
-            } else if ("org.hibernate.cache.internal.OldNaturalIdCacheKey".equals(clazz.getName())) {
-                naturalIdKeySerializerFound = true;
-            } else if (StandardCacheEntryImpl.class.equals(clazz)
+            if (StandardCacheEntryImpl.class.equals(clazz)
                     || "com.hazelcast.hibernate.serialization.CacheEntryImpl".equals(clazz.getName())) {
                 cacheEntrySerializerFound = true;
             }
         }
 
-        assertTrue("CacheKey serializer not found", cacheKeySerializerFound);
         assertTrue("CacheEntry serializer not found", cacheEntrySerializerFound);
-        assertTrue("NaturalIdCacheKey serializer not found", naturalIdKeySerializerFound);
     }
 }
