@@ -18,7 +18,7 @@ package com.hazelcast.hibernate.region;
 
 import com.hazelcast.hibernate.access.AccessDelegate;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.internal.DefaultCacheKeysFactory;
+import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.CollectionRegion;
 import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
 import org.hibernate.cache.spi.access.SoftLock;
@@ -32,6 +32,8 @@ import org.hibernate.persister.collection.CollectionPersister;
 public final class CollectionRegionAccessStrategyAdapter implements CollectionRegionAccessStrategy {
 
     private final AccessDelegate<? extends HazelcastCollectionRegion> delegate;
+
+    private final CacheKeysFactory cacheKeysFactory = new HazelcastCacheKeysFactory();
 
     public CollectionRegionAccessStrategyAdapter(final AccessDelegate<? extends HazelcastCollectionRegion> delegate) {
         this.delegate = delegate;
@@ -50,7 +52,7 @@ public final class CollectionRegionAccessStrategyAdapter implements CollectionRe
     @Override
     public Object generateCacheKey(final Object id, final CollectionPersister persister,
                                    final SessionFactoryImplementor session, final String tenantIdentifier) {
-        return DefaultCacheKeysFactory.createCollectionKey(id, persister, session, tenantIdentifier);
+        return cacheKeysFactory.createCollectionKey(id, persister, session, tenantIdentifier);
     }
 
     @Override
@@ -61,7 +63,7 @@ public final class CollectionRegionAccessStrategyAdapter implements CollectionRe
 
     @Override
     public Object getCacheKeyId(final Object cacheKey) {
-        return DefaultCacheKeysFactory.getCollectionId(cacheKey);
+        return cacheKeysFactory.getCollectionId(cacheKey);
     }
 
     @Override

@@ -91,17 +91,9 @@ public class HibernateSerializationHookNonAvailableTest {
             Object serializationService = GET_SERIALIZATION_SERVICE.invoke(impl);
             //noinspection unchecked
             ConcurrentMap<Class, ?> typeMap = (ConcurrentMap<Class, ?>) TYPE_MAP.get(serializationService);
-            boolean cacheKeySerializerFound = false;
             boolean cacheEntrySerializerFound = false;
-            boolean naturalIdKeySerializerFound = false;
             for (Class clazz : typeMap.keySet()) {
-                // The Old* implementations are matched by class name here just to avoid the Reflection hassle
-                // of retrieving their classes, since they're package-private
-                if ("org.hibernate.cache.internal.OldCacheKeyImplementation".equals(clazz.getName())) {
-                    cacheKeySerializerFound = true;
-                } else if ("org.hibernate.cache.internal.OldNaturalIdCacheKey".equals(clazz.getName())) {
-                    naturalIdKeySerializerFound = true;
-                } else if (StandardCacheEntryImpl.class.equals(clazz)
+                if (StandardCacheEntryImpl.class.equals(clazz)
                         || "com.hazelcast.hibernate.serialization.CacheEntryImpl".equals(clazz.getName())) {
                     cacheEntrySerializerFound = true;
                 }
@@ -109,9 +101,7 @@ public class HibernateSerializationHookNonAvailableTest {
 
             hazelcastClazz.getDeclaredMethod("shutdownAll").invoke(impl);
 
-            assertFalse("CacheKey serializer found", cacheKeySerializerFound);
             assertFalse("CacheEntry serializer found", cacheEntrySerializerFound);
-            assertFalse("NaturalIdCacheKey serializer found", naturalIdKeySerializerFound);
         } finally {
             if (config != null && setClassLoader != null) {
                 setClassLoader.invoke(config, tccl);
