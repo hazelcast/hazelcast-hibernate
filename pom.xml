@@ -83,6 +83,7 @@
 
         <hsqldb.version>2.2.9</hsqldb.version>
         <javassist.version>3.18.1-GA</javassist.version>
+        <bytebuddy.version>1.6.12</bytebuddy.version>
     </properties>
 
     <licenses>
@@ -335,6 +336,18 @@
             <artifactId>javassist</artifactId>
             <version>${javassist.version}</version>
             <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${bytebuddy.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>${bytebuddy.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
