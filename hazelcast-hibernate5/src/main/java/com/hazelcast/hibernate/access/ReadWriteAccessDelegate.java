@@ -49,7 +49,7 @@ public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends Abstract
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * Called after <code>com.hazelcast.ReadWriteAccessDelegate.lockItem()</code>
      */
     @Override
@@ -86,7 +86,7 @@ public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends Abstract
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * A no-op since this is an asynchronous cache access strategy.
      */
     @Override
@@ -97,7 +97,7 @@ public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends Abstract
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * A no-op since this is an asynchronous cache access strategy.
      */
     @Override

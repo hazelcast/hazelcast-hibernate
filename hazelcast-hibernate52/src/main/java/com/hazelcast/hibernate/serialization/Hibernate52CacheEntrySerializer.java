@@ -124,7 +124,7 @@ class Hibernate52CacheEntrySerializer implements StreamSerializer<CacheEntry> {
 
     /**
      * Wraps a CacheEntry so that serializing it will not recursively call back into this class.
-     * <p/>
+     * <p>
      * {@code CacheEntry} extends {@code Serializable}, so the entry could theoretically just be written with
      * {@code ObjectDataOutput.writeObject(Object)}. However, doing so would cause the {@code SerializationService}
      * to look up the serializer and route the entry right back here again, forming an infinite loop. This wrapper

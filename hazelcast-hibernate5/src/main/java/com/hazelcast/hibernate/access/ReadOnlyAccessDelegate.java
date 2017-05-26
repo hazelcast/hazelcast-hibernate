@@ -39,7 +39,7 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException always, because updates are not supported
      */
     @Override
     public boolean afterUpdate(final Object key, final Object value, final Object currentVersion,
@@ -50,7 +50,7 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * This cache is asynchronous hence a no-op
      */
     @Override
@@ -64,7 +64,7 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException always because locking a read only region is unnecessary
      */
     @Override
     public SoftLock lockRegion() throws CacheException {
@@ -79,7 +79,7 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * Should be a no-op since this cache is read-only
      */
     @Override
@@ -100,7 +100,7 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException always, because updates are not supported
      */
     @Override
     public boolean update(final Object key, final Object value, final Object currentVersion,
