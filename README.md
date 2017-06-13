@@ -8,7 +8,7 @@
     * [Configuring RegionFactory](#configuring-regionfactory)
       * [HazelcastCacheRegionFactory](#hazelcastcacheregionfactory)
       * [HazelcastLocalCacheRegionFactory](#hazelcastlocalcacheregionfactory)
-    * [Configuring Query Cache and Other Settings](#configuring query-cache-and-other-settings)
+    * [Configuring Query Cache and Other Settings](#configuring-query-cache-and-other-settings)
   * [Configuring Hazelcast for Hibernate](#configuring-hazelcast-for-hibernate)
   * [Setting P2P for Hibernate](#setting-p2p-for-hibernate)
   * [Setting Client/Server for Hibernate](#setting-client-server-for-hibernate)
