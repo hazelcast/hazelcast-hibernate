@@ -125,7 +125,7 @@ Eviction support is limited to maximum size of the map (defined by `max-size` co
 
 To configure Hazelcast for Hibernate, put the configuration file named `hazelcast.xml` into the root of your classpath. If Hazelcast cannot find `hazelcast.xml`, then it will use the default configuration from `hazelcast.jar`.
 
-You can define a custom-named Hazelcast configuration XML file with one of these Hibernate configuration properties.
+You can define a custom-named Hazelcast configuration XML file with one of these Hibernate configuration properties. 
 
 ```xml
 <property name="hibernate.cache.provider_configuration_file_resource_path">
@@ -139,6 +139,8 @@ You can define a custom-named Hazelcast configuration XML file with one of these
   hazelcast-custom-config.xml
 </property>
 ```
+
+If you're using Hazelcast client (`hibernate.cache.hazelcast.use_native_client=true`), you can specify a custom Hazelcast client configuration file by using the same parameters.
 
 Hazelcast creates a separate distributed map for each Hibernate cache region. You can easily configure these regions via Hazelcast map configuration. You can define **backup**, **eviction**, **TTL** and **Near Cache** properties.
 
