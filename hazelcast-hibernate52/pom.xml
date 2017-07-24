@@ -61,10 +61,8 @@
                                     <directory>../hazelcast-hibernate5/src/main/java</directory>
                                     <excludes>
                                         <exclude>com/hazelcast/hibernate/region/AbstractGeneralRegion.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/region/CacheKeyImpl.java</exclude>
                                         <exclude>com/hazelcast/hibernate/region/CollectionRegionAccessStrategyAdapter.java</exclude>
                                         <exclude>com/hazelcast/hibernate/region/HazelcastCacheKeysFactory.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/region/NaturalIdCacheKey.java</exclude>
                                         <exclude>com/hazelcast/hibernate/region/NaturalIdRegionAccessStrategyAdapter.java</exclude>
                                         <exclude>com/hazelcast/hibernate/region/EntityRegionAccessStrategyAdapter.java</exclude>
                                         <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializerHook.java</exclude>

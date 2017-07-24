@@ -18,6 +18,7 @@ package com.hazelcast.hibernate.region;
 
 import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
@@ -31,20 +32,20 @@ public class HazelcastCacheKeysFactory implements CacheKeysFactory {
   @Override
   public Object createCollectionKey(Object id, CollectionPersister persister, SessionFactoryImplementor factory,
       String tenantIdentifier) {
-    return new CacheKeyImpl(id, persister.getRole(), tenantIdentifier, persister.getKeyType());
+    return new CacheKeyImpl(id, persister.getKeyType(), persister.getRole(), tenantIdentifier, factory);
   }
 
   @Override
   public Object createEntityKey(Object id, EntityPersister persister, SessionFactoryImplementor factory,
       String tenantIdentifier) {
-    return new CacheKeyImpl(id, persister.getRootEntityName(), tenantIdentifier, persister.getIdentifierType());
+    return new CacheKeyImpl(id, persister.getIdentifierType(), persister.getRootEntityName(), tenantIdentifier, factory);
   }
 
   @Override
   public Object createNaturalIdKey(Object[] naturalIdValues, EntityPersister persister,
       SharedSessionContractImplementor session) {
     return new NaturalIdCacheKey(naturalIdValues,  persister.getPropertyTypes(), persister.getNaturalIdentifierProperties(),
-        persister.getRootEntityName(), session);
+        persister.getRootEntityName(), (SessionImplementor) session);
   }
 
   @Override
