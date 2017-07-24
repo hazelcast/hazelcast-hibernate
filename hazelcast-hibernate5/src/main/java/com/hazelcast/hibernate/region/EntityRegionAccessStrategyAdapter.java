@@ -18,7 +18,7 @@ package com.hazelcast.hibernate.region;
 
 import com.hazelcast.hibernate.access.AccessDelegate;
 import org.hibernate.cache.CacheException;
-import org.hibernate.cache.internal.DefaultCacheKeysFactory;
+import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.EntityRegion;
 import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
 import org.hibernate.cache.spi.access.SoftLock;
@@ -32,6 +32,8 @@ import org.hibernate.persister.entity.EntityPersister;
 public final class EntityRegionAccessStrategyAdapter implements EntityRegionAccessStrategy {
 
     private final AccessDelegate<? extends HazelcastEntityRegion> delegate;
+
+    private final CacheKeysFactory cacheKeysFactory = new HazelcastCacheKeysFactory();
 
     public EntityRegionAccessStrategyAdapter(final AccessDelegate<? extends HazelcastEntityRegion> delegate) {
         this.delegate = delegate;
@@ -63,7 +65,7 @@ public final class EntityRegionAccessStrategyAdapter implements EntityRegionAcce
     @Override
     public Object generateCacheKey(final Object id, final EntityPersister persister,
                                    final SessionFactoryImplementor session, final String tenantIdentifier) {
-        return DefaultCacheKeysFactory.createEntityKey(id, persister, session, tenantIdentifier);
+        return cacheKeysFactory.createEntityKey(id, persister, session, tenantIdentifier);
     }
 
     @Override
@@ -74,7 +76,7 @@ public final class EntityRegionAccessStrategyAdapter implements EntityRegionAcce
 
     @Override
     public Object getCacheKeyId(final Object cacheKey) {
-        return DefaultCacheKeysFactory.getEntityId(cacheKey);
+        return cacheKeysFactory.getEntityId(cacheKey);
     }
 
     @Override
