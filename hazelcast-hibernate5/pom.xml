@@ -29,4 +29,13 @@
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>509compatibility</id>
+            <properties>
+                <hibernate.core.version>5.0.9.Final</hibernate.core.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>
