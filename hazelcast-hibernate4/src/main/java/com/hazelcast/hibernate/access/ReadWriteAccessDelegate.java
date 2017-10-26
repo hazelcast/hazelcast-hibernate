@@ -50,8 +50,9 @@ public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends Abstract
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * Called after <code>com.hazelcast.ReadWriteAccessDelegate.lockItem()</code>
+     * </p>
      */
     @Override
     public boolean afterUpdate(final Object key, final Object value, final Object currentVersion, final Object previousVersion,
@@ -87,8 +88,9 @@ public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends Abstract
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * A no-op since this is an asynchronous cache access strategy.
+     * </p>
      */
     @Override
     public boolean update(Object key, Object value, Object currentVersion, Object previousVersion)
@@ -98,8 +100,9 @@ public class ReadWriteAccessDelegate<T extends HazelcastRegion> extends Abstract
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * A no-op since this is an asynchronous cache access strategy.
+     * </p>
      */
     @Override
     public void remove(final Object key) throws CacheException {

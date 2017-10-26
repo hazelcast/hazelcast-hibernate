@@ -68,6 +68,7 @@ public abstract class Expirable implements IdentifiedDataSerializable {
     }
 
     /**
+     * @param lock <code>ExpiryMarker</code> to be checked for a match
      * @return {@code true} if the {@link Expirable} matches using the specified lock, {@code false} otherwise
      * @see ExpiryMarker#expire(long)
      */
@@ -75,9 +76,10 @@ public abstract class Expirable implements IdentifiedDataSerializable {
 
     /**
      * Mark the entry for expiration with the given timeout and marker id.
-     * <p/>
+     * <p>
      * For every invocation a corresponding call to {@link ExpiryMarker#expire(long)} should be made, provided that
      * the returned marker {@link #matches(ExpiryMarker) matches}
+     * </p>
      *
      * @param timeout      the timestamp in which the lock times out
      * @param nextMarkerId the next lock id to use if creating a new lock

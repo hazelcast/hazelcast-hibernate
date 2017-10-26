@@ -43,7 +43,7 @@ public final class HazelcastAccessor {
     /**
      * Tries to extract <code>HazelcastInstance</code> from <code>Session</code>.
      *
-     * @param session
+     * @param session Hibernate session to extract the <code>SessionFactory</code> and its settings from
      * @return Currently used <code>HazelcastInstance</code> or null if an error occurs.
      */
     public static HazelcastInstance getHazelcastInstance(final Session session) {
@@ -53,7 +53,7 @@ public final class HazelcastAccessor {
     /**
      * Tries to extract <code>HazelcastInstance</code> from <code>SessionFactory</code>.
      *
-     * @param sessionFactory
+     * @param sessionFactory Hibernate <code>SessionFactory</code> to extract settings from
      * @return Currently used <code>HazelcastInstance</code> or null if an error occurs.
      */
     public static HazelcastInstance getHazelcastInstance(final SessionFactory sessionFactory) {
@@ -67,7 +67,7 @@ public final class HazelcastAccessor {
     /**
      * Tries to extract <code>HazelcastInstance</code> from <code>SessionFactoryImplementor</code>.
      *
-     * @param sessionFactory
+     * @param sessionFactory Hibernate <code>SessionFactory</code> to extract settings from
      * @return currently used <code>HazelcastInstance</code> or null if an error occurs.
      */
     public static HazelcastInstance getHazelcastInstance(final SessionFactoryImplementor sessionFactory) {
