@@ -38,8 +38,9 @@ public class NonStrictReadWriteAccessDelegate<T extends HazelcastRegion> extends
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * Returns <code>false</code> since this is a non-strict read/write cache access strategy
+     * </p>
      */
     @Override
     public boolean afterInsert(final Object key, final Object value, final Object version) throws CacheException {
@@ -55,8 +56,9 @@ public class NonStrictReadWriteAccessDelegate<T extends HazelcastRegion> extends
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * Returns <code>false</code> since this is an asynchronous cache access strategy.
+     * </p>
      */
     @Override
     public boolean insert(final Object key, final Object value, final Object version) throws CacheException {
@@ -65,8 +67,9 @@ public class NonStrictReadWriteAccessDelegate<T extends HazelcastRegion> extends
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * Removes the entry since this is a non-strict read/write cache strategy.
+     * </p>
      */
     @Override
     public boolean update(final Object key, final Object value, final Object currentVersion, final Object previousVersion) {
