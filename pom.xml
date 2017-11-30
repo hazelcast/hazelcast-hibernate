@@ -62,8 +62,8 @@
         <maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
         <maven.findbugs.plugin.version>3.0.0</maven.findbugs.plugin.version>
         <maven.checkstyle.plugin.version>2.12</maven.checkstyle.plugin.version>
-        <maven.sonar.plugin.version>2.6</maven.sonar.plugin.version>
-        <maven.jacoco.plugin.version>0.7.4.201502262128</maven.jacoco.plugin.version>
+        <maven.sonar.plugin.version>3.3.0.603</maven.sonar.plugin.version>
+        <maven.jacoco.plugin.version>0.7.9</maven.jacoco.plugin.version>
         <maven.cobertura.plugin.version>2.0</maven.cobertura.plugin.version>
 
         <log4j.version>1.2.12</log4j.version>
@@ -234,12 +234,6 @@
                         -Dhazelcast.test.use.network=false
                     </argLine>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>${maven.sonar.plugin.version}</version>
             </plugin>
         </plugins>
     </build>
@@ -462,6 +456,12 @@
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <testFailureIgnore>true</testFailureIgnore>
                         </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>${maven.sonar.plugin.version}</version>
                     </plugin>
                 </plugins>
             </build>
