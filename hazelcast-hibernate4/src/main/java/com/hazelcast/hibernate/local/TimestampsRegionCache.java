@@ -47,6 +47,12 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
         final Timestamp ts = (Timestamp) messageObject;
         final Object key = ts.getKey();
 
+        if (key == null) {
+            // Invalidate the entire region cache.
+            cache.clear();
+            return;
+        }
+
         for (;;) {
             final Expirable value = cache.get(key);
             final Long current = value != null ? (Long) value.getValue() : null;
@@ -69,6 +75,12 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     @Override
     protected Object createMessage(final Object key, final Object value, final Object currentVersion) {
         return new Timestamp(key, (Long) value);
+    }
+
+    @Override
+    public void clear() {
+        cache.clear();
+        maybeNotifyTopic(null, -1L, null);
     }
 
     final void cleanup() {
