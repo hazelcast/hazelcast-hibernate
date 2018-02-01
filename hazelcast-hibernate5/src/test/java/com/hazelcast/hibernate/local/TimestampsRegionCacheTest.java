@@ -1,5 +1,6 @@
 package com.hazelcast.hibernate.local;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -76,4 +77,15 @@ public class TimestampsRegionCacheTest {
         // this fails if we use system time instead of cluster time, causing the value to stay invisible until clustertime == system time (which it often isn't)
         assertThat("key should be visible and have value specified in timestamp message, with current cluster time.", (Long)target.get("QuerySpace", clusterTime), is(secondTimestamp));
     }
+
+    @Test
+    public void clearCache() {
+        long aTimestamp = 1;
+        assertThat(target.put("QuerySpace", aTimestamp, aTimestamp, null), is(true));
+        assertThat("value should be in the cache", (Long)target.get("QuerySpace", aTimestamp), is(aTimestamp));
+
+        target.clear();
+
+        assertThat("value should not be in the cache", target.get("QuerySpace", aTimestamp), nullValue());
+    }    
 }
