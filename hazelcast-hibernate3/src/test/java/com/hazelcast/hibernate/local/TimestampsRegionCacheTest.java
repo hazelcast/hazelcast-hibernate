@@ -1,5 +1,6 @@
 package com.hazelcast.hibernate.local;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
@@ -32,10 +33,10 @@ public class TimestampsRegionCacheTest {
     @Mock private HazelcastInstance instance;
     @Mock private Cluster cluster;
     @Mock private Member member;
-    
+
     private TimestampsRegionCache target;
     private MessageListener<Object> listener;
-    
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Before
     public void setup() {
@@ -43,7 +44,7 @@ public class TimestampsRegionCacheTest {
         when(instance.getCluster()).thenReturn(cluster);
         when(instance.getConfig()).thenReturn(config);
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
-        
+
         // make the message appear that it is coming from a different member of the cluster
         when(member.localMember()).thenReturn(false);
 
@@ -52,7 +53,7 @@ public class TimestampsRegionCacheTest {
         target = new TimestampsRegionCache(CACHE_NAME, instance);
         this.listener = listener.getValue();
     }
-    
+
     @Test
     public void shouldUseClusterTimestampFromInvalidationmessageInsteadOfSystemTime() {
         long firstTimestamp = 1;
@@ -69,11 +70,22 @@ public class TimestampsRegionCacheTest {
 
         // a message is generated on a different cluster member informing us to update the timestamp region cache
         Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp), publishTime, member);
-        
+
         // process the timestamp region update
         listener.onMessage(message);
 
         // this fails if we use system time instead of cluster time, causing the value to stay invisible until clustertime == system time (which it often isn't)
         assertThat("key should be visible and have value specified in timestamp message, with current cluster time.", (Long)target.get("QuerySpace", clusterTime), is(secondTimestamp));
+    }
+
+    @Test
+    public void clearCache() {
+        long aTimestamp = 1;
+        assertThat(target.put("QuerySpace", aTimestamp, aTimestamp, null), is(true));
+        assertThat("value should be in the cache", (Long) target.get("QuerySpace", aTimestamp), is(aTimestamp));
+
+        target.clear();
+
+        assertThat("value should not be in the cache", target.get("QuerySpace", aTimestamp), nullValue());
     }
 }
