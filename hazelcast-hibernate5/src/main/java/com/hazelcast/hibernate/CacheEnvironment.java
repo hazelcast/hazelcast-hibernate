@@ -106,7 +106,7 @@ public final class CacheEnvironment {
     /**
      * Property to configure Hazelcast reconnect limit
      */
-    public static final String HAZELCAST_RECONNECT_LIMIT = "hibernate.cache.hazelcast.reconnect_limit";
+    public static final String HAZELCAST_CONNECTION_ATTEMPT_LIMIT = "hibernate.cache.hazelcast.connection_attempt_limit";
 
     // milliseconds
     private static final int MAXIMUM_LOCK_TIMEOUT = 10000;

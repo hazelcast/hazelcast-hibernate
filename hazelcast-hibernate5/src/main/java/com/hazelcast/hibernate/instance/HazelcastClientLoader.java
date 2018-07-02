@@ -48,7 +48,7 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
         String group = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_GROUP, props, null);
         String pass = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_PASSWORD, props, null);
-        int reconnectLimit = ConfigurationHelper.getInt(CacheEnvironment.HAZELCAST_RECONNECT_LIMIT, props, 10);
+        int connectionAttemptLimit = ConfigurationHelper.getInt(CacheEnvironment.HAZELCAST_CONNECTION_ATTEMPT_LIMIT, props, 10);
         String configResourcePath = CacheEnvironment.getConfigFilePath(props);
 
         if (configResourcePath != null) {
@@ -73,7 +73,7 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
         clientConfig.getNetworkConfig().setSmartRouting(true);
         clientConfig.getNetworkConfig().setRedoOperation(true);
-        clientConfig.getNetworkConfig().setConnectionAttemptLimit(reconnectLimit);
+        clientConfig.getNetworkConfig().setConnectionAttemptLimit(connectionAttemptLimit);
     }
 
     @Override
