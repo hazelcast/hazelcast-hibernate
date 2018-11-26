@@ -37,7 +37,6 @@ import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -242,7 +241,7 @@ public class LocalRegionCache implements RegionCache {
 
     private void evictEntries(final List<EvictionEntry> entries, final int evictionRate) {
         // Only sort the entries if we're going to evict some
-        Collections.sort(entries);
+        entries.sort(null);
         int removed = 0;
         for (final EvictionEntry entry : entries) {
             if (cache.remove(entry.key, entry.value) && ++removed == evictionRate) {
