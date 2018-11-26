@@ -25,14 +25,14 @@ import org.hibernate.cache.spi.access.SoftLock;
  */
 public interface RegionCache extends Region, ExtendedStatisticsSupport {
 
-    void afterUpdate(Object key, Object newValue, Object newVersion);
+    void afterUpdate(final Object key, final Object newValue, final Object newVersion);
 
     @Override
     default void clear() {
         evictData();
     }
 
-    boolean contains(Object key);
+    boolean contains(final Object key);
 
     @Override
     default void destroy() {
@@ -40,9 +40,9 @@ public interface RegionCache extends Region, ExtendedStatisticsSupport {
 
     void evictData();
 
-    void evictData(Object key);
+    void evictData(final Object key);
 
-    Object get(Object key, long txTimestamp);
+    Object get(final Object key, final long txTimestamp);
 
     @Override
     default long getElementCountOnDisk() {
@@ -53,7 +53,7 @@ public interface RegionCache extends Region, ExtendedStatisticsSupport {
         return getRegionFactory().nextTimestamp();
     }
 
-    boolean put(Object key, Object value, long txTimestamp, Object version);
+    boolean put(final Object key, final Object value, final long txTimestamp, final Object version);
 
-    void unlockItem(Object key, SoftLock lock);
+    void unlockItem(final Object key, final SoftLock lock);
 }

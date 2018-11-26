@@ -101,9 +101,9 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         return new HazelcastStorageAccessImpl(regionCache);
     }
 
-    protected abstract RegionCache createRegionCache(String unqualifiedRegionName,
-                                                     SessionFactoryImplementor sessionFactory,
-                                                     DomainDataRegionConfig regionConfig);
+    protected abstract RegionCache createRegionCache(final String unqualifiedRegionName,
+                                                     final SessionFactoryImplementor sessionFactory,
+                                                     final DomainDataRegionConfig regionConfig);
 
     @Override
     protected StorageAccess createTimestampsRegionStorageAccess(final String regionName,
@@ -113,8 +113,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         );
     }
 
-    protected abstract RegionCache createTimestampsRegionCache(String regionName,
-                                                               SessionFactoryImplementor sessionFactory);
+    protected abstract RegionCache createTimestampsRegionCache(final String regionName,
+                                                               final SessionFactoryImplementor sessionFactory);
 
     @Override
     protected CacheKeysFactory getImplicitCacheKeysFactory() {

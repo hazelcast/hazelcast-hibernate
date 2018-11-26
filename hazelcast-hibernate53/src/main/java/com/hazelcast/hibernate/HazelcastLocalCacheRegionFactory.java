@@ -59,7 +59,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
 
     @Override
     protected RegionCache createTimestampsRegionCache(final String unqualifiedRegionName,
-                                                    final SessionFactoryImplementor sessionFactory) {
+                                                      final SessionFactoryImplementor sessionFactory) {
         verifyStarted();
         assert !RegionNameQualifier.INSTANCE.isQualified(unqualifiedRegionName, sessionFactory.getSessionFactoryOptions());
 

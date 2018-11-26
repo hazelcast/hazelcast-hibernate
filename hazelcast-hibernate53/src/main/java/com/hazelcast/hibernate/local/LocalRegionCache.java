@@ -135,7 +135,7 @@ public class LocalRegionCache implements RegionCache {
     }
 
     @Override
-    public Object get(final Object key, long txTimestamp) {
+    public Object get(final Object key, final long txTimestamp) {
         final Expirable value = cache.get(key);
         return value == null ? null : value.getValue(txTimestamp);
     }
@@ -251,7 +251,7 @@ public class LocalRegionCache implements RegionCache {
         }
     }
 
-    private Comparator findVersionComparator(DomainDataRegionConfig regionConfig) {
+    private Comparator findVersionComparator(final DomainDataRegionConfig regionConfig) {
         if (regionConfig == null) {
             return null;
         }
