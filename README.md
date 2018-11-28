@@ -8,6 +8,8 @@ Hazelcast provides a distributed second level cache for your Hibernate entities,
 
 `hazelcast-hibernate52` supports Java 8, Hibernate 5.2.x and Hazelcast 3.7+
 
+`hazelcast-hibernate53` supports Java 8, Hibernate 5.3.x and Hazelcast 3.7+
+
 ## Development
 
 The project needs to be compiled using Java 8.
