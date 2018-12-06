@@ -95,12 +95,10 @@ public class IMapRegionCache implements RegionCache {
         // a spin loop around atomic operations.
         long timeout = System.currentTimeMillis() + tryLockAndGetTimeout;
         do {
-            Expirable previousEntry = map.get(key);
             Value newValue = new Value(version, txTimestamp, value);
+            Expirable previousEntry = map.putIfAbsent(key, newValue);
             if (previousEntry == null) {
-                if (map.putIfAbsent(key, newValue) == null) {
-                    return true;
-                }
+                return true;
             } else if (previousEntry.isReplaceableBy(txTimestamp, version, versionComparator)) {
                 if (map.replace(key, previousEntry, newValue)) {
                     return true;
