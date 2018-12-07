@@ -99,12 +99,10 @@ public class IMapRegionCache implements RegionCache {
             Expirable previousEntry = map.putIfAbsent(key, newValue);
             if (previousEntry == null) {
                 return true;
-            } else if (previousEntry.isReplaceableBy(txTimestamp, version, versionComparator)) {
-                if (map.replace(key, previousEntry, newValue)) {
-                    return true;
-                }
-            } else {
+            } else if (!previousEntry.isReplaceableBy(txTimestamp, version, versionComparator)) {
                 return false;
+            } else if (map.replace(key, previousEntry, newValue)) {
+                return true;
             }
         } while (System.currentTimeMillis() < timeout);
 
