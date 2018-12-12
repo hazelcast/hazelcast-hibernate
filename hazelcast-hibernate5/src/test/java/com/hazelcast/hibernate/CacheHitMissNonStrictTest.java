@@ -56,7 +56,7 @@ public class CacheHitMissNonStrictTest
     @Test
     public void testGetUpdateRemoveGet()
             throws Exception {
-        insertDummyEntities(10, 4);
+        insertDummyEntities(sf, 10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);
@@ -86,7 +86,7 @@ public class CacheHitMissNonStrictTest
 
     @Test
     public void testUpdateEventuallyInvalidatesObject() {
-        insertDummyEntities(10, 4);
+        insertDummyEntities(sf, 10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);

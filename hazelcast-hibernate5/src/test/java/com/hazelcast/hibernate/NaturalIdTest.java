@@ -50,7 +50,7 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
     public void testNaturalIdCacheEvictsEntityOnUpdate() {
         Assume.assumeTrue(defaultAccessType == AccessType.READ_WRITE);
 
-        insertAnnotatedEntities(1);
+        insertAnnotatedEntities(sf, 1);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -76,7 +76,7 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
     public void testNaturalIdCacheStillHitsAfterIrrelevantNaturalIdUpdate() {
         Assume.assumeTrue(defaultAccessType == AccessType.READ_WRITE);
 
-        insertAnnotatedEntities(2);
+        insertAnnotatedEntities(sf, 2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -101,7 +101,7 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
 
     @Test
     public void testFindByNaturalId() {
-        insertAnnotatedEntities(1);
+        insertAnnotatedEntities(sf, 1);
         Session session = sf.openSession();
 
         AnnotatedEntity toBeUpdated = session.byNaturalId(AnnotatedEntity.class).using("title", "dummy:0").getReference();
@@ -111,7 +111,7 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
 
     @Test
     public void testEvictionNaturalId() {
-        insertAnnotatedEntities(1);
+        insertAnnotatedEntities(sf, 1);
         sf.getCache().evictNaturalIdRegion(AnnotatedEntity.class);
         assertFalse(sf.getCache().containsEntity(AnnotatedEntity.class, 0L));
     }

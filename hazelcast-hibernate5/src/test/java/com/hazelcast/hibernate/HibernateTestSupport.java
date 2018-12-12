@@ -19,6 +19,8 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
+import com.hazelcast.hibernate.entity.DummyEntity;
+import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.hibernate.instance.HazelcastAccessor;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
@@ -26,7 +28,10 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.nio.IOUtil;
 import com.hazelcast.test.HazelcastTestSupport;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
@@ -34,11 +39,16 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 
 public abstract class HibernateTestSupport extends HazelcastTestSupport {
 
     private final ILogger logger = Logger.getLogger(getClass());
+
+    protected final String CACHE_ENTITY = DummyEntity.class.getName();
+    protected final String CACHE_PROPERTY = DummyProperty.class.getName();
 
     @BeforeClass
     @AfterClass
@@ -97,6 +107,113 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
 
     protected HazelcastInstance getHazelcastInstance(final SessionFactory sf) {
         return HazelcastAccessor.getHazelcastInstance(sf);
+    }
+
+    protected void deleteDummyEntity(SessionFactory sf, long id) throws Exception {
+        Session session = null;
+        Transaction txn = null;
+        try {
+            session = sf.openSession();
+            txn = session.beginTransaction();
+            DummyEntity entityToDelete = session.get(DummyEntity.class, id);
+            session.delete(entityToDelete);
+            txn.commit();
+        } catch (Exception e) {
+            txn.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+
+    protected void executeUpdateQuery(SessionFactory sf, String queryString)
+            throws RuntimeException {
+        Session session = null;
+        Transaction txn = null;
+        try {
+            session = sf.openSession();
+            txn = session.beginTransaction();
+            Query query = session.createQuery(queryString);
+            query.setCacheable(true);
+            query.executeUpdate();
+            txn.commit();
+        } catch (RuntimeException e) {
+            txn.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+
+    protected ArrayList<DummyEntity> getDummyEntities(SessionFactory sf, long untilId) {
+        Session session = sf.openSession();
+        ArrayList<DummyEntity> entities = new ArrayList<DummyEntity>();
+        for (long i=0; i<untilId; i++) {
+            DummyEntity entity = session.get(DummyEntity.class, i);
+            if (entity != null) {
+                session.evict(entity);
+                entities.add(entity);
+            }
+        }
+        session.close();
+        return entities;
+    }
+
+    protected void insertAnnotatedEntities(SessionFactory sf, int count) {
+        Session session = sf.openSession();
+        Transaction tx = session.beginTransaction();
+        for(int i=0; i< count; i++) {
+            AnnotatedEntity annotatedEntity = new AnnotatedEntity("dummy:"+i);
+            session.save(annotatedEntity);
+        }
+        tx.commit();
+        session.close();
+    }
+
+    protected void insertDummyEntities(SessionFactory sf, int count) {
+        insertDummyEntities(sf, count, 0);
+    }
+
+    protected void insertDummyEntities(SessionFactory sf, int count, int childCount) {
+        Session session = sf.openSession();
+        Transaction tx = session.beginTransaction();
+        try {
+            for (int i = 0; i < count; i++) {
+                DummyEntity e = new DummyEntity((long) i, "dummy:" + i, i * 123456d, new Date());
+                session.save(e);
+                for (int j = 0; j < childCount; j++) {
+                    DummyProperty p = new DummyProperty("key:" + j, e);
+                    session.save(p);
+                }
+            }
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    protected void updateDummyEntityName(SessionFactory sf, long id, String newName) {
+        Session session = null;
+        Transaction txn = null;
+        try {
+            session = sf.openSession();
+            txn = session.beginTransaction();
+            DummyEntity entityToUpdate = session.get(DummyEntity.class, id);
+            entityToUpdate.setName(newName);
+            session.update(entityToUpdate);
+            txn.commit();
+        } catch (RuntimeException e) {
+            txn.rollback();
+            e.printStackTrace();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 
     /**

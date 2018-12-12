@@ -56,9 +56,8 @@ public class CacheHitMissReadWriteTest
     }
 
     @Test
-    public void testGetUpdateRemoveGet()
-            throws Exception {
-        insertDummyEntities(10, 4);
+    public void testGetUpdateRemoveGet() throws Exception {
+        insertDummyEntities(sf, 10, 4);
         //all 10 entities and 40 properties are cached
         CacheRegionStatistics dummyEntityCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_ENTITY);
         CacheRegionStatistics dummyPropertyCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_PROPERTY);
@@ -86,7 +85,7 @@ public class CacheHitMissReadWriteTest
 
     @Test
     public void testUpdateShouldInvalidateEntryInCache() {
-        insertDummyEntities(10, 4);
+        insertDummyEntities(sf, 10, 4);
         //all 10 entities and 40 properties are cached
         DomainDataRegionTemplate regionTemplate = (DomainDataRegionTemplate) (((SessionFactoryImpl) sf).getCache()).getRegion(CACHE_ENTITY);
         ExtendedStatisticsSupport stats = ((HazelcastStorageAccessImpl) regionTemplate.getCacheStorageAccess()).getDelegate();

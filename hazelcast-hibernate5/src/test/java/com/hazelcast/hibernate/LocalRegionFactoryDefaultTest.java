@@ -53,7 +53,7 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
         assertNotNull(hz);
         final int count = 100;
         final int childCount = 3;
-        insertDummyEntities(count, childCount);
+        insertDummyEntities(sf, count, childCount);
         List<DummyEntity> list = new ArrayList<DummyEntity>(count);
         Session session = sf.openSession();
         try {
