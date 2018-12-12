@@ -22,7 +22,6 @@ import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
-import com.hazelcast.test.annotation.Repeat;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -60,7 +59,7 @@ public class RegionFactoryDefaultTest extends HibernateStatisticsTestSupport {
         assertNotNull(hz);
         final int count = 100;
         final int childCount = 3;
-        insertDummyEntities(count, childCount);
+        insertDummyEntities(sf, count, childCount);
         List<DummyEntity> list = new ArrayList<DummyEntity>(count);
         Session session = sf.openSession();
         try {
@@ -109,10 +108,11 @@ public class RegionFactoryDefaultTest extends HibernateStatisticsTestSupport {
         stats.logSummary();
     }
 
-    public void testQuery() throws Exception {
+    @Test
+    public void testQuery() {
         final int entityCount = 10;
         final int queryCount = 3;
-        insertDummyEntities(entityCount);
+        insertDummyEntities(sf, entityCount);
         // After inserting the entities, we need a slight delay. Otherwise, when the queries run, it's possible
         // that the UpdateTimestampsCache entry for DummyEntity still matches the current timestamp. When that
         // happens, this test fails because the StandardQueryCache considers the cached data out-of-date, which
@@ -160,7 +160,7 @@ public class RegionFactoryDefaultTest extends HibernateStatisticsTestSupport {
     @Test
     public void testSpecificQueryRegionEviction() {
         int entityCount = 10;
-        insertDummyEntities(entityCount, 0);
+        insertDummyEntities(sf, entityCount, 0);
 
         //miss 1 query list entities
         Session session = sf.openSession();
@@ -249,21 +249,21 @@ public class RegionFactoryDefaultTest extends HibernateStatisticsTestSupport {
 
     @Test
     public void testEvictionEntity() {
-        insertDummyEntities(1, 1);
+        insertDummyEntities(sf, 1, 1);
         sf.getCache().evictEntity("com.hazelcast.hibernate.entity.DummyEntity", 0L);
         assertFalse(sf.getCache().containsEntity("com.hazelcast.hibernate.entity.DummyEntity", 0L));
     }
 
     @Test
     public void testEvictionCollection() {
-        insertDummyEntities(1, 1);
+        insertDummyEntities(sf, 1, 1);
         sf.getCache().evictCollection("com.hazelcast.hibernate.entity.DummyEntity.properties", 0L);
         assertFalse(sf.getCache().containsCollection("com.hazelcast.hibernate.entity.DummyEntity.properties", 0L));
     }
 
     @Test
     public void testInsertEvictUpdate() {
-        insertDummyEntities(1);
+        insertDummyEntities(sf, 1);
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
         DummyEntity ent = session.get(DummyEntity.class, 0L);

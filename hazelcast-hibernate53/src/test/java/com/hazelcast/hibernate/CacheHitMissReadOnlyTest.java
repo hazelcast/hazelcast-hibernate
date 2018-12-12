@@ -55,9 +55,8 @@ public class CacheHitMissReadOnlyTest
     }
 
     @Test
-    public void testGetUpdateRemoveGet()
-            throws Exception {
-        insertDummyEntities(10, 4);
+    public void testGetUpdateRemoveGet() throws Exception {
+        insertDummyEntities(sf, 10, 4);
         //all 10 entities and 40 properties are cached
         CacheRegionStatistics dummyEntityCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_ENTITY);
         CacheRegionStatistics dummyPropertyCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_PROPERTY);
@@ -77,7 +76,7 @@ public class CacheHitMissReadOnlyTest
 
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyUpdate() {
-        insertDummyEntities(1, 0);
+        insertDummyEntities(sf, 1, 0);
         updateDummyEntityName(sf, 0, "updated");
     }
 

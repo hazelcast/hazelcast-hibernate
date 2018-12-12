@@ -55,9 +55,8 @@ public class CacheHitMissReadOnlyTest
     }
 
     @Test
-    public void testGetUpdateRemoveGet()
-            throws Exception {
-        insertDummyEntities(10, 4);
+    public void testGetUpdateRemoveGet() throws Exception {
+        insertDummyEntities(sf, 10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);
@@ -77,13 +76,13 @@ public class CacheHitMissReadOnlyTest
 
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateQueryCausesInvalidationOfEntireRegion() {
-        insertDummyEntities(10);
+        insertDummyEntities(sf, 10);
         executeUpdateQuery(sf, "UPDATE DummyEntity set name = 'manually-updated' where id=2");
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void testReadOnlyUpdate() throws Exception{
-        insertDummyEntities(1, 0);
+    public void testReadOnlyUpdate() {
+        insertDummyEntities(sf, 1, 0);
         updateDummyEntityName(sf, 0, "updated");
     }
 
@@ -98,7 +97,7 @@ public class CacheHitMissReadOnlyTest
 
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateQueryCausesInvalidationOfEntireCollectionRegion() {
-        insertDummyEntities(1, 10);
+        insertDummyEntities(sf, 1, 10);
 
         //attempt to evict properties reference in DummyEntity because of custom SQL query on Collection region
         executeUpdateQuery(sf, "update DummyProperty ent set ent.key='manually-updated'");

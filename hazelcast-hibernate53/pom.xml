@@ -102,12 +102,12 @@
                                 <resource>
                                     <directory>../hazelcast-hibernate5/src/test/java</directory>
                                     <excludes>
-                                        <exclude>com/hazelcast/hibernate/CacheHitMissNonStrictTest.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/CacheHitMissReadOnlyTest.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/CacheHitMissReadWriteTest.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/CacheHitMiss*Test.java</exclude>
                                         <exclude>com/hazelcast/hibernate/CustomPropertiesTest.java</exclude>
                                         <exclude>com/hazelcast/hibernate/NaturalIdTest.java</exclude>
                                         <exclude>com/hazelcast/hibernate/RegionFactoryDefaultSlowTest.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/HibernateTopicTestSupport.java</exclude>
+                                        <exclude>com/hazelcast/hibernate/Topic*Test.java</exclude>
                                         <exclude>com/hazelcast/hibernate/access/**.java</exclude>
                                         <exclude>com/hazelcast/hibernate/region/**.java</exclude>
                                         <exclude>com/hazelcast/hibernate/local/LocalRegionCacheTest.java</exclude>
