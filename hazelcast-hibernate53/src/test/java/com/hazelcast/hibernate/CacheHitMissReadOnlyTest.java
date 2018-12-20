@@ -43,8 +43,9 @@ import static org.mockito.Mockito.mock;
 public class CacheHitMissReadOnlyTest
         extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.READ_ONLY.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.READ_ONLY;
     }
 
     @Override

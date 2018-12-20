@@ -46,8 +46,9 @@ import static org.junit.Assert.assertEquals;
 public class CacheHitMissNonStrictTest
         extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.NONSTRICT_READ_WRITE.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.NONSTRICT_READ_WRITE;
     }
 
     @Override

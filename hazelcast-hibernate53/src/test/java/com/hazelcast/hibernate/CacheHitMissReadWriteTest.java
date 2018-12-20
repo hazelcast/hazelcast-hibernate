@@ -44,8 +44,9 @@ import static org.junit.Assert.assertEquals;
 public class CacheHitMissReadWriteTest
         extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.READ_WRITE.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.READ_WRITE;
     }
 
     @Override

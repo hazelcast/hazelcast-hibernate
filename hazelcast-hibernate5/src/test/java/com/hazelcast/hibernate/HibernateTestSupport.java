@@ -61,8 +61,8 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
         Hazelcast.shutdownAll();
     }
 
-    protected String getCacheStrategy() {
-        return  AccessType.READ_WRITE.getExternalName();
+    protected AccessType getCacheStrategy() {
+        return AccessType.READ_WRITE;
     }
 
     protected void sleep(int seconds) {
@@ -242,7 +242,7 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
 
             writer = new BufferedWriter(new FileWriter(hbmXmlFile));
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                writer.write(String.format(line, getCacheStrategy()));
+                writer.write(String.format(line, getCacheStrategy().getExternalName()));
                 writer.newLine();
             }
             writer.flush();

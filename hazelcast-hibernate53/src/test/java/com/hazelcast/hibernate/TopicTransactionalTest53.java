@@ -35,9 +35,7 @@ import java.util.Properties;
 
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
-public class TopicReadWriteTest extends HibernateTopicTestSupport {
-
-    public AccessType defaultAccessType = AccessType.READ_WRITE;
+public class TopicTransactionalTest53 extends HibernateTopicTestSupport {
 
     @Test
     public void testReplaceCollection() {
@@ -60,7 +58,7 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
         session.close();
 
         assertTopicNotifications(1, CACHE_ENTITY);
-        assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
+        assertTopicNotifications(4, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(18, CACHE_TIMESTAMPS_REGION);
     }
 
@@ -106,9 +104,6 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
 
         executeUpdateQuery(sf, "update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
 
-        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
-        // - removeAll is called after executing the update
-        // - unlockRegion is called after the transaction completes
         assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
         assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
     }
@@ -154,9 +149,9 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
 
         deleteDummyEntity(sf, 0);
 
-        assertTopicNotifications(1, CACHE_ENTITY);
-        assertTopicNotifications(1, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(1, CACHE_PROPERTY);
+        assertTopicNotifications(2, CACHE_ENTITY);
+        assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
+        assertTopicNotifications(2, CACHE_PROPERTY);
         assertTopicNotifications(9, CACHE_TIMESTAMPS_REGION);
     }
 
@@ -168,9 +163,9 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
             deleteDummyEntity(sf, i);
         }
 
-        assertTopicNotifications(3, CACHE_ENTITY);
-        assertTopicNotifications(3, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(12, CACHE_PROPERTY);
+        assertTopicNotifications(6, CACHE_ENTITY);
+        assertTopicNotifications(6, CACHE_ENTITY_PROPERTIES);
+        assertTopicNotifications(24, CACHE_PROPERTY);
         assertTopicNotifications(67, CACHE_TIMESTAMPS_REGION);
     }
 
@@ -194,7 +189,7 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
 
         executeUpdateQuery(sf, "update DummyEntity set name = 'updated-name' where id < 2");
 
-        assertTopicNotifications(1, CACHE_ENTITY);
+        assertTopicNotifications(2, CACHE_ENTITY);
         assertTopicNotifications(0, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(0, CACHE_PROPERTY);
         assertTopicNotifications(15, CACHE_TIMESTAMPS_REGION);
@@ -209,11 +204,11 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
         try {
             session = sf.openSession();
             txn = session.beginTransaction();
-            Query query = session.createQuery( "update DummyEntity set name = 'updated-name' where id < 2");
+            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id < 2");
             query.setCacheable(true);
             query.executeUpdate();
 
-            Query query2 = session.createQuery( "update DummyProperty set version = version + 1");
+            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
             query2.setCacheable(true);
             query2.executeUpdate();
 
@@ -226,12 +221,9 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
             session.close();
         }
 
-        assertTopicNotifications(1, CACHE_ENTITY);
-        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
-        // - removeAll is called after executing the update
-        // - unlockRegion is called after the transaction completes
+        assertTopicNotifications(2, CACHE_ENTITY);
         assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(1, CACHE_PROPERTY);
+        assertTopicNotifications(2, CACHE_PROPERTY);
         assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
     }
 
@@ -244,11 +236,11 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
         try {
             session = sf.openSession();
             txn = session.beginTransaction();
-            Query query = session.createQuery( "update DummyEntity set name = 'updated-name' where id = 0");
+            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id = 0");
             query.setCacheable(true);
             query.executeUpdate();
 
-            Query query2 = session.createQuery( "update DummyProperty set version = version + 1");
+            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
             query2.setCacheable(true);
             query2.executeUpdate();
 
@@ -261,24 +253,14 @@ public class TopicReadWriteTest extends HibernateTopicTestSupport {
             session.close();
         }
 
-        assertTopicNotifications(1, CACHE_ENTITY);
-        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
-        // - removeAll is called after executing the update
-        // - unlockRegion is called after the transaction completes
+        assertTopicNotifications(2, CACHE_ENTITY);
         assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(1, CACHE_PROPERTY);
+        assertTopicNotifications(2, CACHE_PROPERTY);
         assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
     }
 
-    protected String getCacheStrategy() {
-        return defaultAccessType.getExternalName();
-    }
-
     @Override
-    protected Properties getCacheProperties() {
-        Properties props = new Properties();
-        props.put("TestAccessType", defaultAccessType);
-        props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastLocalCacheRegionFactory.class.getName());
-        return props;
+    protected AccessType getCacheStrategy() {
+        return AccessType.TRANSACTIONAL;
     }
 }

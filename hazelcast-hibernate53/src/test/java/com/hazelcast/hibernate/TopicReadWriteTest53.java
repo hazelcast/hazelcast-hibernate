@@ -18,17 +18,16 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cache.spi.access.AccessType;
+import org.hibernate.query.Query;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
-public class TopicReadOnlyTest extends TopicReadOnlyTestSupport {
+public class TopicReadWriteTest53 extends TopicReadWriteTestSupport {
 
     @Test
     public void testUpdateQueryByNaturalId() {
@@ -36,44 +35,14 @@ public class TopicReadOnlyTest extends TopicReadOnlyTestSupport {
 
         executeUpdateQuery(sf, "update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
 
-        assertTopicNotifications(1, CACHE_ANNOTATED_ENTITY + "##NaturalId");
+        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
+        // - removeAll is called after executing the update
+        // - unlockRegion is called after the transaction completes
+        assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
         assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
     }
 
     @Test
-    public void testDeleteOneEntity() throws Exception {
-        insertDummyEntities(sf, 1, 1);
-
-        deleteDummyEntity(sf, 0);
-
-        assertTopicNotifications(2, CACHE_ENTITY);
-        assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(2, CACHE_PROPERTY);
-        assertTopicNotifications(9, CACHE_TIMESTAMPS_REGION);
-    }
-
-    @Test
-    public void testDeleteEntities() throws Exception {
-        insertDummyEntities(sf, 10, 4);
-
-        for (int i = 0; i < 3; i++) {
-            deleteDummyEntity(sf, i);
-        }
-
-        assertTopicNotifications(6, CACHE_ENTITY);
-        assertTopicNotifications(6, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(24, CACHE_PROPERTY);
-        assertTopicNotifications(67, CACHE_TIMESTAMPS_REGION);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateEntities() {
-        insertDummyEntities(sf, 1, 10);
-
-        executeUpdateQuery(sf, "update DummyEntity set name = 'updated-name' where id < 2");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
     public void testUpdateEntitiesAndProperties() {
         insertDummyEntities(sf, 1, 10);
 
@@ -98,9 +67,17 @@ public class TopicReadOnlyTest extends TopicReadOnlyTestSupport {
         } finally {
             session.close();
         }
+
+        assertTopicNotifications(1, CACHE_ENTITY);
+        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
+        // - removeAll is called after executing the update
+        // - unlockRegion is called after the transaction completes
+        assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
+        assertTopicNotifications(1, CACHE_PROPERTY);
+        assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testUpdateOneEntityAndProperties() {
         insertDummyEntities(sf, 1, 10);
 
@@ -125,9 +102,13 @@ public class TopicReadOnlyTest extends TopicReadOnlyTestSupport {
         } finally {
             session.close();
         }
-    }
 
-    protected AccessType getCacheStrategy() {
-        return AccessType.READ_ONLY;
+        assertTopicNotifications(1, CACHE_ENTITY);
+        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
+        // - removeAll is called after executing the update
+        // - unlockRegion is called after the transaction completes
+        assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
+        assertTopicNotifications(1, CACHE_PROPERTY);
+        assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
     }
 }

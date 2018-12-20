@@ -40,11 +40,11 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(HazelcastSerialClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class CacheHitMissReadOnlyTest
-        extends HibernateStatisticsTestSupport {
+public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.READ_ONLY.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.READ_ONLY;
     }
 
     @Override
