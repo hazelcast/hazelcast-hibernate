@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
-public class TopicNonStrictReadWriteTest extends TopicNonStrictReadWriteTestSupport {
+public class TopicNonStrictReadWriteTest53 extends TopicNonStrictReadWriteTestSupport {
 
     @Test
     public void testUpdateQueryByNaturalId() {
@@ -32,7 +32,10 @@ public class TopicNonStrictReadWriteTest extends TopicNonStrictReadWriteTestSupp
 
         executeUpdateQuery(sf, "update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
 
-        assertTopicNotifications(1, CACHE_ANNOTATED_ENTITY + "##NaturalId");
+        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
+        // - removeAll is called after executing the update
+        // - unlockRegion is called after the transaction completes
+        assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
         assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
     }
 }

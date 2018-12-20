@@ -38,11 +38,11 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(HazelcastSerialClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class CacheHitMissReadWriteTest
-        extends HibernateStatisticsTestSupport {
+public class CacheHitMissReadWriteTest extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.READ_WRITE.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.READ_WRITE;
     }
 
     @Override

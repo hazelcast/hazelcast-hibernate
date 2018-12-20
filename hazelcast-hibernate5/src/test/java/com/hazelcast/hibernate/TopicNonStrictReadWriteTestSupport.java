@@ -19,25 +19,15 @@ package com.hazelcast.hibernate;
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
-import com.hazelcast.test.HazelcastSerialClassRunner;
-import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cache.spi.access.AccessType;
-import org.hibernate.cfg.Environment;
-import org.hibernate.query.Query;
+import org.hibernate.Query;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 
 import java.util.HashSet;
-import java.util.Properties;
 
-@RunWith(HazelcastSerialClassRunner.class)
-@Category(SlowTest.class)
-public class TopicNonStrictReadWriteTest extends HibernateTopicTestSupport {
-
-    public AccessType defaultAccessType = AccessType.NONSTRICT_READ_WRITE;
+public abstract class TopicNonStrictReadWriteTestSupport extends HibernateTopicTestSupport {
 
     @Test
     public void testReplaceCollection() {
@@ -50,7 +40,7 @@ public class TopicNonStrictReadWriteTest extends HibernateTopicTestSupport {
         session.save(property);
 
         DummyEntity entity = session.get(DummyEntity.class, 1L);
-        HashSet<DummyProperty> updatedProperties = new HashSet<>();
+        HashSet<DummyProperty> updatedProperties = new HashSet<DummyProperty>();
         updatedProperties.add(property);
         entity.setProperties(updatedProperties);
 
@@ -97,19 +87,6 @@ public class TopicNonStrictReadWriteTest extends HibernateTopicTestSupport {
 
         // 5 notifications = 1 eviction, plus for each update: one unlockItem and one afterUpdate
         assertTopicNotifications(5, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
-    }
-
-    @Test
-    public void testUpdateQueryByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
-
-        executeUpdateQuery(sf, "update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
-
-        // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
-        // - removeAll is called after executing the update
-        // - unlockRegion is called after the transaction completes
-        assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
         assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
     }
 
@@ -209,11 +186,11 @@ public class TopicNonStrictReadWriteTest extends HibernateTopicTestSupport {
         try {
             session = sf.openSession();
             txn = session.beginTransaction();
-            Query query = session.createQuery( "update DummyEntity set name = 'updated-name' where id < 2");
+            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id < 2");
             query.setCacheable(true);
             query.executeUpdate();
 
-            Query query2 = session.createQuery( "update DummyProperty set version = version + 1");
+            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
             query2.setCacheable(true);
             query2.executeUpdate();
 
@@ -241,11 +218,11 @@ public class TopicNonStrictReadWriteTest extends HibernateTopicTestSupport {
         try {
             session = sf.openSession();
             txn = session.beginTransaction();
-            Query query = session.createQuery( "update DummyEntity set name = 'updated-name' where id = 0");
+            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id = 0");
             query.setCacheable(true);
             query.executeUpdate();
 
-            Query query2 = session.createQuery( "update DummyProperty set version = version + 1");
+            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
             query2.setCacheable(true);
             query2.executeUpdate();
 
@@ -264,15 +241,8 @@ public class TopicNonStrictReadWriteTest extends HibernateTopicTestSupport {
         assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
     }
 
-    protected String getCacheStrategy() {
-        return defaultAccessType.getExternalName();
-    }
-
     @Override
-    protected Properties getCacheProperties() {
-        Properties props = new Properties();
-        props.put("TestAccessType", defaultAccessType);
-        props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastLocalCacheRegionFactory.class.getName());
-        return props;
+    protected AccessType getCacheStrategy() {
+        return AccessType.NONSTRICT_READ_WRITE;
     }
 }

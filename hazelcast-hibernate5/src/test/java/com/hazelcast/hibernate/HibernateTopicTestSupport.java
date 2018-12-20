@@ -8,6 +8,7 @@ import com.hazelcast.hibernate.instance.HazelcastMockInstanceLoader;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.UpdateTimestampsCache;
+import org.hibernate.cfg.Environment;
 import org.junit.After;
 import org.junit.Before;
 
@@ -48,7 +49,12 @@ public abstract class HibernateTopicTestSupport extends HibernateTestSupport {
         factory.shutdownAll();
     }
 
-    protected abstract Properties getCacheProperties();
+    protected Properties getCacheProperties() {
+        Properties props = new Properties();
+        props.put("TestAccessType", getCacheStrategy());
+        props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastLocalCacheRegionFactory.class.getName());
+        return props;
+    }
 
     protected void assertTopicNotifications(int expectedCount, String topicName) {
         assertEquals(expectedCount, instance.getTopic(topicName).getLocalTopicStats().getPublishOperationCount());
