@@ -43,8 +43,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(HazelcastSerialClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class CacheHitMissNonStrictTest
-        extends HibernateStatisticsTestSupport {
+public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
 
     @Override
     protected AccessType getCacheStrategy() {
@@ -60,7 +59,7 @@ public class CacheHitMissNonStrictTest
 
     @Test
     public void testGetUpdateRemoveGet() throws Exception {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         CacheRegionStatistics dummyEntityCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_ENTITY);
         CacheRegionStatistics dummyPropertyCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_PROPERTY);
@@ -69,18 +68,18 @@ public class CacheHitMissNonStrictTest
         sf.getCache().evictCollectionData();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         //entity 2 and its properties are invalidated
 
         //miss updated entity, hit 4 properties(they are still the same)
-        getPropertiesOfEntity(sf, 2);
+        getPropertiesOfEntity(2);
 
         //hit 1 entity and 4 properties
-        deleteDummyEntity(sf, 1);
+        deleteDummyEntity(1);
 
         assertEquals(12, dummyPropertyCacheStats.getHitCount());
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
@@ -90,19 +89,19 @@ public class CacheHitMissNonStrictTest
 
     @Test
     public void testUpdateEventuallyInvalidatesObject() {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         DomainDataRegionTemplate regionTemplate = (DomainDataRegionTemplate) (((SessionFactoryImpl) sf).getCache()).getRegion(CACHE_ENTITY);
-        ExtendedStatisticsSupport stats = (ExtendedStatisticsSupport) ((HazelcastStorageAccessImpl) regionTemplate.getCacheStorageAccess()).getDelegate();
+        ExtendedStatisticsSupport stats = ((HazelcastStorageAccessImpl) regionTemplate.getCacheStorageAccess()).getDelegate();
 
         sf.getCache().evictEntityData();
         sf.getCache().evictCollectionData();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         assertTrueEventually(new AssertTask() {
             public void run() {

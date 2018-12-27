@@ -40,8 +40,7 @@ import static org.mockito.Mockito.mock;
  */
 @RunWith(HazelcastSerialClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class CacheHitMissReadOnlyTest
-        extends HibernateStatisticsTestSupport {
+public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
 
     @Override
     protected AccessType getCacheStrategy() {
@@ -57,7 +56,7 @@ public class CacheHitMissReadOnlyTest
 
     @Test
     public void testGetUpdateRemoveGet() throws Exception {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         CacheRegionStatistics dummyEntityCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_ENTITY);
         CacheRegionStatistics dummyPropertyCacheStats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_PROPERTY);
@@ -65,9 +64,9 @@ public class CacheHitMissReadOnlyTest
         sf.getCache().evictEntityData();
         sf.getCache().evictCollectionData();
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
         //hit 1 entity and 4 properties
-        deleteDummyEntity(sf, 1);
+        deleteDummyEntity(1);
 
         assertEquals(4, dummyPropertyCacheStats.getHitCount());
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
@@ -77,8 +76,8 @@ public class CacheHitMissReadOnlyTest
 
     @Test(expected = UnsupportedOperationException.class)
     public void testReadOnlyUpdate() {
-        insertDummyEntities(sf, 1, 0);
-        updateDummyEntityName(sf, 0, "updated");
+        insertDummyEntities(1, 0);
+        updateDummyEntityName(0, "updated");
     }
 
     @Test(expected = UnsupportedOperationException.class)

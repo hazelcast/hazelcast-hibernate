@@ -16,11 +16,14 @@
 
 package com.hazelcast.hibernate;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.cache.spi.UpdateTimestampsCache;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -29,19 +32,30 @@ import org.junit.runner.RunWith;
 @Category(SlowTest.class)
 public class TopicReadWriteTest extends TopicReadWriteTestSupport {
 
+    @Override
+    protected void configureTopic(HazelcastInstance instance) {
+        // Construct a LocalRegionCache instance, which configures the topic
+        new LocalRegionCache("cache", instance, null, true);
+    }
+
+    @Override
+    protected String getTimestampsRegionName() {
+        return UpdateTimestampsCache.REGION_NAME;
+    }
+
     @Test
     public void testUpdateQueryByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
-        executeUpdateQuery(sf, "update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
+        executeUpdateQuery("update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
 
         assertTopicNotifications(1, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateEntitiesAndProperties() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
         Session session = null;
         Transaction txn = null;
@@ -68,12 +82,12 @@ public class TopicReadWriteTest extends TopicReadWriteTestSupport {
         assertTopicNotifications(1, CACHE_ENTITY);
         assertTopicNotifications(1, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(1, CACHE_PROPERTY);
-        assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(17, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateOneEntityAndProperties() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
         Session session = null;
         Transaction txn = null;
@@ -100,6 +114,6 @@ public class TopicReadWriteTest extends TopicReadWriteTestSupport {
         assertTopicNotifications(1, CACHE_ENTITY);
         assertTopicNotifications(1, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(1, CACHE_PROPERTY);
-        assertTopicNotifications(17, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(17, getTimestampsRegionName());
     }
 }

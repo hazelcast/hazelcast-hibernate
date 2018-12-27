@@ -35,15 +35,14 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class HibernateStatisticsTestSupport extends HibernateTestSupport {
 
+    private final TestHazelcastFactory factory  = new TestHazelcastFactory();
+
     protected SessionFactory sf;
     protected SessionFactory sf2;
-
-    private static TestHazelcastFactory factory;
 
     @Before
     public void postConstruct() {
         HazelcastMockInstanceLoader loader = new HazelcastMockInstanceLoader();
-        factory = new TestHazelcastFactory();
         loader.setInstanceFactory(factory);
         sf = createSessionFactory(getCacheProperties(),  loader);
         sf2 = createSessionFactory(getCacheProperties(), loader);
@@ -65,8 +64,20 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
 
     protected abstract Properties getCacheProperties();
 
-    protected List<DummyEntity> executeQuery(SessionFactory factory) {
-        Session session = factory.openSession();
+    protected void insertDummyEntities(int count) {
+        insertDummyEntities(sf, count, 0);
+    }
+
+    protected void insertDummyEntities(int count, int childCount) {
+        insertDummyEntities(sf, count, childCount);
+    }
+
+    protected void insertAnnotatedEntities(int count) {
+        insertAnnotatedEntities(sf, count);
+    }
+
+    protected List<DummyEntity> executeQuery() {
+        Session session = sf.openSession();
         try {
             Query query = session.createQuery("from " + DummyEntity.class.getName());
             query.setCacheable(true);
@@ -76,19 +87,35 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
         }
     }
 
-    protected Set<DummyProperty> getPropertiesOfEntity(SessionFactory sf, long entityId) {
+    protected ArrayList<DummyEntity> getDummyEntities(long untilId) {
+        return getDummyEntities(sf, untilId);
+    }
+
+    protected Set<DummyProperty> getPropertiesOfEntity(long entityId) {
         Session session = sf.openSession();
         DummyEntity entity = session.get(DummyEntity.class, entityId);
-        if(entity != null) {
+        if (entity != null) {
             return entity.getProperties();
         } else {
             return null;
         }
     }
 
+    protected void updateDummyEntityName(long id, String newName) {
+        updateDummyEntityName(sf, id, newName);
+    }
+
+    protected void deleteDummyEntity(long id) throws Exception {
+        deleteDummyEntity(sf, id);
+    }
+
+    protected void executeUpdateQuery(String queryString) throws RuntimeException {
+        executeUpdateQuery(sf, queryString);
+    }
+
     @Test
     public void testUpdateQueryCausesInvalidationOfEntireRegion() {
-        insertDummyEntities(sf, 10);
+        insertDummyEntities(10);
 
         executeUpdateQuery(sf, "UPDATE DummyEntity set name = 'manually-updated' where id=2");
 
@@ -103,14 +130,14 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
 
     @Test
     public void testUpdateQueryCausesInvalidationOfEntireCollectionRegion() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
         //properties reference in DummyEntity is evicted because of custom SQL query on Collection region
         executeUpdateQuery(sf, "update DummyProperty ent set ent.key='manually-updated'");
         sf.getStatistics().clear();
 
         //property reference missed in cache.
-        getPropertiesOfEntity(sf, 0);
+        getPropertiesOfEntity(0);
 
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY + ".properties");
         assertEquals(0, dummyPropertyCacheStats.getHitCount());

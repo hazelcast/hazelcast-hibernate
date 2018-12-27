@@ -31,7 +31,7 @@ public abstract class TopicReadWriteTestSupport extends HibernateTopicTestSuppor
 
     @Test
     public void testReplaceCollection() {
-        insertDummyEntities(sf, 2, 4);
+        insertDummyEntities(2, 4);
 
         Session session = sf.openSession();
         Transaction transaction = session.beginTransaction();
@@ -51,12 +51,12 @@ public abstract class TopicReadWriteTestSupport extends HibernateTopicTestSuppor
 
         assertTopicNotifications(1, CACHE_ENTITY);
         assertTopicNotifications(2, CACHE_ENTITY_PROPERTIES);
-        assertTopicNotifications(18, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(18, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateOneEntityByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -67,12 +67,12 @@ public abstract class TopicReadWriteTestSupport extends HibernateTopicTestSuppor
         session.close();
 
         assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateEntitiesByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -87,12 +87,12 @@ public abstract class TopicReadWriteTestSupport extends HibernateTopicTestSuppor
 
         // 5 notifications = 1 eviction, plus for each update: one unlockItem and one afterUpdate
         assertTopicNotifications(5, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteOneEntityByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -103,12 +103,12 @@ public abstract class TopicReadWriteTestSupport extends HibernateTopicTestSuppor
         session.close();
 
         assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteEntitiesByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -122,59 +122,59 @@ public abstract class TopicReadWriteTestSupport extends HibernateTopicTestSuppor
         session.close();
 
         assertTopicNotifications(4, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteOneEntity() throws Exception {
-        insertDummyEntities(sf, 1, 1);
+        insertDummyEntities(1, 1);
 
-        deleteDummyEntity(sf, 0);
+        deleteDummyEntity(0);
 
         assertTopicNotifications(1, CACHE_ENTITY);
         assertTopicNotifications(1, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(1, CACHE_PROPERTY);
-        assertTopicNotifications(9, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(9, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteEntities() throws Exception {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
 
         for (int i = 0; i < 3; i++) {
-            deleteDummyEntity(sf, i);
+            deleteDummyEntity(i);
         }
 
         assertTopicNotifications(3, CACHE_ENTITY);
         assertTopicNotifications(3, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(12, CACHE_PROPERTY);
-        assertTopicNotifications(67, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(67, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateOneEntity() {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
 
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         assertTopicNotifications(1, CACHE_ENTITY);
         assertTopicNotifications(0, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(0, CACHE_PROPERTY);
-        assertTopicNotifications(54, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(54, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateEntities() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
-        executeUpdateQuery(sf, "update DummyEntity set name = 'updated-name' where id < 2");
+        executeUpdateQuery("update DummyEntity set name = 'updated-name' where id < 2");
 
         assertTopicNotifications(1, CACHE_ENTITY);
         assertTopicNotifications(0, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(0, CACHE_PROPERTY);
-        assertTopicNotifications(15, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(15, getTimestampsRegionName());
     }
 
     @Override
