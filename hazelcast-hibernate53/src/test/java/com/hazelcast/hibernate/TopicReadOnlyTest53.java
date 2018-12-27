@@ -16,59 +16,75 @@
 
 package com.hazelcast.hibernate;
 
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.query.Query;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+import static org.mockito.Mockito.mock;
+
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
 public class TopicReadOnlyTest53 extends TopicReadOnlyTestSupport {
 
+    @Override
+    protected void configureTopic(HazelcastInstance instance) {
+        // Construct a LocalRegionCache instance, which configures the topic
+        new LocalRegionCache(mock(RegionFactory.class), "cache", instance, null, true);
+    }
+
+    @Override
+    protected String getTimestampsRegionName() {
+        return "default-update-timestamps-region";
+    }
+
     @Test
     public void testUpdateQueryByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
-        executeUpdateQuery(sf, "update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
+        executeUpdateQuery("update AnnotatedEntity set title = 'updated-name' where title = 'dummy:1'");
 
         // There are *2* topic notifications (compared to *1* on previous Hibernate versions):
         // - removeAll is called after executing the update
         // - unlockRegion is called after the transaction completes
         assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteOneEntity() throws Exception {
-        insertDummyEntities(sf, 1, 1);
+        insertDummyEntities(1, 1);
 
-        deleteDummyEntity(sf, 0);
+        deleteDummyEntity(0);
 
         assertTopicNotifications(2, CACHE_ENTITY);
         // There is only *1* topic notification (compared to *2* - which are both an evict by the key - on previous
         // Hibernate versions)
         assertTopicNotifications(1, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(2, CACHE_PROPERTY);
-        assertTopicNotifications(9, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(9, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteEntities() throws Exception {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
 
         for (int i = 0; i < 3; i++) {
-            deleteDummyEntity(sf, i);
+            deleteDummyEntity(i);
         }
 
         assertTopicNotifications(6, CACHE_ENTITY);
         assertTopicNotifications(3, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(24, CACHE_PROPERTY);
-        assertTopicNotifications(67, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(67, getTimestampsRegionName());
     }
 
     // This test should throw an UnsupportedOperationException, for attempting an update on a read-only cache,
@@ -76,9 +92,9 @@ public class TopicReadOnlyTest53 extends TopicReadOnlyTestSupport {
     @Ignore
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateEntities() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
-        executeUpdateQuery(sf, "update DummyEntity set name = 'updated-name' where id < 2");
+        executeUpdateQuery("update DummyEntity set name = 'updated-name' where id < 2");
     }
 
     // This test should throw an UnsupportedOperationException, for attempting an update on a read-only cache,
@@ -86,7 +102,7 @@ public class TopicReadOnlyTest53 extends TopicReadOnlyTestSupport {
     @Ignore
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateEntitiesAndProperties() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
         Session session = null;
         Transaction txn = null;
@@ -116,7 +132,7 @@ public class TopicReadOnlyTest53 extends TopicReadOnlyTestSupport {
     @Ignore
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateOneEntityAndProperties() {
-        insertDummyEntities(sf, 1, 10);
+        insertDummyEntities(1, 10);
 
         Session session = null;
         Transaction txn = null;

@@ -56,7 +56,7 @@ public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
     @Test
     public void testGetUpdateRemoveGet()
             throws Exception {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);
@@ -65,18 +65,18 @@ public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
         sf.getCache().evictCollectionRegions();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         //entity 2 and its properties are invalidated
 
         //miss updated entity, hit 4 properties(they are still the same)
-        getPropertiesOfEntity(sf, 2);
+        getPropertiesOfEntity(2);
 
         //hit 1 entity and 4 properties
-        deleteDummyEntity(sf, 1);
+        deleteDummyEntity(1);
 
         assertEquals(12, dummyPropertyCacheStats.getHitCount());
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
@@ -86,7 +86,7 @@ public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
 
     @Test
     public void testUpdateEventuallyInvalidatesObject() {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);
@@ -95,10 +95,10 @@ public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
         sf.getCache().evictCollectionRegions();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
         assertSizeEventually(9, dummyEntityCacheStats.getEntries());
     }
 }

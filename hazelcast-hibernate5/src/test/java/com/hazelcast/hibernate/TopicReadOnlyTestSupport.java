@@ -30,7 +30,7 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
 
     @Test(expected = UnsupportedOperationException.class)
     public void testReplaceCollection() {
-        insertDummyEntities(sf, 2, 4);
+        insertDummyEntities(2, 4);
 
         Session session = sf.openSession();
         Transaction transaction = session.beginTransaction();
@@ -51,7 +51,7 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
 
     @Test
     public void testUpdateOneEntityByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -62,12 +62,12 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
         session.close();
 
         assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testUpdateEntitiesByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -82,12 +82,12 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
 
         // 5 notifications = 1 eviction, plus for each update: one unlockItem and one afterUpdate
         assertTopicNotifications(5, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteOneEntityByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -98,12 +98,12 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
         session.close();
 
         assertTopicNotifications(2, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test
     public void testDeleteEntitiesByNaturalId() {
-        insertAnnotatedEntities(sf, 2);
+        insertAnnotatedEntities(2);
 
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
@@ -117,16 +117,16 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
         session.close();
 
         assertTopicNotifications(4, CACHE_ANNOTATED_ENTITY + "##NaturalId");
-        assertTopicNotifications(4, CACHE_TIMESTAMPS_REGION);
+        assertTopicNotifications(4, getTimestampsRegionName());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateOneEntity() {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
 
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
     }
 
     @Override

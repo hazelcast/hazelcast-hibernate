@@ -55,7 +55,7 @@ public class CacheHitMissReadWriteTest extends HibernateStatisticsTestSupport {
     @Test
     public void testGetUpdateRemoveGet()
             throws Exception {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);
@@ -64,15 +64,15 @@ public class CacheHitMissReadWriteTest extends HibernateStatisticsTestSupport {
         sf.getCache().evictCollectionRegions();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         //hit 1 entity, hit 4 properties
-        getPropertiesOfEntity(sf, 2);
+        getPropertiesOfEntity(2);
         //hit 1 entity and 4 properties
-        deleteDummyEntity(sf, 1);
+        deleteDummyEntity(1);
 
         assertEquals(12, dummyPropertyCacheStats.getHitCount());
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
@@ -83,7 +83,7 @@ public class CacheHitMissReadWriteTest extends HibernateStatisticsTestSupport {
 
     @Test
     public void testUpdateShouldNotInvalidateEntryInCache() {
-        insertDummyEntities(sf, 10, 4);
+        insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
 
@@ -91,10 +91,10 @@ public class CacheHitMissReadWriteTest extends HibernateStatisticsTestSupport {
         sf.getCache().evictCollectionRegions();
 
         //miss 10 entities, 10 entities are cached
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //updates cache entity
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         assertEquals(10, dummyEntityCacheStats.getElementCountInMemory());
     }

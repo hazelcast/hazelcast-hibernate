@@ -35,8 +35,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
-public class RegionFactoryDefaultSlowTest
-        extends HibernateSlowTestSupport {
+public class RegionFactoryDefaultSlowTest extends HibernateSlowTestSupport {
 
     protected Properties getCacheProperties() {
         Properties props = new Properties();
