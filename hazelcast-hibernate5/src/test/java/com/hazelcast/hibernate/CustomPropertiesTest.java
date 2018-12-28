@@ -55,6 +55,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
 public class CustomPropertiesTest extends HibernateTestSupport {
+
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 

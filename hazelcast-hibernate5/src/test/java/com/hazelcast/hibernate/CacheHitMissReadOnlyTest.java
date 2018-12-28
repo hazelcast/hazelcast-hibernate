@@ -40,11 +40,11 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(HazelcastSerialClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class CacheHitMissReadOnlyTest
-        extends HibernateStatisticsTestSupport {
+public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.READ_ONLY.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.READ_ONLY;
     }
 
     @Override
@@ -55,8 +55,7 @@ public class CacheHitMissReadOnlyTest
     }
 
     @Test
-    public void testGetUpdateRemoveGet()
-            throws Exception {
+    public void testGetUpdateRemoveGet() throws Exception {
         insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
         SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
@@ -65,9 +64,9 @@ public class CacheHitMissReadOnlyTest
         sf.getCache().evictEntityRegions();
         sf.getCache().evictCollectionRegions();
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
         //hit 1 entity and 4 properties
-        deleteDummyEntity(sf, 1);
+        deleteDummyEntity(1);
 
         assertEquals(4, dummyPropertyCacheStats.getHitCount());
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
@@ -78,13 +77,13 @@ public class CacheHitMissReadOnlyTest
     @Test(expected = UnsupportedOperationException.class)
     public void testUpdateQueryCausesInvalidationOfEntireRegion() {
         insertDummyEntities(10);
-        executeUpdateQuery(sf, "UPDATE DummyEntity set name = 'manually-updated' where id=2");
+        executeUpdateQuery("UPDATE DummyEntity set name = 'manually-updated' where id=2");
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void testReadOnlyUpdate() throws Exception{
+    public void testReadOnlyUpdate() {
         insertDummyEntities(1, 0);
-        updateDummyEntityName(sf, 0, "updated");
+        updateDummyEntityName(0, "updated");
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -101,6 +100,6 @@ public class CacheHitMissReadOnlyTest
         insertDummyEntities(1, 10);
 
         //attempt to evict properties reference in DummyEntity because of custom SQL query on Collection region
-        executeUpdateQuery(sf, "update DummyProperty ent set ent.key='manually-updated'");
+        executeUpdateQuery("update DummyProperty ent set ent.key='manually-updated'");
     }
 }
