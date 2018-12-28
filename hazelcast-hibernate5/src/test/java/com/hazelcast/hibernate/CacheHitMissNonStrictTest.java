@@ -39,11 +39,11 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(HazelcastSerialClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class CacheHitMissNonStrictTest
-        extends HibernateStatisticsTestSupport {
+public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
 
-    protected String getCacheStrategy() {
-        return AccessType.NONSTRICT_READ_WRITE.getExternalName();
+    @Override
+    protected AccessType getCacheStrategy() {
+        return AccessType.NONSTRICT_READ_WRITE;
     }
 
     @Override
@@ -65,18 +65,18 @@ public class CacheHitMissNonStrictTest
         sf.getCache().evictCollectionRegions();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
 
         //entity 2 and its properties are invalidated
 
         //miss updated entity, hit 4 properties(they are still the same)
-        getPropertiesOfEntity(sf, 2);
+        getPropertiesOfEntity(2);
 
         //hit 1 entity and 4 properties
-        deleteDummyEntity(sf, 1);
+        deleteDummyEntity(1);
 
         assertEquals(12, dummyPropertyCacheStats.getHitCount());
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
@@ -95,10 +95,10 @@ public class CacheHitMissNonStrictTest
         sf.getCache().evictCollectionRegions();
 
         //miss 10 entities
-        getDummyEntities(sf, 10);
+        getDummyEntities(10);
 
         //hit 1 entity and 4 properties
-        updateDummyEntityName(sf, 2, "updated");
+        updateDummyEntityName(2, "updated");
         assertSizeEventually(9, dummyEntityCacheStats.getEntries());
     }
 }

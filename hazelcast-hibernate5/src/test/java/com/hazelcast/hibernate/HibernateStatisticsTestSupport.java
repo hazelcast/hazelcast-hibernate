@@ -18,14 +18,12 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.core.Hazelcast;
-import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceLoader;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.stat.SecondLevelCacheStatistics;
 import org.junit.After;
 import org.junit.Before;
@@ -37,18 +35,14 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class HibernateStatisticsTestSupport extends HibernateTestSupport {
 
+    private final TestHazelcastFactory factory  = new TestHazelcastFactory();
+
     protected SessionFactory sf;
     protected SessionFactory sf2;
-
-    protected final String CACHE_ENTITY = DummyEntity.class.getName();
-    protected final String CACHE_PROPERTY = DummyProperty.class.getName();
-
-    private static  TestHazelcastFactory factory;
 
     @Before
     public void postConstruct() {
         HazelcastMockInstanceLoader loader = new HazelcastMockInstanceLoader();
-        factory = new TestHazelcastFactory();
         loader.setInstanceFactory(factory);
         sf = createSessionFactory(getCacheProperties(),  loader);
         sf2 = createSessionFactory(getCacheProperties(), loader);
@@ -71,43 +65,19 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
     protected abstract Properties getCacheProperties();
 
     protected void insertDummyEntities(int count) {
-        insertDummyEntities(count, 0);
+        insertDummyEntities(sf, count, 0);
     }
 
     protected void insertDummyEntities(int count, int childCount) {
-        Session session = sf.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            for (int i = 0; i < count; i++) {
-                DummyEntity e = new DummyEntity((long) i, "dummy:" + i, i * 123456d, new Date());
-                session.save(e);
-                for (int j = 0; j < childCount; j++) {
-                    DummyProperty p = new DummyProperty("key:" + j, e);
-                    session.save(p);
-                }
-            }
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
+        insertDummyEntities(sf, count, childCount);
     }
 
     protected void insertAnnotatedEntities(int count) {
-        Session session = sf.openSession();
-        Transaction tx = session.beginTransaction();
-        for(int i=0; i< count; i++) {
-            AnnotatedEntity annotatedEntity = new AnnotatedEntity("dummy:"+i);
-            session.save(annotatedEntity);
-        }
-        tx.commit();
-        session.close();
+        insertAnnotatedEntities(sf, count);
     }
 
-    protected List<DummyEntity> executeQuery(SessionFactory factory) {
-        Session session = factory.openSession();
+    protected List<DummyEntity> executeQuery() {
+        Session session = sf.openSession();
         try {
             Query query = session.createQuery("from " + DummyEntity.class.getName());
             query.setCacheable(true);
@@ -117,86 +87,30 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
         }
     }
 
-    protected ArrayList<DummyEntity> getDummyEntities(SessionFactory sf, long untilId) {
-        Session session = sf.openSession();
-        ArrayList<DummyEntity> entities = new ArrayList<DummyEntity>();
-        for (long i=0; i<untilId; i++) {
-            DummyEntity entity = session.get(DummyEntity.class, i);
-            if (entity != null) {
-                session.evict(entity);
-                entities.add(entity);
-            }
-        }
-        session.close();
-        return entities;
+    protected ArrayList<DummyEntity> getDummyEntities(long untilId) {
+        return getDummyEntities(sf, untilId);
     }
 
-    protected Set<DummyProperty> getPropertiesOfEntity(SessionFactory sf, long entityId) {
+    protected Set<DummyProperty> getPropertiesOfEntity(long entityId) {
         Session session = sf.openSession();
         DummyEntity entity = session.get(DummyEntity.class, entityId);
-        if(entity != null) {
+        if (entity != null) {
             return entity.getProperties();
         } else {
             return null;
         }
     }
 
-    protected void updateDummyEntityName(SessionFactory sf, long id, String newName) {
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            DummyEntity entityToUpdate = session.get(DummyEntity.class, id);
-            entityToUpdate.setName(newName);
-            session.update(entityToUpdate);
-            txn.commit();
-        } catch (RuntimeException e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
+    protected void updateDummyEntityName(long id, String newName) {
+        updateDummyEntityName(sf, id, newName);
     }
 
-    protected void deleteDummyEntity(SessionFactory sf, long id)
-            throws Exception {
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            DummyEntity entityToDelete = session.get(DummyEntity.class, id);
-            session.delete(entityToDelete);
-            txn.commit();
-        } catch (Exception e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
+    protected void deleteDummyEntity(long id) throws Exception {
+        deleteDummyEntity(sf, id);
     }
 
-    protected void executeUpdateQuery(SessionFactory sf, String queryString)
-            throws RuntimeException {
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            Query query = session.createQuery(queryString);
-            query.setCacheable(true);
-            query.executeUpdate();
-            txn.commit();
-        } catch (RuntimeException e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
+    protected void executeUpdateQuery(String queryString) throws RuntimeException {
+        executeUpdateQuery(sf, queryString);
     }
 
     @Test
@@ -223,7 +137,7 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
         sf.getStatistics().clear();
 
         //property reference missed in cache.
-        getPropertiesOfEntity(sf, 0);
+        getPropertiesOfEntity(0);
 
         SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY + ".properties");
         assertEquals(0, dummyPropertyCacheStats.getHitCount());
