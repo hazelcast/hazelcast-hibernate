@@ -17,7 +17,7 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.impl.HazelcastClientProxy;
+import com.hazelcast.client.impl.clientside.HazelcastClientProxy;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
