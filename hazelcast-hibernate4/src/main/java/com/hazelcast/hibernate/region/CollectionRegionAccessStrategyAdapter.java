@@ -52,11 +52,11 @@ public final class CollectionRegionAccessStrategyAdapter implements CollectionRe
     }
 
     public SoftLock lockItem(final Object key, final Object version) throws CacheException {
-        return null;
+        return delegate.lockItem(key, version);
     }
 
     public SoftLock lockRegion() throws CacheException {
-        return null;
+        return delegate.lockRegion();
     }
 
     public boolean putFromLoad(final Object key, final Object value, final long txTimestamp, final Object version)
@@ -78,8 +78,10 @@ public final class CollectionRegionAccessStrategyAdapter implements CollectionRe
     }
 
     public void unlockItem(final Object key, final SoftLock lock) throws CacheException {
+        delegate.unlockItem(key, lock);
     }
 
     public void unlockRegion(final SoftLock lock) throws CacheException {
+        delegate.unlockRegion(lock);
     }
 }
