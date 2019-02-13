@@ -155,4 +155,7 @@ public class ExpiryMarker extends Expirable implements Serializable {
         return HibernateDataSerializerHook.EXPIRY_MARKER;
     }
 
+    public long getTimeout() {
+        return timeout;
+    }
 }

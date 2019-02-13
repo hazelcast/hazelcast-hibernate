@@ -219,7 +219,7 @@ public class LocalRegionCache implements RegionCache {
         String markerId = nextMarkerId();
         while (true) {
             final Expirable original = cache.get(key);
-            long timeout = nextTimestamp() + CacheEnvironment.getDefaultCacheTimeoutInMillis();
+            long timeout = nextTimestamp() + CacheEnvironment.getMaximumLockTimeoutInMillis();
             if (original == null) {
                 marker = new ExpiryMarker(version, timeout, markerId);
                 if (cache.putIfAbsent(key, marker) == null) {
@@ -356,6 +356,9 @@ public class LocalRegionCache implements RegionCache {
             final Object k = e.getKey();
             final Expirable expirable = e.getValue();
             if (expirable instanceof ExpiryMarker) {
+                if (((ExpiryMarker) expirable).getTimeout() < now) {
+                    iter.remove();
+                }
                 continue;
             }
             final Value v = (Value) expirable;

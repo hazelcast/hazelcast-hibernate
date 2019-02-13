@@ -138,6 +138,10 @@ public final class CacheEnvironment {
         return timeout;
     }
 
+    public static int getMaximumLockTimeoutInMillis() {
+        return MAXIMUM_LOCK_TIMEOUT;
+    }
+
     public static boolean shutdownOnStop(Properties props, boolean defaultValue) {
         return ConfigurationHelper.getBoolean(CacheEnvironment.SHUTDOWN_ON_STOP, props, defaultValue);
     }

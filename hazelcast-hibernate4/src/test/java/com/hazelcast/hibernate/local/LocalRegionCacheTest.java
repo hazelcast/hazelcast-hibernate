@@ -5,6 +5,9 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.MessageListener;
+import com.hazelcast.hibernate.CacheEnvironment;
+import com.hazelcast.hibernate.serialization.ExpiryMarker;
+import com.hazelcast.hibernate.serialization.Value;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
@@ -15,6 +18,7 @@ import org.junit.runner.RunWith;
 
 import java.util.Comparator;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNotNull;
@@ -100,6 +104,19 @@ public class LocalRegionCacheTest {
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
         verify(topic).addMessageListener(isNotNull(MessageListener.class));
+    }
+
+    @Test
+    public void cleanup() {
+        LocalRegionCache cache = new LocalRegionCache(CACHE_NAME, null, null);
+        int version = 1;
+        long alreadyExpired = System.currentTimeMillis() - CacheEnvironment.getDefaultCacheTimeoutInMillis() - 1;
+        cache.cache.put(1, new Value(version, alreadyExpired, 1));
+        cache.cache.put(2, new ExpiryMarker(version, alreadyExpired, "2"));
+
+        cache.cleanup();
+
+        assertEquals(0, cache.size());
     }
 
     public static void runCleanup(LocalRegionCache cache) {
