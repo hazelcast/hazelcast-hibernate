@@ -41,7 +41,7 @@ public interface AccessDelegate<T extends HazelcastRegion> {
      *
      * @param key         The key of the item to be retrieved.
      * @param txTimestamp a timestamp prior to the transaction start time
-     * @return the cached object or <tt>null</tt>
+     * @return the cached object or null
      * @throws org.hibernate.cache.CacheException
      *          Propagated from underlying {@link org.hibernate.cache.spi.Region}
      */
@@ -114,7 +114,7 @@ public interface AccessDelegate<T extends HazelcastRegion> {
      * @param value       The item
      * @param txTimestamp a timestamp prior to the transaction start time
      * @param version     the item version number
-     * @return <tt>true</tt> if the object was successfully cached
+     * @return true if the object was successfully cached
      * @throws org.hibernate.cache.CacheException
      *          Propagated from underlying {@link org.hibernate.cache.spi.Region}
      */
@@ -129,7 +129,7 @@ public interface AccessDelegate<T extends HazelcastRegion> {
      * @param txTimestamp        a timestamp prior to the transaction start time
      * @param version            the item version number
      * @param minimalPutOverride Explicit minimalPut flag
-     * @return <tt>true</tt> if the object was successfully cached
+     * @return true if the object was successfully cached
      * @throws org.hibernate.cache.CacheException
      *          Propagated from underlying {@link org.hibernate.cache.spi.Region}
      */
