@@ -32,7 +32,7 @@ public final class CleanupService {
     /**
      * Default fixed delay in seconds for scheduled job.
      */
-    private static final long DEFAULT_FIXED_DELAY = 60;
+    private static final long DEFAULT_FIXED_DELAY = 60L;
 
     private final long fixedDelay;
     private final String name;
