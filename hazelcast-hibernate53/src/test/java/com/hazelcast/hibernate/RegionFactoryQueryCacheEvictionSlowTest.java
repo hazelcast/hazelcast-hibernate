@@ -61,7 +61,7 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
                 /*
                  * This test is configured such that 0 entities should be evicted from the cache:
                  *   - number of entities (100) < cache max size (150)
-                 *   - ttl (30) > cleanup period (21)
+                 *   - ttl (30) > cleanup period (6)
                  * It is run for both types of cache region factory.
                  */
                 new Object[]{"hazelcast-custom-region-factory-slow-test.xml", TestCacheRegionFactory.class.getName()},

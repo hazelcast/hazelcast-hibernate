@@ -12,8 +12,11 @@ import java.util.Map;
  */
 public class TestLocalCacheRegionFactory extends HazelcastLocalCacheRegionFactory {
 
-    // Visible for testing
-    public final static long CLEANUP_PERIOD = 12L;
+    /**
+     * Cleanup period in seconds.
+     * Visible for testing.
+     */
+    public final static long CLEANUP_PERIOD = 6L;
 
     public TestLocalCacheRegionFactory() {
         super();

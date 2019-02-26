@@ -31,9 +31,8 @@ public final class CleanupService {
 
     /**
      * Default fixed delay in seconds for scheduled job.
-     * Visible for testing.
      */
-    public static final long DEFAULT_FIXED_DELAY = 60;
+    private static final long DEFAULT_FIXED_DELAY = 60;
 
     private final long fixedDelay;
     private final String name;
@@ -43,6 +42,9 @@ public final class CleanupService {
         this(name, DEFAULT_FIXED_DELAY);
     }
 
+    /**
+     * Visible for testing only.
+     */
     public CleanupService(final String name, final long fixedDelay) {
         this.fixedDelay = fixedDelay;
         this.name = name;
