@@ -22,12 +22,14 @@ import com.hazelcast.core.ITopic;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 import com.hazelcast.hibernate.CacheEnvironment;
+import com.hazelcast.hibernate.HazelcastTimestamper;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
 import com.hazelcast.hibernate.serialization.Value;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
+import com.hazelcast.util.Clock;
 import com.hazelcast.util.EmptyStatement;
 import org.hibernate.cache.cfg.spi.CollectionDataCachingConfig;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
@@ -55,6 +57,7 @@ public class LocalRegionCache implements RegionCache {
 
     protected final ConcurrentMap<Object, Expirable> cache;
 
+    private final HazelcastInstance hazelcastInstance;
     private final ILogger log = Logger.getLogger(getClass());
     private final String name;
     private final RegionFactory regionFactory;
@@ -91,6 +94,7 @@ public class LocalRegionCache implements RegionCache {
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
                             final boolean withTopic) {
+        this.hazelcastInstance = hazelcastInstance;
         this.name = name;
         this.regionFactory = regionFactory;
 
@@ -170,6 +174,11 @@ public class LocalRegionCache implements RegionCache {
     @Override
     public void unlockItem(final Object key, final SoftLock lock) {
         maybeNotifyTopic(key, null, null);
+    }
+
+    public long nextTimestamp() {
+        return hazelcastInstance == null ? Clock.currentTimeMillis()
+                : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
     }
 
     protected Object createMessage(final Object key, final Object value, final Object currentVersion) {
