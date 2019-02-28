@@ -58,7 +58,6 @@
                                         <exclude>com/hazelcast/hibernate/AbstractHazelcastCacheRegionFactory.java</exclude>
                                         <exclude>com/hazelcast/hibernate/HazelcastCacheRegionFactory.java</exclude>
                                         <exclude>com/hazelcast/hibernate/HazelcastLocalCacheRegionFactory.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/HazelcastTimestamper.java</exclude>
                                         <exclude>com/hazelcast/hibernate/RegionCache.java</exclude>
                                         <exclude>com/hazelcast/hibernate/distributed/IMapRegionCache.java</exclude>
                                         <exclude>com/hazelcast/hibernate/local/LocalRegionCache.java</exclude>
