@@ -8,13 +8,12 @@ import org.hibernate.cache.spi.CacheKeysFactory;
 
 import java.util.Map;
 
+import static com.hazelcast.hibernate.local.TestLocalCacheRegionFactory.CLEANUP_PERIOD;
+
 /**
  * This class just extends HazelcastCacheRegionFactory to allow using a CleanupService with a shorter delay.
  */
 public class TestCacheRegionFactory extends HazelcastCacheRegionFactory {
-
-    // Visible for testing
-    public final static long CLEANUP_PERIOD = 12L;
 
     public TestCacheRegionFactory() {
         super();
