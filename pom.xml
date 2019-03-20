@@ -551,6 +551,24 @@
             <properties>
                 <hazelcast.version>3.12-SNAPSHOT</hazelcast.version>
             </properties>
+            <!-- These dependencies are just workaround to prevent master build failures at jenkins:
+                    CustomPropertiesTest.testNamedInstance_noInstance()
+                    CustomPropertiesTest.testNamedClient_noInstance()
+            -->
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                    <version>15.0</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.reflections</groupId>
+                    <artifactId>reflections</artifactId>
+                    <version>0.9.10</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
