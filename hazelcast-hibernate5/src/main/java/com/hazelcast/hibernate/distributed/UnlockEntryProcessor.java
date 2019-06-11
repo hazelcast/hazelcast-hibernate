@@ -19,8 +19,10 @@ package com.hazelcast.hibernate.distributed;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
 import com.hazelcast.hibernate.serialization.HibernateDataSerializerHook;
+import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -29,7 +31,7 @@ import java.util.Map;
  * A concrete implementation of {@link com.hazelcast.map.EntryProcessor} which unlocks
  * a soft-locked region cached entry
  */
-public class UnlockEntryProcessor extends AbstractRegionCacheEntryProcessor {
+public class UnlockEntryProcessor implements EntryProcessor<Object, Expirable, Object>, IdentifiedDataSerializable {
 
     private ExpiryMarker lock;
     private String nextMarkerId;
@@ -45,7 +47,7 @@ public class UnlockEntryProcessor extends AbstractRegionCacheEntryProcessor {
     }
 
     @Override
-    public Void process(final Map.Entry<Object, Expirable> entry) {
+    public Object process(final Map.Entry<Object, Expirable> entry) {
         Expirable expirable = entry.getValue();
 
         if (expirable != null) {
@@ -80,8 +82,12 @@ public class UnlockEntryProcessor extends AbstractRegionCacheEntryProcessor {
     }
 
     @Override
-    public int getId() {
+    public int getClassId() {
         return HibernateDataSerializerHook.UNLOCK;
     }
 
+    @Override
+    public int getFactoryId() {
+        return HibernateDataSerializerHook.F_ID;
+    }
 }

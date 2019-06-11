@@ -151,7 +151,7 @@ public class ExpiryMarker extends Expirable implements Serializable {
     }
 
     @Override
-    public int getId() {
+    public int getClassId() {
         return HibernateDataSerializerHook.EXPIRY_MARKER;
     }
 

@@ -65,7 +65,7 @@ public class Timestamp implements IdentifiedDataSerializable {
     }
 
     @Override
-    public int getId() {
+    public int getClassId() {
         return HibernateDataSerializerHook.TIMESTAMP;
     }
 

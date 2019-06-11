@@ -66,7 +66,7 @@ public class Invalidation implements IdentifiedDataSerializable {
     }
 
     @Override
-    public int getId() {
+    public int getClassId() {
         return HibernateDataSerializerHook.INVALIDATION;
     }
 

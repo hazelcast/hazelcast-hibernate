@@ -19,7 +19,7 @@ package com.hazelcast.hibernate;
 import com.hazelcast.hibernate.access.ReadOnlyAccessDelegate;
 import com.hazelcast.hibernate.region.HazelcastRegion;
 import com.hazelcast.test.HazelcastSerialClassRunner;
-import com.hazelcast.test.annotation.ParallelTest;
+import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cfg.Environment;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * Data may be added and removed, but not mutated.
  */
 @RunWith(HazelcastSerialClassRunner.class)
-@Category({QuickTest.class, ParallelTest.class})
+@Category({QuickTest.class, ParallelJVMTest.class})
 public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
 
     @Override

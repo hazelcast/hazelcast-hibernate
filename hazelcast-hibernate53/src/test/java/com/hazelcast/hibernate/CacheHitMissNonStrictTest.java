@@ -18,7 +18,7 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastSerialClassRunner;
-import com.hazelcast.test.annotation.ParallelTest;
+import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
 import org.hibernate.cache.spi.ExtendedStatisticsSupport;
 import org.hibernate.cache.spi.access.AccessType;
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
  * Read through cache
  */
 @RunWith(HazelcastSerialClassRunner.class)
-@Category({QuickTest.class, ParallelTest.class})
+@Category({QuickTest.class, ParallelJVMTest.class})
 public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
 
     @Override

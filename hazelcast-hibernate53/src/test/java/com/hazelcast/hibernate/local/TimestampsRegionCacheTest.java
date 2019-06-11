@@ -1,8 +1,13 @@
 package com.hazelcast.hibernate.local;
 
+import com.hazelcast.cluster.Cluster;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.core.*;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.topic.ITopic;
+import com.hazelcast.topic.Message;
+import com.hazelcast.topic.MessageListener;
 import org.hibernate.cache.spi.RegionFactory;
 import org.junit.Before;
 import org.junit.Test;
