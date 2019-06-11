@@ -1,7 +1,6 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
-import com.hazelcast.test.HazelcastParametersRunnerFactory;
 import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Criteria;

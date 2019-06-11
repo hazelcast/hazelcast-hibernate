@@ -19,7 +19,6 @@ package com.hazelcast.hibernate;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.hibernate.local.TestLocalCacheRegionFactory;
 import com.hazelcast.hibernate.region.TestCacheRegionFactory;
-import com.hazelcast.test.HazelcastParametersRunnerFactory;
 import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.cache.spi.support.QueryResultsRegionTemplate;
