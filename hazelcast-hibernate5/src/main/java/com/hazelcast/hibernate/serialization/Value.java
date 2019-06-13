@@ -91,7 +91,7 @@ public class Value extends Expirable {
     }
 
     @Override
-    public int getId() {
+    public int getClassId() {
         return HibernateDataSerializerHook.VALUE;
     }
 

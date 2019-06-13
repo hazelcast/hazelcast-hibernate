@@ -19,7 +19,7 @@ package com.hazelcast.hibernate;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.hibernate.local.TestLocalCacheRegionFactory;
 import com.hazelcast.hibernate.region.TestCacheRegionFactory;
-import com.hazelcast.test.HazelcastParametersRunnerFactory;
+import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.cache.spi.support.QueryResultsRegionTemplate;
 import org.hibernate.cfg.Environment;
@@ -37,7 +37,7 @@ import static com.hazelcast.hibernate.local.TestLocalCacheRegionFactory.CLEANUP_
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-@Parameterized.UseParametersRunnerFactory(HazelcastParametersRunnerFactory.class)
+@Parameterized.UseParametersRunnerFactory(HazelcastSerialParametersRunnerFactory.class)
 @Category(SlowTest.class)
 public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSupport {
 

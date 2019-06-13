@@ -20,8 +20,10 @@ import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
 import com.hazelcast.hibernate.serialization.HibernateDataSerializerHook;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -30,7 +32,7 @@ import java.util.Map;
  * A concrete implementation of {@link com.hazelcast.map.EntryProcessor} which attempts
  * to update a region cache entry
  */
-public class UpdateEntryProcessor extends AbstractRegionCacheEntryProcessor {
+public class UpdateEntryProcessor implements EntryProcessor<Object, Expirable, Boolean>, IdentifiedDataSerializable {
 
     private ExpiryMarker lock;
     private Object newValue;
@@ -110,8 +112,12 @@ public class UpdateEntryProcessor extends AbstractRegionCacheEntryProcessor {
     }
 
     @Override
-    public int getId() {
+    public int getClassId() {
         return HibernateDataSerializerHook.UPDATE;
     }
 
+    @Override
+    public int getFactoryId() {
+        return HibernateDataSerializerHook.F_ID;
+    }
 }
