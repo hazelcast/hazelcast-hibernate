@@ -18,7 +18,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.cluster.Cluster;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.topic.ITopic;
-import com.hazelcast.core.Member;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.topic.Message;
 import com.hazelcast.topic.MessageListener;
 

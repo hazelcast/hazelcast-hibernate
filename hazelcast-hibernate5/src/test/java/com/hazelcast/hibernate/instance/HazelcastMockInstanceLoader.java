@@ -6,8 +6,8 @@ import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ConfigLoader;
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.XmlConfigBuilder;
-import com.hazelcast.core.DuplicateInstanceNameException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.logging.ILogger;
@@ -83,7 +83,7 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
                 if (instance == null) {
                     try {
                         createOrGetInstance();
-                    } catch (DuplicateInstanceNameException ignored) {
+                    } catch (InvalidConfigurationException ignored) {
                         instance = getHazelcastInstanceByName(instanceName);
                     }
                 }
@@ -94,7 +94,7 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
         }
     }
 
-    private void createOrGetInstance() throws DuplicateInstanceNameException {
+    private void createOrGetInstance() throws InvalidConfigurationException {
         if (config == null) {
             config = new XmlConfigBuilder().build();
         }
