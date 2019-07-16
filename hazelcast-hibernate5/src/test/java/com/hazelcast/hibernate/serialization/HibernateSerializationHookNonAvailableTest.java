@@ -47,11 +47,11 @@ public class HibernateSerializationHookNonAvailableTest {
             List<String> excludes = Collections.singletonList("org.hibernate");
             FILTERING_CLASS_LOADER = new FilteringClassLoader(excludes, "com.hazelcast");
 
-            String hazelcastInstanceImplClassName = "com.hazelcast.instance.HazelcastInstanceImpl";
+            String hazelcastInstanceImplClassName = "com.hazelcast.instance.impl.HazelcastInstanceImpl";
             Class<?> hazelcastInstanceImplClass = FILTERING_CLASS_LOADER.loadClass(hazelcastInstanceImplClassName);
             GET_SERIALIZATION_SERVICE = hazelcastInstanceImplClass.getMethod("getSerializationService");
 
-            String hazelcastInstanceProxyClassName = "com.hazelcast.instance.HazelcastInstanceProxy";
+            String hazelcastInstanceProxyClassName = "com.hazelcast.instance.impl.HazelcastInstanceProxy";
             Class<?> hazelcastInstanceProxyClass = FILTERING_CLASS_LOADER.loadClass(hazelcastInstanceProxyClassName);
             ORIGINAL = hazelcastInstanceProxyClass.getDeclaredField("original");
             ORIGINAL.setAccessible(true);
