@@ -17,7 +17,6 @@
 package com.hazelcast.hibernate.serialization;
 
 import com.hazelcast.logging.Logger;
-import com.hazelcast.nio.UnsafeHelper;
 import com.hazelcast.nio.serialization.Serializer;
 import com.hazelcast.nio.serialization.SerializerHook;
 
@@ -34,12 +33,10 @@ public class Hibernate5CacheEntrySerializerHook
 
     public Hibernate5CacheEntrySerializerHook() {
         Class<?> cacheEntryClass = null;
-        if (UnsafeHelper.UNSAFE_AVAILABLE) {
-            try {
-                cacheEntryClass = Class.forName("org.hibernate.cache.spi.entry.StandardCacheEntryImpl");
-            } catch (Exception e) {
-                Logger.getLogger(Hibernate5CacheEntrySerializerHook.class).finest(SKIP_INIT_MSG);
-            }
+        try {
+            cacheEntryClass = Class.forName("org.hibernate.cache.spi.entry.StandardCacheEntryImpl");
+        } catch (Exception e) {
+            Logger.getLogger(Hibernate5CacheEntrySerializerHook.class).finest(SKIP_INIT_MSG);
         }
         this.cacheEntryClass = cacheEntryClass;
     }
