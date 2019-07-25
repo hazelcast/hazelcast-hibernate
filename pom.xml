@@ -18,7 +18,7 @@
     <name>hazelcast-hibernate5</name>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-hibernate5-parent</artifactId>
-    <version>1.3.3-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
