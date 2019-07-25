@@ -18,7 +18,7 @@
     <parent>
         <groupId>com.hazelcast</groupId>
         <artifactId>hazelcast-hibernate5-parent</artifactId>
-        <version>1.3.3-SNAPSHOT</version>
+        <version>1.4.0-SNAPSHOT</version>
     </parent>
     <artifactId>hazelcast-hibernate52</artifactId>
     <packaging>jar</packaging>
