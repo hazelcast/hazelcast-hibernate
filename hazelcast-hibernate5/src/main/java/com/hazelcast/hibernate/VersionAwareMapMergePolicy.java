@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hazelcast.hibernate;
+
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.merge.MergingValue;
@@ -24,7 +26,7 @@ import java.io.IOException;
  * A merge policy implementation to handle split brain remerges based on the timestamps stored in
  * the values.
  */
-public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object,MergingValue<Object>> {
+public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object, MergingValue<Object>> {
 
 
     public Object merge(MergingValue<Object> mergingValue, MergingValue<Object> existingValue) {
@@ -32,7 +34,9 @@ public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object,
         final Object mergingVal = mergingValue.getValue();
         final Object existingVal = existingValue.getValue();
 
-        if(existingVal == null) { return mergingVal; }
+        if (existingVal == null) {
+            return mergingVal;
+        }
 
         if (existingVal != null && existingVal instanceof CacheEntry
                 && mergingVal != null && mergingVal instanceof CacheEntry) {
