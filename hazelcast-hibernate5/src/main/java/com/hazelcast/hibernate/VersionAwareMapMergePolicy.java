@@ -13,48 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.hazelcast.hibernate;
-
-import com.hazelcast.core.EntryView;
-import com.hazelcast.map.merge.MapMergePolicy;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.spi.merge.MergingValue;
+import com.hazelcast.spi.merge.SplitBrainMergePolicy;
 import org.hibernate.cache.spi.entry.CacheEntry;
-
 import java.io.IOException;
-
 /**
  * A merge policy implementation to handle split brain remerges based on the timestamps stored in
  * the values.
  */
-public class VersionAwareMapMergePolicy implements MapMergePolicy {
+public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object,MergingValue<Object>> {
 
-    @Override
-    public Object merge(final String mapName, final EntryView mergingEntry, final EntryView existingEntry) {
-        final Object existingValue = existingEntry != null ? existingEntry.getValue() : null;
-        final Object mergingValue = mergingEntry.getValue();
-        if (existingValue != null && existingValue instanceof CacheEntry
-                && mergingValue != null && mergingValue instanceof CacheEntry) {
 
-            final CacheEntry existingCacheEntry = (CacheEntry) existingValue;
-            final CacheEntry mergingCacheEntry = (CacheEntry) mergingValue;
+    public Object merge(MergingValue<Object> mergingValue, MergingValue<Object> existingValue) {
+
+        final Object mergingVal = mergingValue.getValue();
+        final Object existingVal = existingValue.getValue();
+
+        if(existingVal == null) { return mergingVal; }
+
+        if (existingVal != null && existingVal instanceof CacheEntry
+                && mergingVal != null && mergingVal instanceof CacheEntry) {
+            CacheEntry existingCacheEntry = (CacheEntry) existingVal;
+            CacheEntry mergingCacheEntry = (CacheEntry) mergingVal;
             final Object mergingVersionObject = mergingCacheEntry.getVersion();
             final Object existingVersionObject = existingCacheEntry.getVersion();
             if (mergingVersionObject != null && existingVersionObject != null
                     && mergingVersionObject instanceof Comparable && existingVersionObject instanceof Comparable) {
-
                 final Comparable mergingVersion = (Comparable) mergingVersionObject;
                 final Comparable existingVersion = (Comparable) existingVersionObject;
-
                 if (mergingVersion.compareTo(existingVersion) > 0) {
-                    return mergingValue;
+                    return mergingVal;
                 } else {
-                    return existingValue;
+                    return existingVal;
                 }
             }
         }
-        return mergingValue;
+        return mergingVal;
     }
 
     @Override
