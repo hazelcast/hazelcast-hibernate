@@ -38,14 +38,13 @@ public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object,
             return mergingVal;
         }
 
-        if (existingVal != null && existingVal instanceof CacheEntry
-                && mergingVal != null && mergingVal instanceof CacheEntry) {
+        if (existingVal instanceof CacheEntry
+                && mergingVal instanceof CacheEntry) {
             CacheEntry existingCacheEntry = (CacheEntry) existingVal;
             CacheEntry mergingCacheEntry = (CacheEntry) mergingVal;
             final Object mergingVersionObject = mergingCacheEntry.getVersion();
             final Object existingVersionObject = existingCacheEntry.getVersion();
-            if (mergingVersionObject != null && existingVersionObject != null
-                    && mergingVersionObject instanceof Comparable && existingVersionObject instanceof Comparable) {
+            if (mergingVersionObject instanceof Comparable && existingVersionObject instanceof Comparable) {
                 final Comparable mergingVersion = (Comparable) mergingVersionObject;
                 final Comparable existingVersion = (Comparable) existingVersionObject;
                 if (mergingVersion.compareTo(existingVersion) > 0) {
