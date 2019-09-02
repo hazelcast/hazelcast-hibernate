@@ -16,45 +16,43 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.merge.MergingValue;
 import com.hazelcast.spi.merge.SplitBrainMergePolicy;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
 import org.hibernate.cache.spi.entry.CacheEntry;
+
 import java.io.IOException;
+
 /**
  * A merge policy implementation to handle split brain remerges based on the timestamps stored in
  * the values.
  */
 public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object, MergingValue<Object>> {
 
+    @Override
+    public Object merge(MergingValue<Object> mergingVal, MergingValue<Object> existingVal) {
+        final Object existingValue = existingVal != null ? existingVal.getValue() : null;
+        final Object mergingValue = mergingVal.getValue();
+        if (existingValue instanceof CacheEntry && mergingValue instanceof CacheEntry) {
 
-    public Object merge(MergingValue<Object> mergingValue, MergingValue<Object> existingValue) {
-
-        final Object mergingVal = mergingValue.getValue();
-        final Object existingVal = existingValue.getValue();
-
-        if (existingVal == null) {
-            return mergingVal;
-        }
-
-        if (existingVal instanceof CacheEntry
-                && mergingVal instanceof CacheEntry) {
-            CacheEntry existingCacheEntry = (CacheEntry) existingVal;
-            CacheEntry mergingCacheEntry = (CacheEntry) mergingVal;
+            final CacheEntry existingCacheEntry = (CacheEntry) existingValue;
+            final CacheEntry mergingCacheEntry = (CacheEntry) mergingValue;
             final Object mergingVersionObject = mergingCacheEntry.getVersion();
             final Object existingVersionObject = existingCacheEntry.getVersion();
             if (mergingVersionObject instanceof Comparable && existingVersionObject instanceof Comparable) {
+
                 final Comparable mergingVersion = (Comparable) mergingVersionObject;
                 final Comparable existingVersion = (Comparable) existingVersionObject;
+
                 if (mergingVersion.compareTo(existingVersion) > 0) {
-                    return mergingVal;
+                    return mergingValue;
                 } else {
-                    return existingVal;
+                    return existingValue;
                 }
             }
         }
-        return mergingVal;
+        return mergingValue;
     }
 
     @Override
