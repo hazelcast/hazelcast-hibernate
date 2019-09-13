@@ -33,7 +33,7 @@ public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object,
     @Override
     public Object merge(MergingValue<Object> mergingVal, MergingValue<Object> existingVal) {
         final Object existingValue = existingVal != null ? existingVal.getValue() : null;
-        final Object mergingValue = mergingVal.getValue();
+        final Object mergingValue = mergingVal != null ? mergingVal.getValue() : null;
         if (existingValue instanceof CacheEntry && mergingValue instanceof CacheEntry) {
 
             final CacheEntry existingCacheEntry = (CacheEntry) existingValue;
@@ -56,10 +56,10 @@ public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object,
     }
 
     @Override
-    public void writeData(final ObjectDataOutput out) throws IOException {
+    public void writeData(ObjectDataOutput out) throws IOException {
     }
 
     @Override
-    public void readData(final ObjectDataInput in) throws IOException {
+    public void readData(ObjectDataInput in) throws IOException {
     }
 }
