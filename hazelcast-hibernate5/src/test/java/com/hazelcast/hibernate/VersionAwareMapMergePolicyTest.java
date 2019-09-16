@@ -1,7 +1,8 @@
 package com.hazelcast.hibernate;
 
-import com.hazelcast.core.EntryView;
-import com.hazelcast.map.merge.MapMergePolicy;
+
+import com.hazelcast.spi.merge.MergingValue;
+import com.hazelcast.spi.merge.SplitBrainMergePolicy;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
@@ -23,7 +24,7 @@ public class VersionAwareMapMergePolicyTest {
     private static final MockVersion versionOld = new MockVersion(0);
     private static final MockVersion versionNew = new MockVersion(1);
 
-    protected MapMergePolicy policy;
+    protected SplitBrainMergePolicy policy;
 
     @Before
     public void given() {
@@ -35,10 +36,10 @@ public class VersionAwareMapMergePolicyTest {
         CacheEntry existing = cacheEntryWithVersion(versionOld);
         CacheEntry merging = cacheEntryWithVersion(versionNew);
 
-        EntryView entryExisting = entryWithGivenValue(existing);
-        EntryView entryMerging = entryWithGivenValue(merging);
+        MergingValue entryExisting = entryWithGivenValue(existing);
+        MergingValue entryMerging = entryWithGivenValue(merging);
 
-        assertEquals(merging, policy.merge("map", entryMerging, entryExisting));
+        assertEquals(merging, policy.merge(entryMerging, entryExisting));
     }
 
     @Test
@@ -46,10 +47,10 @@ public class VersionAwareMapMergePolicyTest {
         CacheEntry existing = cacheEntryWithVersion(versionNew);
         CacheEntry merging = cacheEntryWithVersion(versionOld);
 
-        EntryView entryExisting = entryWithGivenValue(existing);
-        EntryView entryMerging = entryWithGivenValue(merging);
+        MergingValue entryExisting = entryWithGivenValue(existing);
+        MergingValue entryMerging = entryWithGivenValue(merging);
 
-        assertEquals(existing, policy.merge("map", entryMerging, entryExisting));
+        assertEquals(existing, policy.merge(entryMerging, entryExisting));
     }
 
     @Test
@@ -57,10 +58,10 @@ public class VersionAwareMapMergePolicyTest {
         CacheEntry existing = null;
         CacheEntry merging = cacheEntryWithVersion(versionNew);
 
-        EntryView entryExisting = entryWithGivenValue(existing);
-        EntryView entryMerging = entryWithGivenValue(merging);
+        MergingValue entryExisting = entryWithGivenValue(existing);
+        MergingValue entryMerging = entryWithGivenValue(merging);
 
-        assertEquals(merging, policy.merge("map", entryMerging, entryExisting));
+        assertEquals(merging, policy.merge(entryMerging, entryExisting));
     }
 
 
@@ -70,11 +71,11 @@ public class VersionAwareMapMergePolicyTest {
         return cacheEntry;
     }
 
-    private EntryView entryWithGivenValue(Object value) {
-        EntryView entryView = mock(EntryView.class);
+    private MergingValue entryWithGivenValue(Object value) {
+        MergingValue mergingValue= mock(MergingValue.class);
         try {
-            when(entryView.getValue()).thenReturn(value);
-            return entryView;
+            when(mergingValue.getValue()).thenReturn(value);
+            return mergingValue;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
