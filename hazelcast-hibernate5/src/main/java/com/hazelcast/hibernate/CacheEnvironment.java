@@ -51,13 +51,14 @@ public final class CacheEnvironment {
     public static final String NATIVE_CLIENT_ADDRESS = "hibernate.cache.hazelcast.native_client_address";
 
     /**
-     * Property to configure Hazelcast client group name
+     * Property to configure Hazelcast client cluster name
      */
-    public static final String NATIVE_CLIENT_GROUP = "hibernate.cache.hazelcast.native_client_group";
+    public static final String NATIVE_CLIENT_CLUSTER = "hibernate.cache.hazelcast.native_client_group";
 
     /**
      * Property to configure Hazelcast client group password
      */
+    @Deprecated
     public static final String NATIVE_CLIENT_PASSWORD = "hibernate.cache.hazelcast.native_client_password";
 
     /**

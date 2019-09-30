@@ -16,6 +16,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -50,7 +52,7 @@ public class TimestampsRegionCacheTest {
         when(member.localMember()).thenReturn(false);
 
         ArgumentCaptor<MessageListener> listener = ArgumentCaptor.forClass(MessageListener.class);
-        when(topic.addMessageListener(listener.capture())).thenReturn("ignored");
+        when(topic.addMessageListener(listener.capture())).thenReturn(UUID.randomUUID());
         target = new TimestampsRegionCache(regionFactory, CACHE_NAME, instance);
         this.listener = listener.getValue();
     }
