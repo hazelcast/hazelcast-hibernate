@@ -21,6 +21,7 @@
            http://www.hazelcast.com/schema/config/hazelcast-config-4.0.xsd">
     <cluster>
         <name>dev-custom</name>
+        <password>dev-pass</password>
     </cluster>
     <network>
         <port auto-increment="true">5701</port>

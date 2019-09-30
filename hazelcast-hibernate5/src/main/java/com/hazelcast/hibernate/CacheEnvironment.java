@@ -58,7 +58,6 @@ public final class CacheEnvironment {
     /**
      * Property to configure Hazelcast client group password
      */
-    @Deprecated
     public static final String NATIVE_CLIENT_PASSWORD = "hibernate.cache.hazelcast.native_client_password";
 
     /**
