@@ -28,8 +28,8 @@ import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
 import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.Value;
-import com.hazelcast.util.Clock;
-import com.hazelcast.util.EmptyStatement;
+import com.hazelcast.internal.util.Clock;
+import com.hazelcast.internal.util.EmptyStatement;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.access.SoftLock;
 

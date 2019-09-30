@@ -24,7 +24,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
-import com.hazelcast.util.StringUtil;
+import com.hazelcast.internal.util.StringUtil;
 import org.hibernate.cache.CacheException;
 
 import java.io.IOException;

@@ -13,6 +13,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.util.Comparator;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -80,7 +81,7 @@ public class LocalRegionCacheTest {
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
 
         ITopic<Object> topic = mock(ITopic.class);
-        when(topic.addMessageListener(isNotNull(MessageListener.class))).thenReturn("ignored");
+        when(topic.addMessageListener(isNotNull(MessageListener.class))).thenReturn(UUID.randomUUID());
 
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);

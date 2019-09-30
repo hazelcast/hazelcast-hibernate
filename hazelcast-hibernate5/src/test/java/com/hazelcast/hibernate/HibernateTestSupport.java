@@ -26,7 +26,7 @@ import com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
-import com.hazelcast.nio.IOUtil;
+import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.test.HazelcastTestSupport;
 import org.hibernate.Query;
 import org.hibernate.Session;
