@@ -34,7 +34,9 @@ import java.util.Properties;
  */
 class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
-    private static final int CONNECTION_ATTEMPT_LIMIT = 10;
+    private static final int INITIAL_BACKOFF_MS = 2000;
+    private static final int MAX_BACKOFF_MS = 35000;
+    private static final double BACKOFF_MULTIPLIER = 1.5D;
 
     private HazelcastInstance client;
     private ClientConfig clientConfig;
@@ -73,7 +75,13 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
         clientConfig.getNetworkConfig().setSmartRouting(true);
         clientConfig.getNetworkConfig().setRedoOperation(true);
-        clientConfig.getNetworkConfig().setConnectionAttemptLimit(CONNECTION_ATTEMPT_LIMIT);
+
+        // Try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
+        // at each step. When the last waiting interval time exceeds 35 seconds, it fails.
+        // This corresponds to 8 trials in total.
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setInitialBackoffMillis(INITIAL_BACKOFF_MS);
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMaxBackoffMillis(MAX_BACKOFF_MS);
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMultiplier(BACKOFF_MULTIPLIER);
     }
 
     @Override
