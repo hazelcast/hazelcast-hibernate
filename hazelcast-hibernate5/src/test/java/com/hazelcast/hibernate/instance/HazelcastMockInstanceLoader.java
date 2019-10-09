@@ -2,6 +2,7 @@ package com.hazelcast.hibernate.instance;
 
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
+import com.hazelcast.client.config.ConnectionRetryConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
@@ -21,7 +22,9 @@ import java.util.Properties;
 public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
 
     private static final ILogger LOGGER = Logger.getLogger(HazelcastMockInstanceLoader.class);
-    private static final int CONNECTION_ATTEMPT_LIMIT = 10;
+    private static final int INITIAL_BACKOFF_MS = 2000;
+    private static final int MAX_BACKOFF_MS = 35000;
+    private static final double BACKOFF_MULTIPLIER = 1.5D;
 
     private final Properties props = new Properties();
     private String instanceName;
@@ -168,9 +171,12 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
         if (clientConfig == null) {
             clientConfig = new ClientConfig();
             final ClientNetworkConfig networkConfig = clientConfig.getNetworkConfig();
+            final ConnectionRetryConfig connectionRetryConfig = clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig();
             networkConfig.setSmartRouting(true);
             networkConfig.setRedoOperation(true);
-            networkConfig.setConnectionAttemptLimit(CONNECTION_ATTEMPT_LIMIT);
+            connectionRetryConfig.setInitialBackoffMillis(INITIAL_BACKOFF_MS);
+            connectionRetryConfig.setMaxBackoffMillis(MAX_BACKOFF_MS);
+            connectionRetryConfig.setMultiplier(BACKOFF_MULTIPLIER);
         }
         return clientConfig;
     }
