@@ -25,7 +25,6 @@
         <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
         <property name="hibernate.connection.url">jdbc:hsqldb:mem:testdb</property>
         <property name="hibernate.connection.username">sa</property>
-        <property name="hibernate.connection.password"/>
 
         <property name="hibernate.connection.pool_size">2</property>
         <property name="hibernate.show_sql">false</property>
@@ -38,7 +37,6 @@
         <property name="hibernate.cache.hazelcast.use_native_client">true</property>
         <property name="hibernate.cache.hazelcast.native_client_address">localhost</property>
         <property name="hibernate.cache.hazelcast.native_client_group">dev-custom</property>
-        <property name="hibernate.cache.hazelcast.native_client_password">dev-pass</property>
         <property name="hibernate.cache.hazelcast.explicit_version_check">true</property>
     </session-factory>
 </hibernate-configuration>
