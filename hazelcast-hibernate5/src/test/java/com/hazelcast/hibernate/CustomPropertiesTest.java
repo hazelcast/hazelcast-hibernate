@@ -79,7 +79,7 @@ public class CustomPropertiesTest extends HibernateTestSupport {
         assertEquals(1, main.getCluster().getMembers().size());
         HazelcastClientProxy client = (HazelcastClientProxy) hz;
         ClientConfig clientConfig = client.getClientConfig();
-        assertEquals("dev-custom", clientConfig.getClientName());
+        assertEquals("dev-custom", clientConfig.getClusterName());
         assertTrue(clientConfig.getNetworkConfig().isSmartRouting());
         assertTrue(clientConfig.getNetworkConfig().isRedoOperation());
         factory.newHazelcastInstance(config);

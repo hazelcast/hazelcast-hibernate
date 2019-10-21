@@ -43,12 +43,12 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
                 unloadInstance();
             }
             String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
-            String clientName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER, props, null);
+            String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER, props, null);
             String configResourcePath = CacheEnvironment.getConfigFilePath(props);
 
             ClientConfig clientConfig = buildClientConfig(configResourcePath);
-            if (clientName != null) {
-                clientConfig.setClientName(clientName);
+            if (clientClusterName != null) {
+                clientConfig.setClusterName(clientClusterName);
             }
             if (address != null) {
                 clientConfig.getNetworkConfig().addAddress(address);
