@@ -6,7 +6,7 @@ import com.hazelcast.client.config.ConnectionRetryConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
-import com.hazelcast.config.ConfigLoader;
+import com.hazelcast.internal.config.ConfigLoader;
 import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.HazelcastInstance;
@@ -43,16 +43,12 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
                 unloadInstance();
             }
             String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
-            String cluster = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER, props, null);
-            String pass = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_PASSWORD, props, null);
+            String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
             String configResourcePath = CacheEnvironment.getConfigFilePath(props);
 
             ClientConfig clientConfig = buildClientConfig(configResourcePath);
-            if (cluster != null) {
-                clientConfig.setClusterName(cluster);
-            }
-            if (pass != null) {
-                clientConfig.setClusterPassword(pass);
+            if (clientClusterName != null) {
+                clientConfig.setClusterName(clientClusterName);
             }
             if (address != null) {
                 clientConfig.getNetworkConfig().addAddress(address);

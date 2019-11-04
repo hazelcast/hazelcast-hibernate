@@ -50,8 +50,7 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         }
 
         String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
-        String cluster = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER, props, null);
-        String pass = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_PASSWORD, props, null);
+        String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
         String configResourcePath = CacheEnvironment.getConfigFilePath(props);
 
         if (configResourcePath != null) {
@@ -63,11 +62,8 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         } else {
             clientConfig = new ClientConfig();
         }
-        if (cluster != null) {
-            clientConfig.setClusterName(cluster);
-        }
-        if (pass != null) {
-            clientConfig.setClusterPassword(pass);
+        if (clientClusterName != null) {
+            clientConfig.setClusterName(clientClusterName);
         }
         if (address != null) {
             clientConfig.getNetworkConfig().addAddress(address);

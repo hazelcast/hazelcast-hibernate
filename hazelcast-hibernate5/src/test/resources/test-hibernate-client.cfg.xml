@@ -37,8 +37,7 @@
 
         <property name="hibernate.cache.hazelcast.use_native_client">true</property>
         <property name="hibernate.cache.hazelcast.native_client_address">localhost</property>
-        <property name="hibernate.cache.hazelcast.native_client_group">dev-custom</property>
-        <property name="hibernate.cache.hazelcast.native_client_password">dev-pass</property>
+        <property name="hibernate.cache.hazelcast.native_client_cluster_name">dev-custom</property>
         <property name="hibernate.cache.hazelcast.explicit_version_check">true</property>
     </session-factory>
 </hibernate-configuration>
