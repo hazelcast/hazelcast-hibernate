@@ -68,7 +68,7 @@ public class CustomPropertiesTest extends HibernateTestSupport {
         props.remove(CacheEnvironment.CONFIG_FILE_PATH_LEGACY);
         props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
         props.setProperty(CacheEnvironment.USE_NATIVE_CLIENT, "true");
-        props.setProperty(CacheEnvironment.NATIVE_CLIENT_CLUSTER, "dev-custom");
+        props.setProperty(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, "dev-custom");
         props.setProperty(CacheEnvironment.CONFIG_FILE_PATH,"hazelcast-client-custom.xml");
         HazelcastMockInstanceLoader loader = new HazelcastMockInstanceLoader();
         loader.configure(props);
