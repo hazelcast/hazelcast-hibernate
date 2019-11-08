@@ -87,7 +87,7 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
         final float baseEvictionRate = 0.2f;
         final int numberOfEntities = 100;
         final int defaultCleanupPeriod = (int) CLEANUP_PERIOD;
-        final int maxSize = mapConfig.getMaxSizeConfig().getSize();
+        final int maxSize = mapConfig.getEvictionConfig().getSize();
         final int evictedItemCount = Math.max(0, numberOfEntities - maxSize + (int) (maxSize * baseEvictionRate));
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {

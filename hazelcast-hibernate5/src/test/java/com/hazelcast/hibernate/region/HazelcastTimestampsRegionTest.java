@@ -1,9 +1,10 @@
 package com.hazelcast.hibernate.region;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.cluster.Cluster;
+import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.OperationTimeoutException;
 import com.hazelcast.hibernate.RegionCache;
@@ -46,7 +47,11 @@ public class HazelcastTimestampsRegionTest {
     @Before
     public void setUp() throws Exception {
         mapConfig = mock(MapConfig.class);
-        when(mapConfig.getMaxSizeConfig()).thenReturn(new MaxSizeConfig(50, MaxSizeConfig.MaxSizePolicy.PER_NODE));
+        EvictionConfig evictionConfig = new EvictionConfig();
+        evictionConfig.setMaxSizePolicy(MaxSizePolicy.PER_NODE);
+        evictionConfig.setSize(50);
+        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
+
         when(mapConfig.getTimeToLiveSeconds()).thenReturn(timeout);
 
         config = mock(Config.class);

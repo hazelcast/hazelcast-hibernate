@@ -297,7 +297,7 @@ public class LocalRegionCache implements RegionCache {
         final int maxSize;
         final long timeToLive;
         if (config != null) {
-            maxSize = config.getMaxSizeConfig().getSize();
+            maxSize = config.getEvictionConfig().getSize();
             timeToLive = config.getTimeToLiveSeconds() * SEC_TO_MS;
         } else {
             maxSize = MAX_SIZE;
