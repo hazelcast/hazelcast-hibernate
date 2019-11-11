@@ -43,25 +43,24 @@
         -->
         <backup-count>1</backup-count>
         <!--
+        eviction-policy:
             Valid values are:
             NONE (no eviction),
             LRU (Least Recently Used),
-            LFU (Least Frequiently Used).
+            LFU (Least Frequently Used).
             NONE is the default.
-        -->
-        <eviction-policy>NONE</eviction-policy>
-        <!--
+        size:
             Maximum size of the map. When max size is reached,
             map is evicted based on the policy defined.
             Any integer between 0 and Integer.MAX_VALUE. 0 means
             Integer.MAX_VALUE. Default is 0.
         -->
-        <max-size>0</max-size>
+        <eviction eviction-policy="NONE" size="0" />
     </map>
 
     <!-- Config for query cache -->
     <map name="org.hibernate.cache.*">
         <time-to-live-seconds>0</time-to-live-seconds>
-        <max-size>50</max-size>
+        <eviction size="50" />
     </map>
 </hazelcast>

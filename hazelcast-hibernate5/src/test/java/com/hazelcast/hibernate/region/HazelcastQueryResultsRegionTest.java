@@ -1,9 +1,10 @@
 package com.hazelcast.hibernate.region;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.cluster.Cluster;
+import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.LocalRegionCacheTest;
@@ -51,7 +52,11 @@ public class HazelcastQueryResultsRegionTest {
     @Before
     public void setUp() throws Exception {
         mapConfig = mock(MapConfig.class);
-        when(mapConfig.getMaxSizeConfig()).thenReturn(new MaxSizeConfig(maxSize, MaxSizeConfig.MaxSizePolicy.PER_NODE));
+        EvictionConfig evictionConfig = new EvictionConfig();
+        evictionConfig.setMaxSizePolicy(MaxSizePolicy.PER_NODE);
+        evictionConfig.setSize(maxSize);
+        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
+
         when(mapConfig.getTimeToLiveSeconds()).thenReturn(timeout);
 
         config = mock(Config.class);
@@ -102,7 +107,9 @@ public class HazelcastQueryResultsRegionTest {
         // the default size is 100,000, so if the configuration is ignored no elements will be removed.
         // But if the configuration is applied as expected
         assertTrue(regionCache.size() <= 50);
-        verify(mapConfig).getMaxSizeConfig();
+        verify(mapConfig).getEvictionConfig();
+        assertEquals(maxSize, mapConfig.getEvictionConfig().getSize());
+        assertEquals(MaxSizePolicy.PER_NODE, mapConfig.getEvictionConfig().getMaxSizePolicy());
         verify(mapConfig, times(3)).getTimeToLiveSeconds(); // Should have been retrieved a second time by the cache
     }
 
