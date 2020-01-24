@@ -28,7 +28,7 @@ import java.io.IOException;
  * A merge policy implementation to handle split brain remerges based on the timestamps stored in
  * the values.
  */
-public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object, MergingValue<Object>> {
+public class VersionAwareMapMergePolicy implements SplitBrainMergePolicy<Object, MergingValue<Object>, Object> {
 
     @Override
     public Object merge(MergingValue<Object> mergingVal, MergingValue<Object> existingVal) {
