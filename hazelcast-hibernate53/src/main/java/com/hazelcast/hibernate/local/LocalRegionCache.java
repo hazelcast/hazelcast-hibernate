@@ -178,15 +178,10 @@ public class LocalRegionCache implements RegionCache {
     @Override
     public boolean put(final Object key, final Object value, final long txTimestamp, final Object version) {
         // The calling code has already done the work of checking if any existing cached entry is replaceable.
-        logger.info(String.format("put(): Key %s, value %s, txTimestamp %d, version %s", key, value, txTimestamp, version));
-
+        logger.fine(String.format("put(): Key %s, value %s, txTimestamp %d, version %s", key, value, txTimestamp, version));
         long nextTimestamp = nextTimestamp();
-        logger.info(String.format("put(): new Value(version, nextTimestamp, value) with other txTimestamp [%d]", nextTimestamp));
         final Value newValue = new Value(version, nextTimestamp, value);
         Expirable oldValue = cache.put(key, newValue);
-        if(oldValue != null){
-            logger.info("put(): Old value: "+oldValue);
-        }
         return true;
     }
 
