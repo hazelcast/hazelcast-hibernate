@@ -22,12 +22,16 @@ import com.hazelcast.core.MessageListener;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.logging.ILogger;
+import com.hazelcast.logging.Logger;
 import org.hibernate.cache.spi.RegionFactory;
 
 /**
  * A timestamp based local RegionCache
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
+
+    private static final ILogger logger = Logger.getLogger(LocalRegionCache.class);
 
     /**
      * @param regionFactory     the region factory
@@ -69,7 +73,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
         final Object key = ts.getKey();
-
+        logger.fine(String.format("maybeInvalidate(): Incoming Timestamp %s, for key %s " ,ts.getTimestamp(), ts.getKey()));
         if (key == null) {
             // Invalidate the entire region cache.
             cache.clear();
@@ -81,14 +85,22 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
+                    logger.fine(String.format("maybeInvalidate() Replacing entry. Timestamp > current %s", current));
+                    long nextTimestamp = nextTimestamp();
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp, ts.getTimestamp()))) {
                         return;
                     }
                 } else {
                     return;
                 }
             } else {
-                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
+                long nextTimestamp = nextTimestamp();
+                logger.fine(String.format("maybeInvalidate() Current time is null, put if absent in cache"));
+//                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
+//                    return;
+//                }
+                //Ajimenez: Instead of use incoming time, use current one. Remote invalidator can has a different time.
+                if (cache.putIfAbsent(key, new Value(null, nextTimestamp, nextTimestamp)) == null) {
                     return;
                 }
             }
