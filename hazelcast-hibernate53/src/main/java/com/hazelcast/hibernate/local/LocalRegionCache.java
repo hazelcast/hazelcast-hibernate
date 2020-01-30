@@ -143,15 +143,6 @@ public class LocalRegionCache implements RegionCache {
     public Object get(final Object key, final long txTimestamp) {
         logger.fine(String.format("get(): Object key [%s]", key));
         final Expirable value = cache.get(key);
-//        logger.info(String.format("get(): Value from cache using given key -> Expirable: [%s]", value));
-//        if(value != null){
-//            logger.info(String.format("get(): expirable.getValue(txTimestamp) -> [%s]", value.getValue(txTimestamp)));
-//            logger.info(String.format("get(): expirable.getValue()            -> [%s]", value.getValue()));
-//            logger.info(String.format("get(): expirable.getVersion() -> [%s]", value.getVersion()));
-//            if(value instanceof Value){
-//                logger.info(String.format("get(): ((Value)expirable).getTimestamp() -> [%s]", ((Value)value).getTimestamp()));
-//            }
-//        }
         return value == null ? null : value.getValue(txTimestamp);
     }
 
@@ -178,10 +169,10 @@ public class LocalRegionCache implements RegionCache {
     @Override
     public boolean put(final Object key, final Object value, final long txTimestamp, final Object version) {
         // The calling code has already done the work of checking if any existing cached entry is replaceable.
-        logger.fine(String.format("put(): Key %s, value %s, txTimestamp %d, version %s", key, value, txTimestamp, version));
         long nextTimestamp = nextTimestamp();
+        logger.fine(String.format("put(): Key %s, value %s, txTimestamp %d (but using %d), version %s", key, value, txTimestamp, nextTimestamp, version));
         final Value newValue = new Value(version, nextTimestamp, value);
-        Expirable oldValue = cache.put(key, newValue);
+        cache.put(key, newValue);
         return true;
     }
 
