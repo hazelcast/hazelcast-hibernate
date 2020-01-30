@@ -88,9 +88,6 @@
         <javassist.version>3.18.1-GA</javassist.version>
         <hibernate.core.version>5.0.12.Final</hibernate.core.version>
         <bytebuddy.version>1.6.12</bytebuddy.version>
-
-        <project.scm.id>github-summa</project.scm.id>
-        <gpg.skip>true</gpg.skip>
     </properties>
 
     <licenses>
@@ -100,18 +97,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-<!--    <scm>-->
-<!--        <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate5.git</connection>-->
-<!--        <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate5.git</developerConnection>-->
-<!--        <url>https://github.com/hazelcast/hazelcast/</url>-->
-<!--    </scm>-->
-    <!-- http way -->
     <scm>
-        <connection>scm:git:https://github.com/SummaNetworks/hazelcast-hibernate5/</connection>
-        <developerConnection>scm:git:https://github.com/SummaNetworks/hazelcast-hibernate5/</developerConnection>
-        <url>https://github.com/SummaNetworks/hazelcast-hibernate5/</url>
-      <tag>HEAD</tag>
-  </scm>
+        <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate5.git</connection>
+        <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate5.git</developerConnection>
+        <url>https://github.com/hazelcast/hazelcast/</url>
+    </scm>
     <developers>
         <developer>
             <id>oztalip</id>
@@ -128,20 +118,8 @@
             <name>bryan turner</name>
             <email>bturner@atlassian.com</email>
         </developer>
-        <developer>
-            <id>ajimenez</id>
-            <name>antonio jimenez</name>
-            <email>antonio.jimenez@summanetworks.com</email>
-        </developer>
     </developers>
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav-jackrabbit</artifactId>
-                <version>1.0</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -237,7 +215,6 @@
         </plugins>
     </build>
 
-    <!--
     <repositories>
         <repository>
             <id>snapshot-repository</id>
@@ -256,19 +233,6 @@
             <name>Maven2 Snapshot Repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-    -->
-    <distributionManagement>
-        <repository>
-            <id>onevox</id>
-            <name>Onevox Repository</name>
-            <url>dav:https://devel.onevox.io/repository</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshot</id>
-            <name>Onevox Repository</name>
-            <url>dav:https://devel.onevox.io/repository-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -528,17 +492,17 @@
                         </executions>
                     </plugin>
 
-<!--                    <plugin>-->
-<!--                        <groupId>org.sonatype.plugins</groupId>-->
-<!--                        <artifactId>nexus-staging-maven-plugin</artifactId>-->
-<!--                        <version>1.6.3</version>-->
-<!--                        <extensions>true</extensions>-->
-<!--                        <configuration>-->
-<!--                            <serverId>release-repository</serverId>-->
-<!--                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
-<!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
-<!--                        </configuration>-->
-<!--                    </plugin>-->
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.3</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>release-repository</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
