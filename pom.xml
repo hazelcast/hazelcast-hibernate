@@ -257,6 +257,18 @@
         </snapshotRepository>
     </distributionManagement>
     -->
+    <distributionManagement>
+        <repository>
+            <id>onevox</id>
+            <name>Onevox Repository</name>
+            <url>dav:https://devel.onevox.io/repository</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot</id>
+            <name>Onevox Repository</name>
+            <url>dav:https://devel.onevox.io/repository-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
