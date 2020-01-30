@@ -18,7 +18,7 @@
     <name>hazelcast-hibernate5</name>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-hibernate5-parent</artifactId>
-    <version>1.3.3-SUMMA-0.0.0</version>
+    <version>1.3.3-SUMMA-0.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
@@ -114,8 +114,7 @@
         <url>https://github.com/SummaNetworks/hazelcast-hibernate5</url>
         <connection>scm:git:git@github.com:SummaNetworks/hazelcast-hibernate5.git</connection>
         <developerConnection>scm:git:git@github.com:SummaNetworks/hazelcast-hibernate5.git</developerConnection>
-      <tag>1.3.3-SUMMA-0.0.0</tag>
-  </scm>
+    </scm>
     <developers>
         <developer>
             <id>oztalip</id>
