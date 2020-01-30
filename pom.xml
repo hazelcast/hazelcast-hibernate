@@ -18,7 +18,7 @@
     <name>hazelcast-hibernate5</name>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-hibernate5-parent</artifactId>
-    <version>1.3.3-SNAPSHOT</version>
+    <version>1.3.3-SUMMA-0.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
@@ -88,6 +88,9 @@
         <javassist.version>3.18.1-GA</javassist.version>
         <hibernate.core.version>5.0.12.Final</hibernate.core.version>
         <bytebuddy.version>1.6.12</bytebuddy.version>
+
+        <project.scm.id>git</project.scm.id>
+        <gpg.skip>true</gpg.skip>
     </properties>
 
     <licenses>
@@ -97,10 +100,15 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+<!--    <scm>-->
+<!--        <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate5.git</connection>-->
+<!--        <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate5.git</developerConnection>-->
+<!--        <url>https://github.com/hazelcast/hazelcast/</url>-->
+<!--    </scm>-->
     <scm>
-        <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate5.git</connection>
-        <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate5.git</developerConnection>
-        <url>https://github.com/hazelcast/hazelcast/</url>
+        <connection>scm:git:https://github.com/SummaNetworks/hazelcast-hibernate5/</connection>
+        <developerConnection>scm:git:https://github.com/SummaNetworks/jss7/</developerConnection>
+        <url>https://github.com/SummaNetworks/jss7/</url>
     </scm>
     <developers>
         <developer>
@@ -117,6 +125,11 @@
             <id>bturner</id>
             <name>bryan turner</name>
             <email>bturner@atlassian.com</email>
+        </developer>
+        <developer>
+            <id>ajimenez</id>
+            <name>antonio jimenez</name>
+            <email>antonio.jimenez@summanetworks.com</email>
         </developer>
     </developers>
     <build>
@@ -215,6 +228,7 @@
         </plugins>
     </build>
 
+    <!--
     <repositories>
         <repository>
             <id>snapshot-repository</id>
@@ -235,6 +249,7 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
+    -->
 
     <dependencies>
         <dependency>
