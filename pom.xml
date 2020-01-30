@@ -111,9 +111,9 @@
 <!--        <url>https://github.com/SummaNetworks/hazelcast-hibernate5/</url>-->
 <!--    </scm>-->
     <scm>
-        <connection>scm:git:git://github.com/SummaNetworks/hazelcast-hibernate5.git</connection>
+        <url>https://github.com/SummaNetworks/hazelcast-hibernate5</url>
+        <connection>scm:git:git@github.com:SummaNetworks/hazelcast-hibernate5.git</connection>
         <developerConnection>scm:git:git@github.com:SummaNetworks/hazelcast-hibernate5.git</developerConnection>
-        <url>https://github.com/SummaNetworks/hazelcast-hibernate5/</url>
     </scm>
     <developers>
         <developer>
