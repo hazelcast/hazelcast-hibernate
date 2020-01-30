@@ -85,9 +85,9 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    logger.fine(String.format("maybeInvalidate() Replacing entry. Timestamp > current %s", current));
+                    logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s > current %s", ts.getTimestamp(), current));
                     long nextTimestamp = nextTimestamp();
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp, ts.getTimestamp()))) {
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp, nextTimestamp))) {
                         return;
                     }
                 } else {
@@ -95,7 +95,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
                 }
             } else {
                 long nextTimestamp = nextTimestamp();
-                logger.fine(String.format("maybeInvalidate() Current time is null, put if absent in cache"));
+                logger.fine(String.format("maybeInvalidate() Current time is null, put if absent in cache with timestamp %s", nextTimestamp));
 //                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
 //                    return;
 //                }
