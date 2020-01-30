@@ -89,7 +89,7 @@
         <hibernate.core.version>5.0.12.Final</hibernate.core.version>
         <bytebuddy.version>1.6.12</bytebuddy.version>
 
-        <project.scm.id>git</project.scm.id>
+        <project.scm.id>github-summa</project.scm.id>
         <gpg.skip>true</gpg.skip>
     </properties>
 
