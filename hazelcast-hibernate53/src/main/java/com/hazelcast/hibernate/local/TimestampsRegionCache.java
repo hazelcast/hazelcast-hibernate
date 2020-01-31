@@ -84,17 +84,18 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Expirable value = cache.get(key);
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
-                if (ts.getTimestamp() > current) {
+                //Replace always to avoid error in machine time differences.
+                //if (ts.getTimestamp() > current) {
                     logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s > current %s", ts.getTimestamp(), current));
                     long nextTimestamp = nextTimestamp();
                     //Ajimenez: Instead of use incoming time, use current one. Remote invalidator can has a different time.
                     if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp, nextTimestamp))) {
                         return;
                     }
-                } else {
-                    logger.fine(String.format("maybeInvalidate() Do not replace entry. Invalidation message timestamp %s < current %s", ts.getTimestamp(), current));
-                    return;
-                }
+//                } else {
+//                    logger.fine(String.format("maybeInvalidate() Do not replace entry. Invalidation message timestamp %s < current %s", ts.getTimestamp(), current));
+//                    return;
+//                }
             } else {
                 long nextTimestamp = nextTimestamp();
                 logger.fine(String.format("maybeInvalidate() Current time is null, put if absent in cache with timestamp %s", nextTimestamp));
