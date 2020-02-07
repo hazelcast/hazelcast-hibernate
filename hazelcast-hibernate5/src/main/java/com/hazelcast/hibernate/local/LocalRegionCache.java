@@ -29,7 +29,6 @@ import com.hazelcast.hibernate.serialization.ExpiryMarker;
 import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.Value;
 import com.hazelcast.util.Clock;
-import com.hazelcast.util.EmptyStatement;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.access.SoftLock;
 
@@ -54,6 +53,7 @@ public class LocalRegionCache implements RegionCache {
     private static final int MAX_SIZE = 100000;
     private static final float BASE_EVICTION_RATE = 0.2F;
 
+    protected final String name;
     protected final HazelcastInstance hazelcastInstance;
     protected final ITopic<Object> topic;
     protected final MessageListener<Object> messageListener;
@@ -87,12 +87,9 @@ public class LocalRegionCache implements RegionCache {
      */
     public LocalRegionCache(final String name, final HazelcastInstance hazelcastInstance,
                             final CacheDataDescription metadata, final boolean withTopic) {
+        this.name = name;
         this.hazelcastInstance = hazelcastInstance;
-        try {
-            config = hazelcastInstance != null ? hazelcastInstance.getConfig().findMapConfig(name) : null;
-        } catch (UnsupportedOperationException ignored) {
-            EmptyStatement.ignore(ignored);
-        }
+        this.config = lookupMapConfig(name, hazelcastInstance);
         versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
         cache = new ConcurrentHashMap<Object, Expirable>();
         markerIdCounter = new AtomicLong();
@@ -103,6 +100,14 @@ public class LocalRegionCache implements RegionCache {
             topic.addMessageListener(messageListener);
         } else {
             topic = null;
+        }
+    }
+
+    private static MapConfig lookupMapConfig(String name, HazelcastInstance hazelcastInstance) {
+        try {
+            return hazelcastInstance != null ? hazelcastInstance.getConfig().getMapConfig(name) : null;
+        } catch (UnsupportedOperationException ignored) {
+            return null;
         }
     }
 
@@ -296,6 +301,7 @@ public class LocalRegionCache implements RegionCache {
     void cleanup() {
         final int maxSize;
         final long timeToLive;
+        final MapConfig config = lookupMapConfig(name, hazelcastInstance);
         if (config != null) {
             maxSize = config.getMaxSizeConfig().getSize();
             timeToLive = config.getTimeToLiveSeconds() * SEC_TO_MS;
