@@ -73,7 +73,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
         final Object key = ts.getKey();
-        logger.fine(String.format("maybeInvalidate(): Incoming Timestamp %s, for key %s " ,ts.getTimestamp(), ts.getKey()));
+        logger.fine(String.format("maybeInvalidate(): Key %s " ,ts.getKey()));
         if (key == null) {
             // Invalidate the entire region cache.
             cache.clear();
@@ -84,23 +84,24 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Expirable value = cache.get(key);
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
-                //Replace always to avoid error in machine time differences.
-                //if (ts.getTimestamp() > current) {
-                    logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s > current %s", ts.getTimestamp(), current));
-                    long nextTimestamp = nextTimestamp();
-                    //Ajimenez: Instead of use incoming time, use current one. Remote invalidator can has a different time.
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp, nextTimestamp))) {
+                if (ts.getTimestamp() > current) {
+                    logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s, current (cache-time) %s, difference %s",
+                            ts.getTimestamp(), current, (ts.getTimestamp()-current)));
+
+                    long nextT = nextTimestamp();
+                    logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s, local-cluster-time %s, difference %s",
+                            ts.getTimestamp(), nextT, (ts.getTimestamp()-nextT)));
+
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
                         return;
                     }
-//                } else {
-//                    logger.fine(String.format("maybeInvalidate() Do not replace entry. Invalidation message timestamp %s < current %s", ts.getTimestamp(), current));
-//                    return;
-//                }
+                }else{
+                    logger.fine(String.format("maybeInvalidate(): No replacing. message timestamp %s <= current %s", ts.getTimestamp(), current));
+                    return;
+                }
             } else {
-                long nextTimestamp = nextTimestamp();
-                logger.fine(String.format("maybeInvalidate() Current time is null, put if absent in cache with timestamp %s", nextTimestamp));
-                //Ajimenez: Instead of use incoming time, use current one. Remote invalidator can has a different time.
-                if (cache.putIfAbsent(key, new Value(null, nextTimestamp, nextTimestamp)) == null) {
+                logger.fine(String.format("maybeInvalidate() Current time is null, putIfAbsent."));
+                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
                     return;
                 }
             }

@@ -19,16 +19,21 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.TimestampsRegionCache;
+import com.hazelcast.logging.ILogger;
+import com.hazelcast.logging.Logger;
 import com.hazelcast.util.Clock;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.support.RegionNameQualifier;
+import org.hibernate.cache.spi.support.SimpleTimestamper;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
  */
 public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegionFactory {
+
+    private static final ILogger logger = Logger.getLogger(LocalRegionCache.class);
 
     public HazelcastLocalCacheRegionFactory() {
     }
@@ -73,6 +78,12 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     }
 
     public long nextTimestamp() {
-        return Clock.currentTimeMillis();
+         long result = instance == null ? Clock.currentTimeMillis()
+                : HazelcastTimestamper.nextTimestamp(instance);
+         return result;
+    }
+
+    public long getTimeout() {
+        return 0L;
     }
 }
