@@ -79,6 +79,6 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     }
 
     public long getTimeout() {
-        return 0L;
+        return super.getTimeout();
     }
 }
