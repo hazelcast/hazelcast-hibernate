@@ -22,16 +22,12 @@ import com.hazelcast.core.MessageListener;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
 import org.hibernate.cache.spi.RegionFactory;
 
 /**
  * A timestamp based local RegionCache
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
-
-    private static final ILogger logger = Logger.getLogger(LocalRegionCache.class);
 
     /**
      * @param regionFactory     the region factory
@@ -73,7 +69,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
         final Object key = ts.getKey();
-        logger.fine(String.format("maybeInvalidate(): Key %s " ,ts.getKey()));
+
         if (key == null) {
             // Invalidate the entire region cache.
             cache.clear();
@@ -85,22 +81,13 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s, current (cache-time) %s, difference %s",
-                            ts.getTimestamp(), current, (ts.getTimestamp()-current)));
-
-                    long nextT = nextTimestamp();
-                    logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s, local-cluster-time %s, difference %s",
-                            ts.getTimestamp(), nextT, (ts.getTimestamp()-nextT)));
-
                     if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
                         return;
                     }
-                }else{
-                    logger.fine(String.format("maybeInvalidate(): No replacing. message timestamp %s <= current %s", ts.getTimestamp(), current));
+                } else {
                     return;
                 }
             } else {
-                logger.fine(String.format("maybeInvalidate() Current time is null, putIfAbsent."));
                 if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
                     return;
                 }
