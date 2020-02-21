@@ -85,23 +85,23 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Expirable value = cache.get(key);
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
-                if (ts.getTimestamp() > current ||
-                        (current - ts.getTimestamp() + 1_000 > SimpleTimestamper.timeOut()) ) {
+                if (ts.getTimestamp() > current ) {
                     logger.fine(String.format("maybeInvalidate() Replacing entry. Invalidation message timestamp %s, " +
-                                    "current (cache-time) %s, difference %s, timeout: %s",
-                            ts.getTimestamp(), current, (ts.getTimestamp()-current), SimpleTimestamper.timeOut()));
-
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
+                                    "current (cache-time) %s, difference %s", ts.getTimestamp(), current, (ts.getTimestamp()-current)));
+                    //Do not use ts.getTimestamp for value to avoid preInvalidation with offset effect.
+                    long nextTime = nextTimestamp();
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
                         return;
                     }
-                }else{
+                } else {
                     logger.fine(String.format("maybeInvalidate(): No replacing. message timestamp %s <= current %s, difference %s"
                             , ts.getTimestamp(), current, (current - ts.getTimestamp())));
                     return;
                 }
             } else {
+                long nextTime = nextTimestamp();
                 logger.fine(String.format("maybeInvalidate() Current time is null, putIfAbsent."));
-                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
+                if (cache.putIfAbsent(key, new Value(null, nextTime, nextTime)) == null) {
                     return;
                 }
             }
