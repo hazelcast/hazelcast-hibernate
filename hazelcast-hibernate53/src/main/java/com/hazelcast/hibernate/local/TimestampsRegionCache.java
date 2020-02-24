@@ -22,8 +22,6 @@ import com.hazelcast.core.MessageListener;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
 import org.hibernate.cache.spi.RegionFactory;
 
 /**
@@ -31,7 +29,6 @@ import org.hibernate.cache.spi.RegionFactory;
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
 
-    private final ILogger log = Logger.getLogger(getClass());
 
     /**
      * @param regionFactory     the region factory
@@ -83,10 +80,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Expirable value = cache.get(key);
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
-                if (ts.getTimestamp() > current ) {
-                    if(log.isFineEnabled()) {
-                        log.fine(String.format("Invalidating entry for key %s, ", ts.getKey()));
-                    }
+                if (ts.getTimestamp() > current) {
                     //Do not use ts.getTimestamp for value to avoid preInvalidation with offset effect.
                     long nextTime = nextTimestamp();
                     if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
