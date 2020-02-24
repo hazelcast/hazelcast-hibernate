@@ -31,7 +31,7 @@ import org.hibernate.cache.spi.RegionFactory;
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
 
-    private static final ILogger logger = Logger.getLogger(LocalRegionCache.class);
+    private final ILogger log = Logger.getLogger(getClass());
 
     /**
      * @param regionFactory     the region factory
@@ -84,7 +84,9 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current ) {
-                    logger.fine(String.format("Invalidating entry for key %s, ", ts.getKey()));
+                    if(log.isFineEnabled()) {
+                        log.fine(String.format("Invalidating entry for key %s, ", ts.getKey()));
+                    }
                     //Do not use ts.getTimestamp for value to avoid preInvalidation with offset effect.
                     long nextTime = nextTimestamp();
                     if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
