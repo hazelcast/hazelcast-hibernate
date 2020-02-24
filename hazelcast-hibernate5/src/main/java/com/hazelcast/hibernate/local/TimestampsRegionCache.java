@@ -20,11 +20,15 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.logging.ILogger;
+import com.hazelcast.logging.Logger;
 
 /**
  * A timestamp based local RegionCache
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
+
+    private final ILogger log = Logger.getLogger(getClass());
 
     public TimestampsRegionCache(final String name, final HazelcastInstance hazelcastInstance) {
         super(name, hazelcastInstance, null);
@@ -58,7 +62,11 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
+                    if(log.isFineEnabled()) {
+                        log.fine(String.format("Invalidating entry for key %s, ", ts.getKey()));
+                    }
+                    long nextTime = nextTimestamp();
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
                         return;
                     }
                 } else {
