@@ -51,8 +51,6 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class LocalRegionCache implements RegionCache {
 
-    private static final ILogger logger = Logger.getLogger(LocalRegionCache.class);
-
     private static final long SEC_TO_MS = 1000L;
     private static final int MAX_SIZE = 100000;
     private static final float BASE_EVICTION_RATE = 0.2F;
@@ -168,7 +166,6 @@ public class LocalRegionCache implements RegionCache {
     @Override
     public boolean put(final Object key, final Object value, final long txTimestamp, final Object version) {
         // The calling code has already done the work of checking if any existing cached entry is replaceable.
-        logger.fine(String.format("put(): Key %s, value %s, txTimestamp %d, version %s", key, value, txTimestamp, version));
         final Value newValue = new Value(version, nextTimestamp(), value);
         cache.put(key, newValue);
         return true;
