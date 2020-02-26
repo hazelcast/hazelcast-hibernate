@@ -20,6 +20,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.util.UuidUtil;
 
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
 
     public TimestampsRegionCache(final String name, final HazelcastInstance hazelcastInstance) {
         super(name, hazelcastInstance, null);
-        this.regionId = UUID.randomUUID();
+        this.regionId = UuidUtil.newSecureUUID();
     }
 
     @Override
@@ -51,9 +52,11 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     @Override
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
-        if (ts.getSenderId().equals(regionId)) return;
-        final Object key = ts.getKey();
+        if (ts.getSenderId().equals(regionId)) {
+            return;
+        }
 
+        final Object key = ts.getKey();
         if (key == null) {
             // Invalidate the entire region cache.
             cache.clear();
