@@ -24,11 +24,15 @@ import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
 import org.hibernate.cache.spi.RegionFactory;
 
+import java.util.UUID;
+
 /**
  * A timestamp based local RegionCache
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
 
+    // Identifier to prevent handling messages sent by this.
+    private UUID regionId;
 
     /**
      * @param regionFactory     the region factory
@@ -40,6 +44,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     public TimestampsRegionCache(final RegionFactory regionFactory, final String name,
                                  final HazelcastInstance hazelcastInstance) {
         super(regionFactory, name, hazelcastInstance, null);
+        regionId = UUID.randomUUID();
     }
 
     @Override
@@ -62,13 +67,14 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
 
     @Override
     protected Object createMessage(final Object key, final Object value, final Object currentVersion) {
-        return new Timestamp(key, (Long) value);
+        return new Timestamp(key, (Long) value, this.regionId);
     }
 
     @SuppressWarnings("Duplicates")
     @Override
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
+        if (ts.getSenderId().equals(regionId)) return;
         final Object key = ts.getKey();
         if (key == null) {
             // Invalidate the entire region cache.
