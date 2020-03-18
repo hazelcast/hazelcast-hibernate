@@ -22,12 +22,18 @@ import com.hazelcast.core.MessageListener;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.util.UuidUtil;
 import org.hibernate.cache.spi.RegionFactory;
+
+import java.util.UUID;
 
 /**
  * A timestamp based local RegionCache
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
+
+    // Identifier to prevent handling messages sent by this.
+    private UUID regionId;
 
     /**
      * @param regionFactory     the region factory
@@ -39,6 +45,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     public TimestampsRegionCache(final RegionFactory regionFactory, final String name,
                                  final HazelcastInstance hazelcastInstance) {
         super(regionFactory, name, hazelcastInstance, null);
+        regionId = UuidUtil.newSecureUUID();
     }
 
     @Override
@@ -61,15 +68,18 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
 
     @Override
     protected Object createMessage(final Object key, final Object value, final Object currentVersion) {
-        return new Timestamp(key, (Long) value);
+        return new Timestamp(key, (Long) value, this.regionId);
     }
 
     @SuppressWarnings("Duplicates")
     @Override
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
-        final Object key = ts.getKey();
+        if (ts.getSenderId().equals(regionId)) {
+            return;
+        }
 
+        final Object key = ts.getKey();
         if (key == null) {
             // Invalidate the entire region cache.
             cache.clear();
@@ -81,14 +91,17 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
+                    //Do not use ts.getTimestamp for value to avoid preInvalidation with offset effect.
+                    long nextTime = nextTimestamp();
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
                         return;
                     }
                 } else {
                     return;
                 }
             } else {
-                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
+                long nextTime = nextTimestamp();
+                if (cache.putIfAbsent(key, new Value(null, nextTime, nextTime)) == null) {
                     return;
                 }
             }

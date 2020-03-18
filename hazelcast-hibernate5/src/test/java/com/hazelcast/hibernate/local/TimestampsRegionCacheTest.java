@@ -22,6 +22,8 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 
+import java.util.UUID;
+
 @RunWith(MockitoJUnitRunner.class)
 public class TimestampsRegionCacheTest {
 
@@ -69,7 +71,7 @@ public class TimestampsRegionCacheTest {
         assertThat("primed value should be in the cache", (Long)target.get("QuerySpace", firstTimestamp), is(firstTimestamp));
 
         // a message is generated on a different cluster member informing us to update the timestamp region cache
-        Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp), publishTime, member);
+        Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp, UUID.randomUUID()), publishTime, member);
 
         // process the timestamp region update
         listener.onMessage(message);

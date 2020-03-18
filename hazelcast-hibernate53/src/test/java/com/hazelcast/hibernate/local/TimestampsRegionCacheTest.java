@@ -11,6 +11,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -66,7 +68,7 @@ public class TimestampsRegionCacheTest {
         assertThat("primed value should be in the cache", (Long) target.get("QuerySpace", firstTimestamp), is(firstTimestamp));
 
         // a message is generated on a different cluster member informing us to update the timestamp region cache
-        Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp), publishTime, member);
+        Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp, UUID.randomUUID()), publishTime, member);
 
         // process the timestamp region update
         listener.onMessage(message);

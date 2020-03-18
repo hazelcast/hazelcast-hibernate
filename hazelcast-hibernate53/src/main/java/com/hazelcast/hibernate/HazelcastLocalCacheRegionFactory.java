@@ -19,6 +19,7 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.TimestampsRegionCache;
+import com.hazelcast.util.Clock;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.support.RegionNameQualifier;
@@ -70,4 +71,11 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
 
         return new TimestampsRegionCache(this, qualifiedRegionName, instance);
     }
+
+    public long nextTimestamp() {
+         long result = instance == null ? Clock.currentTimeMillis()
+                : HazelcastTimestamper.nextTimestamp(instance);
+         return result;
+    }
+
 }
