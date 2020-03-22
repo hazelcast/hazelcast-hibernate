@@ -51,13 +51,7 @@ public final class CleanupService {
     }
 
     public void registerCache(final LocalRegionCache cache) {
-        executor.scheduleWithFixedDelay(new Runnable() {
-
-            @Override
-            public void run() {
-                cache.cleanup();
-            }
-        }, fixedDelay, fixedDelay, TimeUnit.SECONDS);
+        executor.scheduleWithFixedDelay(cache::cleanup, fixedDelay, fixedDelay, TimeUnit.SECONDS);
     }
 
     public void stop() {
