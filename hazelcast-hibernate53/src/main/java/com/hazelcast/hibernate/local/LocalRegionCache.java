@@ -42,6 +42,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -238,13 +239,7 @@ public class LocalRegionCache implements RegionCache {
     }
 
     private MessageListener<Object> createMessageListener() {
-        return new MessageListener<Object>() {
-
-            @Override
-            public void onMessage(final Message<Object> message) {
-                maybeInvalidate(message.getMessageObject());
-            }
-        };
+        return message -> maybeInvalidate(message.getMessageObject());
     }
 
     private void evictEntries(final List<EvictionEntry> entries, final int evictionRate) {
@@ -357,8 +352,8 @@ public class LocalRegionCache implements RegionCache {
 
             EvictionEntry that = (EvictionEntry) o;
 
-            return (key == null ? that.key == null : key.equals(that.key))
-                    && (value == null ? that.value == null : value.equals(that.value));
+            return (Objects.equals(key, that.key))
+                    && (Objects.equals(value, that.value));
         }
 
         @Override

@@ -50,28 +50,28 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
     @Override
     public CollectionRegion buildCollectionRegion(final String regionName, final Properties properties,
                                                   final CacheDataDescription metadata) throws CacheException {
-        return new HazelcastCollectionRegion<IMapRegionCache>(instance, regionName, properties, metadata,
-                new IMapRegionCache(regionName, instance, properties, metadata));
+        return new HazelcastCollectionRegion<>(instance, regionName, properties, metadata,
+          new IMapRegionCache(regionName, instance, properties, metadata));
     }
 
     @Override
     public EntityRegion buildEntityRegion(final String regionName, final Properties properties,
                                           final CacheDataDescription metadata) throws CacheException {
-        return new HazelcastEntityRegion<IMapRegionCache>(instance, regionName, properties, metadata,
-                new IMapRegionCache(regionName, instance, properties, metadata));
+        return new HazelcastEntityRegion<>(instance, regionName, properties, metadata,
+          new IMapRegionCache(regionName, instance, properties, metadata));
     }
 
     @Override
     public NaturalIdRegion buildNaturalIdRegion(final String regionName, final Properties properties,
                                                 final CacheDataDescription metadata) throws CacheException {
-        return new HazelcastNaturalIdRegion<IMapRegionCache>(instance, regionName, properties, metadata,
-                new IMapRegionCache(regionName, instance, properties, metadata));
+        return new HazelcastNaturalIdRegion<>(instance, regionName, properties, metadata,
+          new IMapRegionCache(regionName, instance, properties, metadata));
     }
 
     @Override
     public TimestampsRegion buildTimestampsRegion(final String regionName, final Properties properties)
             throws CacheException {
-        return new HazelcastTimestampsRegion<IMapRegionCache>(instance, regionName, properties,
-                new IMapRegionCache(regionName, instance, properties, null));
+        return new HazelcastTimestampsRegion<>(instance, regionName, properties,
+          new IMapRegionCache(regionName, instance, properties, null));
     }
 }

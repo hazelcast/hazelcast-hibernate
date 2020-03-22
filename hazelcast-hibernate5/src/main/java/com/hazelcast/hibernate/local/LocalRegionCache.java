@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -93,7 +94,7 @@ public class LocalRegionCache implements RegionCache {
             EmptyStatement.ignore(ignored);
         }
         versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
-        cache = new ConcurrentHashMap<Object, Expirable>();
+        cache = new ConcurrentHashMap<>();
         markerIdCounter = new AtomicLong();
 
         messageListener = createMessageListener();
@@ -200,13 +201,7 @@ public class LocalRegionCache implements RegionCache {
     }
 
     protected MessageListener<Object> createMessageListener() {
-        return new MessageListener<Object>() {
-
-            @Override
-            public void onMessage(final Message<Object> message) {
-                    maybeInvalidate(message.getMessageObject());
-            }
-        };
+        return message -> maybeInvalidate(message.getMessageObject());
     }
 
     @Override
@@ -378,7 +373,7 @@ public class LocalRegionCache implements RegionCache {
                     // _first_ entry at a given timestamp is the only one that can be evicted because
                     // TreeSet does not add "equivalent" entries. A second benefit of using a List is
                     // that the cost of sorting the entries is not incurred if eviction isn't performed
-                    entries = new ArrayList<EvictionEntry>(cache.size());
+                    entries = new ArrayList<>(cache.size());
                 }
                 entries.add(new EvictionEntry(k, v));
             }
@@ -417,7 +412,7 @@ public class LocalRegionCache implements RegionCache {
         public int compareTo(final EvictionEntry o) {
             final long thisVal = this.value.getTimestamp();
             final long anotherVal = o.value.getTimestamp();
-            return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+            return (Long.compare(thisVal, anotherVal));
         }
 
         @Override
@@ -431,8 +426,8 @@ public class LocalRegionCache implements RegionCache {
 
             EvictionEntry that = (EvictionEntry) o;
 
-            return (key == null ? that.key == null : key.equals(that.key))
-                    && (value == null ? that.value == null : value.equals(that.value));
+            return (Objects.equals(key, that.key))
+                    && (Objects.equals(value, that.value));
         }
 
         @Override

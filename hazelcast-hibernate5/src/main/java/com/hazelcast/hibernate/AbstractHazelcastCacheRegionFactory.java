@@ -86,11 +86,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
                 Class<IHazelcastInstanceFactory> factory =
                         (Class<IHazelcastInstanceFactory>) Class.forName(factoryName, true, cl);
                 instanceLoader = factory.newInstance().createInstanceLoader(properties);
-            } catch (ClassNotFoundException e) {
-                throw new CacheException("Failed to set up hazelcast instance factory", e);
-            } catch (InstantiationException e) {
-                throw new CacheException("Failed to set up hazelcast instance factory", e);
-            } catch (IllegalAccessException e) {
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                 throw new CacheException("Failed to set up hazelcast instance factory", e);
             }
             instance = instanceLoader.loadInstance();
