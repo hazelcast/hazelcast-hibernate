@@ -17,19 +17,18 @@ package com.hazelcast.hibernate.local;
 
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.topic.ITopic;
-import com.hazelcast.topic.Message;
-import com.hazelcast.topic.MessageListener;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.hibernate.HazelcastTimestamper;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
 import com.hazelcast.hibernate.serialization.Value;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
 import com.hazelcast.internal.util.Clock;
 import com.hazelcast.internal.util.EmptyStatement;
+import com.hazelcast.logging.ILogger;
+import com.hazelcast.logging.Logger;
+import com.hazelcast.topic.ITopic;
+import com.hazelcast.topic.MessageListener;
 import org.hibernate.cache.cfg.spi.CollectionDataCachingConfig;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.cfg.spi.EntityDataCachingConfig;
@@ -178,7 +177,7 @@ public class LocalRegionCache implements RegionCache {
 
     public long nextTimestamp() {
         return hazelcastInstance == null ? Clock.currentTimeMillis()
-                : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
+          : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
     }
 
     protected Object createMessage(final Object key, final Object value, final Object currentVersion) {
@@ -353,7 +352,7 @@ public class LocalRegionCache implements RegionCache {
             EvictionEntry that = (EvictionEntry) o;
 
             return (Objects.equals(key, that.key))
-                    && (Objects.equals(value, that.value));
+              && (Objects.equals(value, that.value));
         }
 
         @Override

@@ -17,9 +17,6 @@ package com.hazelcast.hibernate.local;
 
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.topic.ITopic;
-import com.hazelcast.topic.Message;
-import com.hazelcast.topic.MessageListener;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.hibernate.HazelcastTimestamper;
 import com.hazelcast.hibernate.RegionCache;
@@ -29,6 +26,8 @@ import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.Value;
 import com.hazelcast.internal.util.Clock;
 import com.hazelcast.internal.util.EmptyStatement;
+import com.hazelcast.topic.ITopic;
+import com.hazelcast.topic.MessageListener;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.access.SoftLock;
 
@@ -348,7 +347,7 @@ public class LocalRegionCache implements RegionCache {
 
     protected long nextTimestamp() {
         return hazelcastInstance == null ? Clock.currentTimeMillis()
-                : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
+          : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
     }
 
     private List<EvictionEntry> searchEvictableEntries(final long timeToLive, final boolean limitSize) {
@@ -427,7 +426,7 @@ public class LocalRegionCache implements RegionCache {
             EvictionEntry that = (EvictionEntry) o;
 
             return (Objects.equals(key, that.key))
-                    && (Objects.equals(value, that.value));
+              && (Objects.equals(value, that.value));
         }
 
         @Override
