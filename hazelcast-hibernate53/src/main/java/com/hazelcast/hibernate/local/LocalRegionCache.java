@@ -38,6 +38,7 @@ import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -63,6 +64,7 @@ public class LocalRegionCache implements RegionCache {
     private final RegionFactory regionFactory;
     private final ITopic<Object> topic;
     private final Comparator versionComparator;
+    private final EvictionConfig evictionConfig;
 
     private MapConfig config;
 
@@ -94,6 +96,27 @@ public class LocalRegionCache implements RegionCache {
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
                             final boolean withTopic) {
+        this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null);
+    }
+
+    /**
+     * @param regionFactory     the region factory
+     * @param name              the name for this region cache, which is also used to retrieve configuration/topic
+     * @param hazelcastInstance the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
+     *                          configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
+     *                          with if {@code withTopic} is {@code true} (optional)
+     * @param regionConfig      the region configuration
+     * @param withTopic         {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
+     *                          matches this region cache <i>if</i> a {@code HazelcastInstance} was provided to look
+     *                          up the topic; otherwise, {@code false} not to register a listener even if an instance
+     *                          was provided
+     * @param evictionConfig    provides the parameters which should be used when evicting entries from the cache;
+     *                          if null, this will be derived from the Hazelcast {@link MapConfig}; if the MapConfig
+     *                          cannot be resolved, this will use defaults.
+     */
+    public LocalRegionCache(final RegionFactory regionFactory, final String name,
+                            final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
+                            final boolean withTopic, final EvictionConfig evictionConfig) {
         this.hazelcastInstance = hazelcastInstance;
         this.name = name;
         this.regionFactory = regionFactory;
@@ -113,6 +136,7 @@ public class LocalRegionCache implements RegionCache {
         }
 
         versionComparator = findVersionComparator(regionConfig);
+        this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
     }
 
     @Override
@@ -207,15 +231,8 @@ public class LocalRegionCache implements RegionCache {
 
     @SuppressWarnings("Duplicates")
     void cleanup() {
-        final int maxSize;
-        final long timeToLive;
-        if (config != null) {
-            maxSize = config.getMaxSizeConfig().getSize();
-            timeToLive = config.getTimeToLiveSeconds() * SEC_TO_MS;
-        } else {
-            maxSize = MAX_SIZE;
-            timeToLive = CacheEnvironment.getDefaultCacheTimeoutInMillis();
-        }
+        final int maxSize = evictionConfig.getMaxSize();
+        final long timeToLive = evictionConfig.getTimeToLive().toMillis();
 
         final boolean limitSize = maxSize > 0 && maxSize != Integer.MAX_VALUE;
         if (limitSize || timeToLive > 0) {
@@ -365,6 +382,44 @@ public class LocalRegionCache implements RegionCache {
         @Override
         public int hashCode() {
             return key == null ? 0 : key.hashCode();
+        }
+    }
+
+    /**
+     * Defines the parameters used when evicting entries from the cache.
+     */
+    public interface EvictionConfig {
+        /**
+         * @return the duration for which an item should live in the cache
+         */
+        Duration getTimeToLive();
+
+        /**
+         * @return the maximum number of entries that should live in the cache
+         */
+        int getMaxSize();
+
+        /**
+         * Creates an {@link EvictionConfig} for a given Hazelcast {@link MapConfig}.
+         *
+         * @param mapConfig the MapConfig to use. If null, defaults will be used.
+         */
+        static EvictionConfig create(final MapConfig mapConfig) {
+            return new EvictionConfig() {
+                @Override
+                public Duration getTimeToLive() {
+                    return mapConfig == null ?
+                            Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis()) :
+                            Duration.ofSeconds(mapConfig.getTimeToLiveSeconds());
+                }
+
+                @Override
+                public int getMaxSize() {
+                    return mapConfig == null ?
+                            MAX_SIZE :
+                            mapConfig.getMaxSizeConfig().getSize();
+                }
+            };
         }
     }
 }
