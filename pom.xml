@@ -341,7 +341,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>23.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -565,7 +565,7 @@
                 <dependency>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
-                    <version>15.0</version>
+                    <version>23.0</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
