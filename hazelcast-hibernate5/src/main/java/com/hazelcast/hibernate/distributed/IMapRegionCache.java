@@ -93,19 +93,15 @@ public class IMapRegionCache implements RegionCache {
         // the lock was released under heavy load or after network partitions. Hence this implementation now uses
         // a spin loop around atomic operations.
         long timeout = System.currentTimeMillis() + tryLockAndGetTimeout;
+        Value newEntry = new Value(version, txTimestamp, value);
         do {
-            Expirable previousEntry = map.get(key);
-            Value newValue = new Value(version, txTimestamp, value);
-            if (previousEntry == null) {
-                if (map.putIfAbsent(key, newValue) == null) {
-                    return true;
-                }
-            } else if (previousEntry.isReplaceableBy(txTimestamp, version, versionComparator)) {
-                if (map.replace(key, previousEntry, newValue)) {
-                    return true;
-                }
-            } else {
+            Expirable currentEntry = map.putIfAbsent(key, newEntry);
+            if (currentEntry == null) {
+                return true;
+            } else if (!currentEntry.isReplaceableBy(txTimestamp, version, versionComparator)) {
                 return false;
+            } else if (map.replace(key, currentEntry, newEntry)) {
+                return true;
             }
         } while (System.currentTimeMillis() < timeout);
 
