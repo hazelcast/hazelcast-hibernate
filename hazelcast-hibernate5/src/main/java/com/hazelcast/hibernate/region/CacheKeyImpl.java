@@ -16,6 +16,7 @@
 package com.hazelcast.hibernate.region;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -106,7 +107,7 @@ public final class CacheKeyImpl implements DataSerializable {
       return false;
     }
 
-    return tenantId != null ? tenantId.equals(that.tenantId) : that.tenantId == null;
+    return Objects.equals(tenantId, that.tenantId);
   }
 
   @Override

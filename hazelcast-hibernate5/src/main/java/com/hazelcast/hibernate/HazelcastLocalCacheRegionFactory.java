@@ -53,8 +53,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     @Override
     public CollectionRegion buildCollectionRegion(final String regionName, final Properties properties,
                                                   final CacheDataDescription metadata) throws CacheException {
-        final HazelcastCollectionRegion<LocalRegionCache> region = new HazelcastCollectionRegion<LocalRegionCache>(instance,
-                regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
+        final HazelcastCollectionRegion<LocalRegionCache> region = new HazelcastCollectionRegion<>(instance,
+          regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
         cleanupService.registerCache(region.getCache());
         return region;
     }
@@ -62,8 +62,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     @Override
     public EntityRegion buildEntityRegion(final String regionName, final Properties properties,
                                           final CacheDataDescription metadata) throws CacheException {
-        final HazelcastEntityRegion<LocalRegionCache> region = new HazelcastEntityRegion<LocalRegionCache>(instance,
-                regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
+        final HazelcastEntityRegion<LocalRegionCache> region = new HazelcastEntityRegion<>(instance,
+          regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
         cleanupService.registerCache(region.getCache());
         return region;
     }
@@ -71,8 +71,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     @Override
     public NaturalIdRegion buildNaturalIdRegion(final String regionName, final Properties properties,
                                                 final CacheDataDescription metadata) throws CacheException {
-        final HazelcastNaturalIdRegion<LocalRegionCache> region = new HazelcastNaturalIdRegion<LocalRegionCache>(
-                instance, regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
+        final HazelcastNaturalIdRegion<LocalRegionCache> region = new HazelcastNaturalIdRegion<>(
+          instance, regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
         cleanupService.registerCache(region.getCache());
 
         return region;
