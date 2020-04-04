@@ -12,7 +12,7 @@ jobs:
         java: [ '8' ]
         architecture: [ 'x64' ]
         module: ['hazelcast-hibernate5', 'hazelcast-hibernate52', 'hazelcast-hibernate53']
-    name: Build with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
+    name: Build ${{ matrix.module }} with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
     steps:
       - uses: actions/checkout@v1
       - name: Setup JDK
