@@ -13,7 +13,7 @@ jobs:
       matrix:
         java: [ '8' ]
         architecture: [ 'x64' ]
-    name: Build with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
+    name: Build against IMDG 4.1-SNAPSHOT with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
     steps:
       - uses: actions/checkout@v1
       - name: Setup JDK
