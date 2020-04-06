@@ -522,6 +522,7 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${maven.javadoc.plugin.version}</version>
                         <configuration>
+                            <doclint>none</doclint>
                             <javaApiLinks>
                                 <property>
                                     <name>api_1.6</name>
@@ -539,7 +540,6 @@
                                 *.nio.ascii:*.nio.ssl:*.nio.tcp:*.partition.client:*.transaction.client:
                                 *.core.server:com.hazelcast.instance:com.hazelcast.PlaceHolder
                             </excludePackageNames>
-                            <additionalparam>-Xdoclint:none</additionalparam>
                         </configuration>
                         <executions>
                             <execution>
