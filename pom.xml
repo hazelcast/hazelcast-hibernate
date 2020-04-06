@@ -333,23 +333,6 @@
             <version>1.0.0.Final</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- These dependencies are just workaround to prevent master build failures at jenkins:
-             CustomPropertiesTest.testNamedInstance_noInstance()
-             CustomPropertiesTest.testNamedClient_noInstance()
-        -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>15.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.12</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <profiles>
         <profile>
@@ -558,24 +541,6 @@
             <properties>
                 <hazelcast.version>4.1-SNAPSHOT</hazelcast.version>
             </properties>
-            <!-- These dependencies are just workaround to prevent master build failures at jenkins:
-                    CustomPropertiesTest.testNamedInstance_noInstance()
-                    CustomPropertiesTest.testNamedClient_noInstance()
-            -->
-            <dependencies>
-                <dependency>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                    <version>15.0</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.reflections</groupId>
-                    <artifactId>reflections</artifactId>
-                    <version>0.9.12</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
