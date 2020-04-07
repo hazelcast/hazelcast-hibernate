@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright 2020 Hazelcast Inc.
+  ~
+  ~ Licensed under the Hazelcast Community License (the "License"); you may not use
+  ~ this file except in compliance with the License. You may obtain a copy of the
+  ~ License at
+  ~
+  ~ http://hazelcast.com/hazelcast-community-license
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OF ANY KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations under the License.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.hazelcast.hibernate.entity">
+    <class name="DummyProperty" table="dummy_props">
+        <cache usage="%1$s"/>
+
+        <id name="id" column="uid" type="long" unsaved-value="null">
+            <generator class="native"/>
+        </id>
+        <version column="version" name="version" type="int"/>
+        <property name="key" type="string" length="100"/>
+
+        <many-to-one name="entity" class="com.hazelcast.hibernate.entity.DummyEntity"
+                     column="parent_uid"/>
+    </class>
+</hibernate-mapping>
