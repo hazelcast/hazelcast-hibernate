@@ -29,7 +29,9 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(HazelcastSerialClassRunner.class)
@@ -59,9 +61,10 @@ public class RegionFactoryDefaultSlowTest
 
         HazelcastQueryResultsRegion queryRegion = ((HazelcastQueryResultsRegion) (((SessionFactoryImpl) sf).getQueryCache()).getRegion());
         assertEquals(numberOfEntities, queryRegion.getCache().size());
-        sleep(defaultCleanupPeriod);
 
-        assertEquals(numberOfEntities - evictedItemCount, queryRegion.getCache().size());
+        await()
+          .atMost(defaultCleanupPeriod + 1, TimeUnit.SECONDS)
+          .until(() -> (numberOfEntities - evictedItemCount) == queryRegion.getCache().size());
     }
 
     @Test
