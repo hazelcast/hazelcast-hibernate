@@ -31,8 +31,10 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static com.hazelcast.hibernate.local.TestLocalCacheRegionFactory.CLEANUP_PERIOD;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -85,7 +87,6 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
         MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("default-query-results-region");
         final float baseEvictionRate = 0.2f;
         final int numberOfEntities = 100;
-        final int defaultCleanupPeriod = (int) CLEANUP_PERIOD;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
         final int evictedItemCount = Math.max(0, numberOfEntities - maxSize + (int) (maxSize * baseEvictionRate));
         insertDummyEntities(numberOfEntities);
@@ -95,9 +96,12 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
 
         QueryResultsRegionTemplate regionTemplate = (QueryResultsRegionTemplate) (((SessionFactoryImpl) sf).getCache()).getDefaultQueryResultsCache().getRegion();
         RegionCache cache = ((HazelcastStorageAccessImpl) regionTemplate.getStorageAccess()).getDelegate();
-        assertEquals(numberOfEntities, cache.getElementCountInMemory());
-        sleep(defaultCleanupPeriod + 1);
 
-        assertEquals("Number of evictions", evictedItemCount, numberOfEntities - cache.getElementCountInMemory());
+        await().atMost(1, TimeUnit.SECONDS)
+          .until(() -> numberOfEntities == cache.getElementCountInMemory());
+
+        await()
+          .atMost((int) (CLEANUP_PERIOD + 2), TimeUnit.SECONDS)
+          .until(() -> (numberOfEntities - cache.getElementCountInMemory()) == evictedItemCount);
     }
 }
