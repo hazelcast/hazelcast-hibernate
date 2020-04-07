@@ -20,6 +20,7 @@ import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.region.HazelcastQueryResultsRegion;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
+import org.awaitility.Awaitility;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
@@ -29,7 +30,9 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(HazelcastSerialClassRunner.class)
@@ -59,9 +62,10 @@ public class RegionFactoryDefaultSlowTest
 
         HazelcastQueryResultsRegion queryRegion = ((HazelcastQueryResultsRegion) (((SessionFactoryImpl) sf).getQueryCache()).getRegion());
         assertEquals(numberOfEntities, queryRegion.getCache().size());
-        sleep(defaultCleanupPeriod);
 
-        assertEquals(numberOfEntities - evictedItemCount, queryRegion.getCache().size());
+        await()
+          .atMost(defaultCleanupPeriod + 1, TimeUnit.SECONDS)
+          .until(() -> (numberOfEntities - evictedItemCount) == queryRegion.getCache().size());
     }
 
     @Test
@@ -73,14 +77,14 @@ public class RegionFactoryDefaultSlowTest
         tx.commit();
 
         tx = session.beginTransaction();
-        DummyEntity ent = (DummyEntity) session.get(DummyEntity.class, dummyId);
+        DummyEntity ent = session.get(DummyEntity.class, dummyId);
         ent.setName("updatedName");
         session.update(ent);
         tx.commit();
         session.close();
 
         session = sf2.openSession();
-        DummyEntity entity = (DummyEntity) session.get(DummyEntity.class, dummyId);
+        DummyEntity entity = session.get(DummyEntity.class, dummyId);
         assertEquals("updatedName", entity.getName());
     }
 }
