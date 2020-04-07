@@ -34,14 +34,6 @@
     </properties>
 
     <build>
-        <!-- Reuse tests from hibernate5 module -->
-        <testSourceDirectory>../hazelcast-hibernate5/src/test/java</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>../hazelcast-hibernate5/src/test/resources</directory>
-            </testResource>
-        </testResources>
-
         <!-- Overlay code onto hibernate5 module -->
         <plugins>
             <plugin>
