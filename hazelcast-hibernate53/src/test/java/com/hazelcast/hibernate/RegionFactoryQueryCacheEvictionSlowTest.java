@@ -97,7 +97,7 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
         QueryResultsRegionTemplate regionTemplate = (QueryResultsRegionTemplate) (((SessionFactoryImpl) sf).getCache()).getDefaultQueryResultsCache().getRegion();
         RegionCache cache = ((HazelcastStorageAccessImpl) regionTemplate.getStorageAccess()).getDelegate();
 
-        await().atMost(1, TimeUnit.SECONDS)
+        await().atMost(5, TimeUnit.SECONDS)
           .until(() -> numberOfEntities == cache.getElementCountInMemory());
 
         await()
