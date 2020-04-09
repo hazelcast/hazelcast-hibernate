@@ -84,20 +84,23 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
 
     @Test
     public void testQueryCacheCleanup() {
-        MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("org.hibernate.cache.*");
+        MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("default-query-results-region");
+        final int numberOfEntities = 100;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
 
-        final int numberOfEntities = 100;
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {
             executeQuery(sf, i);
         }
 
-        HazelcastQueryResultsRegion queryRegion = ((HazelcastQueryResultsRegion) (((SessionFactoryImpl) sf).getQueryCache()).getRegion());
-        assertEquals(numberOfEntities, queryRegion.getCache().size());
+        QueryResultsRegionTemplate regionTemplate = (QueryResultsRegionTemplate) (((SessionFactoryImpl) sf).getCache()).getDefaultQueryResultsCache().getRegion();
+        RegionCache cache = ((HazelcastStorageAccessImpl) regionTemplate.getStorageAccess()).getDelegate();
+
+        await().atMost(5, TimeUnit.SECONDS)
+          .until(() -> numberOfEntities == cache.getElementCountInMemory());
 
         await()
-          .atMost(7, TimeUnit.SECONDS)
-          .until(() -> (queryRegion.getCache().size() < maxSize));
+          .atMost((int) (CLEANUP_PERIOD + 1), TimeUnit.SECONDS)
+          .until(() -> (cache.getElementCountInMemory()) < maxSize);
     }
 }
