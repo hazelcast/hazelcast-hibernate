@@ -78,7 +78,6 @@ abstract class AbstractGeneralRegion<Cache extends RegionCache>
         }
     }
 
-    @Override
     public Cache getCache() {
         return cache;
     }
