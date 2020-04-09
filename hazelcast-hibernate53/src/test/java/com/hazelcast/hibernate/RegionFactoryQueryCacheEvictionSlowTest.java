@@ -57,16 +57,7 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
                  * It is run for both types of cache region factory.
                  */
                 new Object[]{"hazelcast-custom.xml", TestCacheRegionFactory.class.getName()},
-                new Object[]{"hazelcast-custom.xml", TestLocalCacheRegionFactory.class.getName()},
-
-                /*
-                 * This test is configured such that 0 entities should be evicted from the cache:
-                 *   - number of entities (100) < cache max size (150)
-                 *   - ttl (30) > cleanup period (6)
-                 * It is run for both types of cache region factory.
-                 */
-                new Object[]{"hazelcast-custom-region-factory-slow-test.xml", TestCacheRegionFactory.class.getName()},
-                new Object[]{"hazelcast-custom-region-factory-slow-test.xml", TestLocalCacheRegionFactory.class.getName()}
+                new Object[]{"hazelcast-custom.xml", TestLocalCacheRegionFactory.class.getName()}
         );
     }
 
@@ -86,7 +77,7 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
     public void testQueryCacheCleanup() {
         MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("default-query-results-region");
         final int numberOfEntities = 100;
-        final int maxSize = mapConfig.getEvictionConfig().getSize();
+        final int maxSize = Math.min(mapConfig.getEvictionConfig().getSize(), numberOfEntities);
 
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {
@@ -95,9 +86,6 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
 
         QueryResultsRegionTemplate regionTemplate = (QueryResultsRegionTemplate) (((SessionFactoryImpl) sf).getCache()).getDefaultQueryResultsCache().getRegion();
         RegionCache cache = ((HazelcastStorageAccessImpl) regionTemplate.getStorageAccess()).getDelegate();
-
-        await().atMost(5, TimeUnit.SECONDS)
-          .until(() -> numberOfEntities == cache.getElementCountInMemory());
 
         await()
           .atMost((int) (CLEANUP_PERIOD + 1), TimeUnit.SECONDS)
