@@ -102,10 +102,6 @@ public class CacheHitMissNonStrictTest extends HibernateStatisticsTestSupport {
         //hit 1 entity and 4 properties
         updateDummyEntityName(2, "updated");
 
-        assertTrueEventually(new AssertTask() {
-            public void run() {
-                assertEquals(9, stats.getElementCountInMemory());
-            }
-        });
+        assertTrueEventually(() -> assertEquals(9, stats.getElementCountInMemory()));
     }
 }
