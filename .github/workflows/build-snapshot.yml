@@ -2,9 +2,6 @@ name: build
 on:
   schedule:
     - cron: '0 3 * * *'
-  push:
-    paths-ignore:
-      - '**.md'
 
 jobs:
   build:
