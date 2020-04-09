@@ -48,9 +48,10 @@ public class RegionFactoryDefaultSlowTest
     @Test
     public void testQueryCacheCleanup() {
         MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("org.hibernate.cache.*");
-        final int maxSize = mapConfig.getEvictionConfig().getSize();
 
         final int numberOfEntities = 100;
+        final int maxSize = Math.min(mapConfig.getEvictionConfig().getSize(), numberOfEntities);
+
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {
             executeQuery(sf, i);
