@@ -85,12 +85,7 @@ public class CustomPropertiesTest extends HibernateTestSupport {
         assertEquals(2, hz.getCluster().getMembers().size());
         main.shutdown();
 
-        assertTrueEventually(new AssertTask() {
-            @Override
-            public void run() throws Exception {
-                assertEquals(1, hz.getCluster().getMembers().size());
-            }
-        });
+        assertTrueEventually(() -> assertEquals(1, hz.getCluster().getMembers().size()));
 
         assertEquals(1, hz.getCluster().getMembers().size());
         Session session = sf.openSession();
