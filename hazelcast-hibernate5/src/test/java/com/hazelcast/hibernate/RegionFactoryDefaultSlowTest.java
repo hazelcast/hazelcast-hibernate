@@ -48,13 +48,10 @@ public class RegionFactoryDefaultSlowTest
 
     @Test
     public void testQueryCacheCleanup() {
-
         MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("org.hibernate.cache.*");
-        final float baseEvictionRate = 0.2f;
-        final int numberOfEntities = 100;
-        final int defaultCleanupPeriod = 60;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
-        final int evictedItemCount = numberOfEntities - maxSize + (int) (maxSize * baseEvictionRate);
+
+        final int numberOfEntities = 100;
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {
             executeQuery(sf, i);
@@ -64,8 +61,8 @@ public class RegionFactoryDefaultSlowTest
         assertEquals(numberOfEntities, queryRegion.getCache().size());
 
         await()
-          .atMost(defaultCleanupPeriod + 1, TimeUnit.SECONDS)
-          .until(() -> (numberOfEntities - evictedItemCount) == queryRegion.getCache().size());
+          .atMost(61, TimeUnit.SECONDS)
+          .until(() -> (queryRegion.getCache().size() < maxSize));
     }
 
     @Test
