@@ -42,38 +42,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.plugin.version}</version>
                 <executions>
-<!--
-                    <execution>
-                        <id>copy-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                            <overwrite>false</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>../hazelcast-hibernate5/src/main/java</directory>
-                                    <excludes>
-                                        <exclude>com/hazelcast/hibernate/AbstractHazelcastCacheRegionFactory.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/HazelcastCacheRegionFactory.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/HazelcastLocalCacheRegionFactory.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/RegionCache.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/distributed/IMapRegionCache.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/local/LocalRegionCache.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/local/TimestampsRegionCache.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/access/**.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/region/**.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializerHook.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate5CacheEntrySerializer.java</exclude>
-                                        <exclude>com/hazelcast/hibernate/serialization/Hibernate51CacheEntrySerializer.java</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
--->
                     <execution>
                         <id>copy-resources</id>
                         <phase>generate-resources</phase>
