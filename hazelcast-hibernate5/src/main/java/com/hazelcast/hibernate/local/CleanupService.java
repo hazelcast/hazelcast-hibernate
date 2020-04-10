@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate.local;
 
-
 import com.hazelcast.instance.impl.OutOfMemoryErrorDispatcher;
 
 import java.util.concurrent.Executors;
@@ -58,35 +57,19 @@ public final class CleanupService {
         executor.shutdownNow();
     }
 
-    /**
-     * Internal ThreadFactory to create cleanup threads
-     */
     private class CleanupThreadFactory implements ThreadFactory {
 
         @Override
         public Thread newThread(final Runnable r) {
-            final Thread thread = new CleanupThread(r, name + ".hibernate.cleanup");
+            final Thread thread = new Thread(() -> {
+                try {
+                    r.run();
+                } catch (OutOfMemoryError e) {
+                    OutOfMemoryErrorDispatcher.onOutOfMemory(e);
+                }
+            }, name + ".hibernate.cleanup");
             thread.setDaemon(true);
             return thread;
-        }
-    }
-
-    /**
-     * Runnable thread adapter to capture exceptions and notify Hazelcast about them
-     */
-    private static final class CleanupThread extends Thread {
-
-        private CleanupThread(final Runnable target, final String name) {
-            super(target, name);
-        }
-
-        @Override
-        public void run() {
-            try {
-                super.run();
-            } catch (OutOfMemoryError e) {
-                OutOfMemoryErrorDispatcher.onOutOfMemory(e);
-            }
         }
     }
 }
