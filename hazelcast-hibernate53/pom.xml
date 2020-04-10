@@ -42,6 +42,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.plugin.version}</version>
                 <executions>
+<!--
                     <execution>
                         <id>copy-sources</id>
                         <phase>generate-sources</phase>
@@ -72,6 +73,7 @@
                             </resources>
                         </configuration>
                     </execution>
+-->
                     <execution>
                         <id>copy-resources</id>
                         <phase>generate-resources</phase>
