@@ -43,22 +43,6 @@
                 <version>${maven.resources.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                            <overwrite>false</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>../hazelcast-hibernate5/src/main/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>copy-test-sources</id>
                         <phase>generate-test-sources</phase>
                         <goals>
