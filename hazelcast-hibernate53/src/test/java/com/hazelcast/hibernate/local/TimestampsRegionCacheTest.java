@@ -16,6 +16,7 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +51,53 @@ public class TimestampsRegionCacheTest {
         when(topic.addMessageListener(listener.capture())).thenReturn("ignored");
         target = new TimestampsRegionCache(regionFactory, CACHE_NAME, instance);
         this.listener = listener.getValue();
+    }
+
+    @Test
+    public void shouldUpdateTimestampAfterPreInvalidationMessage_issue_33() {
+        long firstTimestamp = 1;
+        long secondTimestamp = 2;
+        long preInvalidationPublishTime = 3;
+        long thirdTimestamp = 4;
+        long invalidationPublishTime = 5;
+        long clusterTime = 6;
+
+        when(cluster.getClusterTime()).thenReturn(firstTimestamp, secondTimestamp, thirdTimestamp);
+
+        assertThat(target.put("QuerySpace", firstTimestamp, firstTimestamp, null), is(true));
+        assertThat("primed value should be in the cache", (Long) target.get("QuerySpace", firstTimestamp),
+                is(firstTimestamp));
+
+        // During an update of an entity <E>, two calls are made to update-timestamps-cache such that the first call
+        // updates the timestamp for <E> about an hour offset. This is because during a transaction happening for
+        // table <E>, no cached entry for <E> must be served from the cache. This is simply a temporary invalidation
+        // mechanism for cached entries. When the transaction ends, a second update to timestamps-cache is made with the
+        // current timestamp.
+
+        long invalidationOffset = 100L;
+
+        UUID regionUuid = UUID.randomUUID();
+
+        Message<Object> preInvalidate = new Message<>("topicName", new Timestamp("QuerySpace",
+                secondTimestamp + invalidationOffset, regionUuid), preInvalidationPublishTime, member);
+
+        // process the pre invalidation update.
+        listener.onMessage(preInvalidate);
+
+        Message<Object> invalidate = new Message<>("topicName", new Timestamp("QuerySpace",
+                thirdTimestamp, regionUuid), invalidationPublishTime, member);
+
+        // process the invalidation update.
+        listener.onMessage(invalidate);
+
+        // Cache must be updated with the invalidation call. If it is ignored due to having a smaller timestamp
+        // than the preInvalidation call timestamp, this will make cache unusable until invalidationOffset expires.
+        // Different updates for cache can be performed here hence not testing a certain value but a predicate instead.
+        long cachedTimestamp = (Long) target.get("QuerySpace", clusterTime);
+
+        assertTrue(String.format("Timestamp cache must be updated after preInvalidation call with a value less than" +
+                        " invalidationOffset. Invalidation offset: %d, cached timestamp: %d", invalidationOffset,
+                cachedTimestamp), cachedTimestamp < invalidationOffset);
     }
 
     @SuppressWarnings("Duplicates")
