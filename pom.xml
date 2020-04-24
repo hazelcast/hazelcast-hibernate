@@ -55,7 +55,7 @@
         <maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
         <maven.shade.plugin.version>2.2</maven.shade.plugin.version>
         <maven.dependency.plugin.version>2.6</maven.dependency.plugin.version>
-        <maven.animal.sniffer.plugin.version>1.14</maven.animal.sniffer.plugin.version>
+        <maven.animal.sniffer.plugin.version>1.18</maven.animal.sniffer.plugin.version>
         <maven.git.commit.id.plugin.version>2.1.10</maven.git.commit.id.plugin.version>
         <maven.gpg.plugin.version>1.4</maven.gpg.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
