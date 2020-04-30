@@ -91,7 +91,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
             }
             instance = instanceLoader.loadInstance();
         }
-        String cleanupTimeout = (String) properties.get(CacheEnvironment.CLEANUP_TIMEOUT);
+        String cleanupTimeout = (String) properties.get(CacheEnvironment.CLEANUP_DELAY);
         cleanupService = cleanupTimeout != null
           ? new CleanupService(instance.getName(), Integer.parseInt(cleanupTimeout))
           : new CleanupService(instance.getName());

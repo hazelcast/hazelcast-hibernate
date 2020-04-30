@@ -57,7 +57,7 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
 
         // Use a specific hazelcast xml config file for these tests
         props.setProperty(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, configFile);
-        props.setProperty(CacheEnvironment.CLEANUP_TIMEOUT, "4");
+        props.setProperty(CacheEnvironment.CLEANUP_DELAY, "4");
         props.setProperty(Environment.CACHE_REGION_FACTORY, regionFactory);
 
         return props;

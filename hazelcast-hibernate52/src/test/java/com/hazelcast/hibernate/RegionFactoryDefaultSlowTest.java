@@ -39,9 +39,12 @@ import static org.junit.Assert.assertEquals;
 public class RegionFactoryDefaultSlowTest
         extends HibernateSlowTestSupport {
 
+    private static final int CLEANUP_DELAY = 4;
+
     protected Properties getCacheProperties() {
         Properties props = new Properties();
         props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
+        props.setProperty(CacheEnvironment.CLEANUP_DELAY, String.valueOf(CLEANUP_DELAY));
         return props;
     }
 
@@ -51,7 +54,6 @@ public class RegionFactoryDefaultSlowTest
         MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("org.hibernate.cache.*");
         final float baseEvictionRate = 0.2f;
         final int numberOfEntities = 100;
-        final int defaultCleanupPeriod = 60;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
         final int evictedItemCount = numberOfEntities - maxSize + (int) (maxSize * baseEvictionRate);
         insertDummyEntities(numberOfEntities);
@@ -63,7 +65,7 @@ public class RegionFactoryDefaultSlowTest
         assertEquals(numberOfEntities, queryRegion.getCache().size());
 
         await()
-          .atMost(defaultCleanupPeriod + 1, TimeUnit.SECONDS)
+          .atMost(CLEANUP_DELAY + 1, TimeUnit.SECONDS)
           .until(() -> (numberOfEntities - evictedItemCount) == queryRegion.getCache().size());
     }
 
@@ -76,14 +78,14 @@ public class RegionFactoryDefaultSlowTest
         tx.commit();
 
         tx = session.beginTransaction();
-        DummyEntity ent = (DummyEntity) session.get(DummyEntity.class, dummyId);
+        DummyEntity ent = session.get(DummyEntity.class, dummyId);
         ent.setName("updatedName");
         session.update(ent);
         tx.commit();
         session.close();
 
         session = sf2.openSession();
-        DummyEntity entity = (DummyEntity) session.get(DummyEntity.class, dummyId);
+        DummyEntity entity = session.get(DummyEntity.class, dummyId);
         assertEquals("updatedName", entity.getName());
     }
 }

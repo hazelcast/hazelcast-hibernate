@@ -72,7 +72,7 @@ public final class CacheEnvironment {
     /**
      * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
      */
-    public static final String CLEANUP_TIMEOUT = "hibernate.cache.hazelcast.cleanup_delay";
+    public static final String CLEANUP_DELAY = "hibernate.cache.hazelcast.cleanup_delay";
 
     /**
      * Property to configure the Hazelcast instance internal name
