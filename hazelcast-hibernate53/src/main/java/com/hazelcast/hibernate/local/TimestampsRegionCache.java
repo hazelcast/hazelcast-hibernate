@@ -81,14 +81,17 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
+                    //Do not use ts.getTimestamp for value to avoid preInvalidation with offset effect.
+                    long nextTime = nextTimestamp();
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
                         return;
                     }
                 } else {
                     return;
                 }
             } else {
-                if (cache.putIfAbsent(key, new Value(null, nextTimestamp(), ts.getTimestamp())) == null) {
+                long nextTime = nextTimestamp();
+                if (cache.putIfAbsent(key, new Value(null, nextTime, nextTime)) == null) {
                     return;
                 }
             }
