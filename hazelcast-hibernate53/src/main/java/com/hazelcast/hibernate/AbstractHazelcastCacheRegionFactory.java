@@ -150,7 +150,11 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             }
             instance = instanceLoader.loadInstance();
         }
-        cleanupService = new CleanupService(instance.getName());
+
+        String cleanupTimeout = (String) configValues.get(CacheEnvironment.CLEANUP_TIMEOUT);
+        cleanupService = cleanupTimeout != null
+          ? new CleanupService(instance.getName(), Integer.parseInt(cleanupTimeout))
+          : new CleanupService(instance.getName());
     }
 
     @SuppressWarnings("Duplicates")

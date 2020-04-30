@@ -70,6 +70,11 @@ public final class CacheEnvironment {
     public static final String LOCK_TIMEOUT = "hibernate.cache.hazelcast.lock_timeout";
 
     /**
+     * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
+     */
+    public static final String CLEANUP_TIMEOUT = "hibernate.cache.hazelcast.cleanup_delay";
+
+    /**
      * Property to configure the Hazelcast instance internal name
      */
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";

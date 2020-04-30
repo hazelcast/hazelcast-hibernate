@@ -40,9 +40,6 @@ public final class CleanupService {
         this(name, DEFAULT_FIXED_DELAY);
     }
 
-    /**
-     * Visible for testing only.
-     */
     public CleanupService(final String name, final long fixedDelay) {
         this.fixedDelay = fixedDelay;
         this.name = name;
