@@ -47,9 +47,23 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
     @Parameterized.Parameters(name = "Executing: {0}, {1}")
     public static Collection<Object[]> parameters() {
         return Arrays.asList(
-          new Object[]{"hazelcast-custom.xml", HazelcastCacheRegionFactory.class.getName()},
-          new Object[]{"hazelcast-custom.xml", HazelcastLocalCacheRegionFactory.class.getName()}
-          );
+                /*
+                 * This test is configured such that 60 entities should be evicted from the cache:
+                 *   - number of entities (100) > cache max size (50).
+                 * It is run for both types of cache region factory.
+                 */
+                new Object[]{"hazelcast-custom.xml", HazelcastCacheRegionFactory.class.getName()},
+                new Object[]{"hazelcast-custom.xml", HazelcastLocalCacheRegionFactory.class.getName()},
+
+                /*
+                 * This test is configured such that 0 entities should be evicted from the cache:
+                 *   - number of entities (100) < cache max size (150)
+                 *   - ttl (30) > cleanup period (6)
+                 * It is run for both types of cache region factory.
+                 */
+                new Object[]{"hazelcast-custom-region-factory-slow-test.xml", HazelcastCacheRegionFactory.class.getName()},
+                new Object[]{"hazelcast-custom-region-factory-slow-test.xml", HazelcastLocalCacheRegionFactory.class.getName()}
+        );
     }
 
     protected Properties getCacheProperties() {
