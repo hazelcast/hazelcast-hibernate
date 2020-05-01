@@ -38,7 +38,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.hazelcast.hibernate.CacheEnvironment.*;
+import static com.hazelcast.hibernate.CacheEnvironment.HAZELCAST_FACTORY;
+import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanupInSeconds;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
