@@ -31,6 +31,8 @@ import org.hibernate.cache.spi.access.AccessType;
 
 import java.util.Properties;
 
+import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanupInSeconds;
+
 /**
  * Abstract superclass of Hazelcast based {@link RegionFactory} implementations
  */
@@ -91,10 +93,8 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
             }
             instance = instanceLoader.loadInstance();
         }
-        String cleanupTimeout = (String) properties.get(CacheEnvironment.CLEANUP_DELAY);
-        cleanupService = cleanupTimeout != null
-          ? new CleanupService(instance.getName(), Integer.parseInt(cleanupTimeout))
-          : new CleanupService(instance.getName());
+
+        cleanupService = new CleanupService(instance.getName(), getCacheCleanupInSeconds(properties));
     }
 
     @Override

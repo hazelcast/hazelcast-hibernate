@@ -38,6 +38,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.hazelcast.hibernate.CacheEnvironment.*;
+
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
  */
@@ -135,7 +137,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         if (instance == null || !instance.getLifecycleService().isRunning()) {
             final String defaultFactory = DefaultHazelcastInstanceFactory.class.getName();
 
-            String factoryName = (String) configValues.get(CacheEnvironment.HAZELCAST_FACTORY);
+            String factoryName = (String) configValues.get(HAZELCAST_FACTORY);
             if (factoryName == null) {
                 factoryName = defaultFactory;
             }
@@ -151,10 +153,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instance = instanceLoader.loadInstance();
         }
 
-        String cleanupTimeout = (String) configValues.get(CacheEnvironment.CLEANUP_DELAY);
-        cleanupService = cleanupTimeout != null
-          ? new CleanupService(instance.getName(), Integer.parseInt(cleanupTimeout))
-          : new CleanupService(instance.getName());
+        cleanupService = new CleanupService(instance.getName(), getCacheCleanupInSeconds(toProperties(configValues)));
     }
 
     @SuppressWarnings("Duplicates")

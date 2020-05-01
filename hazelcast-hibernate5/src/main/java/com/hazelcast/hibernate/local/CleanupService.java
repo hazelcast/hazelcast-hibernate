@@ -27,18 +27,9 @@ import java.util.concurrent.TimeUnit;
  */
 public final class CleanupService {
 
-    /**
-     * Default fixed delay in seconds for scheduled job.
-     */
-    private static final long DEFAULT_FIXED_DELAY = 60L;
-
     private final long fixedDelay;
     private final String name;
     private final ScheduledExecutorService executor;
-
-    public CleanupService(final String name) {
-        this(name, DEFAULT_FIXED_DELAY);
-    }
 
     public CleanupService(final String name, final long fixedDelay) {
         this.fixedDelay = fixedDelay;
