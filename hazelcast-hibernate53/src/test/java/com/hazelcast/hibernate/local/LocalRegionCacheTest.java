@@ -2,6 +2,7 @@ package com.hazelcast.hibernate.local;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.MessageListener;
@@ -16,6 +17,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.Supplier;
@@ -132,6 +134,44 @@ public class LocalRegionCacheTest {
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
         verify(topic).addMessageListener(isNotNull(MessageListener.class));
+    }
+
+    @Test
+    public void testEvictionConfigIsDerivedFromMapConfig() {
+        MapConfig mapConfig = mock(MapConfig.class);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        MaxSizeConfig maxSizeConfig = mock(MaxSizeConfig.class);
+        when(mapConfig.getMaxSizeConfig()).thenReturn(maxSizeConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false)
+                .cleanup();
+
+        verify(maxSizeConfig).getSize();
+        verify(mapConfig).getTimeToLiveSeconds();
+    }
+
+    @Test
+    public void testEvictionConfigIsNotDerivedFromMapConfig() {
+        MapConfig mapConfig = mock(MapConfig.class);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        LocalRegionCache.EvictionConfig evictionConfig = mock(LocalRegionCache.EvictionConfig.class);
+        when(evictionConfig.getTimeToLive()).thenReturn(Duration.ofSeconds(1));
+
+        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig)
+                .cleanup();
+
+        verify(evictionConfig).getMaxSize();
+        verify(evictionConfig).getTimeToLive();
+        verifyZeroInteractions(mapConfig);
     }
 
     @SuppressWarnings("unused")
