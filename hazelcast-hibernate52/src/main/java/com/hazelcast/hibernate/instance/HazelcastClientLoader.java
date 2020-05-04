@@ -35,14 +35,14 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     private static final int INITIAL_BACKOFF_MS = 2000;
     private static final int MAX_BACKOFF_MS = 35000;
-    private static final double BACKOFF_MULTIPLIER = 1.5D;
+    private static final double BACKOFF_MULTIPLIER = 1D;
 
     private HazelcastInstance client;
     private ClientConfig clientConfig;
     private String instanceName;
 
     @Override
-    public void configure(final Properties props) {
+    public void     configure(final Properties props) {
         instanceName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME, props, null);
         if (instanceName != null) {
             return;
@@ -77,6 +77,7 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setInitialBackoffMillis(INITIAL_BACKOFF_MS);
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMaxBackoffMillis(MAX_BACKOFF_MS);
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMultiplier(BACKOFF_MULTIPLIER);
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(Long.MAX_VALUE);
     }
 
     @Override

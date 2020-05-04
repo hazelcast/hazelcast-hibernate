@@ -21,6 +21,10 @@ import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * StorageAccess implementation wrapping a Hazelcast {@link RegionCache} reference.
  */
@@ -28,9 +32,15 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
 
     private final RegionCache delegate;
+    private final boolean fallback;
 
     HazelcastStorageAccessImpl(final RegionCache delegate) {
+        this(delegate, Collections.emptyMap());
+    }
+
+    public HazelcastStorageAccessImpl(RegionCache delegate, Map<String, Object> properties) {
         this.delegate = delegate;
+        this.fallback = CacheEnvironment.getShouldFallback(properties);
     }
 
     @Override
@@ -40,15 +50,27 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
 
     @Override
     public boolean contains(final Object key) {
-        return delegate.contains(key);
+        try {
+            return delegate.contains(key);
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+                return false;
+            }
+            throw new CacheException(e);
+        }
     }
 
     @Override
     public void evictData() throws CacheException {
         try {
             delegate.evictData();
-        } catch (OperationTimeoutException e) {
-            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e);
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+                return;
+            }
+            throw new CacheException(e);
         }
     }
 
@@ -56,8 +78,12 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
     public void evictData(final Object key) throws CacheException {
         try {
             delegate.evictData(key);
-        } catch (OperationTimeoutException e) {
-            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e);
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+                return;
+            }
+            throw new CacheException(e);
         }
     }
 
@@ -66,8 +92,16 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
         try {
             return delegate.get(key, nextTimestamp());
         } catch (OperationTimeoutException e) {
+            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
             return null;
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+                return null;
+            }
+            throw new CacheException(e);
         }
+
     }
 
     @Override
@@ -75,19 +109,39 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
             throws CacheException {
         try {
             delegate.put(key, value, nextTimestamp(), null);
-        } catch (OperationTimeoutException e) {
-            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e);
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+            } else {
+                throw new CacheException(e);
+            }
         }
     }
 
     @Override
     public void release() {
-        // no-op
+        try {
+            delegate.destroy(); // TODO why noop was here?
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+            } else {
+                throw new CacheException(e);
+            }
+        }
     }
 
     @Override
     public void unlockItem(final Object key, final SoftLock lock) {
-        delegate.unlockItem(key, lock);
+        try {
+            delegate.unlockItem(key, lock);
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+            } else {
+                throw new CacheException(e);
+            }
+        }
     }
 
     RegionCache getDelegate() {

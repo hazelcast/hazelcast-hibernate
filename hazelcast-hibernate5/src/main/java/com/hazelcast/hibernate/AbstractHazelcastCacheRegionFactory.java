@@ -16,6 +16,7 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.LifecycleEvent;
 import com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;

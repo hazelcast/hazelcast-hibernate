@@ -20,6 +20,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -75,6 +76,11 @@ public final class CacheEnvironment {
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
 
     /**
+     * Property to enable fallback on datasource if Hazelcast cluster is not available
+     */
+    public static final String FALLBACK = "hibernate.cache.hazelcast.fallback";
+
+    /**
      * Property to configure explicitly checks the CacheEntry's version while updating RegionCache.
      * If new entry's version is not higher then previous, update will be cancelled.
      */
@@ -124,6 +130,10 @@ public final class CacheEnvironment {
 
     public static int getDefaultCacheTimeoutInMillis() {
         return DEFAULT_CACHE_TIMEOUT;
+    }
+
+    public static boolean getShouldFallback(final Map<String, Object> props) {
+        return ConfigurationHelper.getBoolean(CacheEnvironment.FALLBACK, props, false);
     }
 
     public static int getLockTimeoutInMillis(final Properties props) {
