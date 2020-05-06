@@ -85,7 +85,9 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @Override
     protected DomainDataStorageAccess createDomainDataStorageAccess(final DomainDataRegionConfig regionConfig,
                                                                     final DomainDataRegionBuildingContext buildingContext) {
-        return new HazelcastStorageAccessImpl(createRegionCache(regionConfig.getRegionName(), buildingContext.getSessionFactory(), regionConfig), buildingContext.getSessionFactory().getProperties());
+        return new HazelcastStorageAccessImpl(createRegionCache(
+          regionConfig.getRegionName(), buildingContext.getSessionFactory(), regionConfig),
+          buildingContext.getSessionFactory().getProperties());
     }
 
     @Override
@@ -105,7 +107,9 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @Override
     protected StorageAccess createTimestampsRegionStorageAccess(final String regionName,
                                                                 final SessionFactoryImplementor sessionFactory) {
-        return new HazelcastStorageAccessImpl(createTimestampsRegionCache(regionName, sessionFactory), sessionFactory.getProperties());
+        return new HazelcastStorageAccessImpl(
+          createTimestampsRegionCache(regionName, sessionFactory),
+          sessionFactory.getProperties());
     }
 
     protected abstract RegionCache createTimestampsRegionCache(final String regionName,
