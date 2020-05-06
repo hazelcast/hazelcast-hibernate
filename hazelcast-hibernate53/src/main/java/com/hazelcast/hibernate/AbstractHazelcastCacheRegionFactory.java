@@ -32,6 +32,7 @@ import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.DomainDataRegion;
 import org.hibernate.cache.spi.support.DomainDataStorageAccess;
 import org.hibernate.cache.spi.support.RegionFactoryTemplate;
+import org.hibernate.cache.spi.support.SimpleTimestamper;
 import org.hibernate.cache.spi.support.StorageAccess;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 
@@ -69,6 +70,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @Override
     public DomainDataRegion buildDomainDataRegion(final DomainDataRegionConfig regionConfig,
                                                   final DomainDataRegionBuildingContext buildingContext) {
+
         return new HazelcastDomainDataRegionImpl(
                 regionConfig,
                 this,
@@ -80,6 +82,16 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
 
     public HazelcastInstance getHazelcastInstance() {
         return instance;
+    }
+
+    @Override
+    public long nextTimestamp() {
+        try {
+            return HazelcastTimestamper.nextTimestamp(instance);
+        } catch (Exception e) {
+            log.finest(e.getMessage(), e);
+            return SimpleTimestamper.next();
+        }
     }
 
     @Override
