@@ -23,7 +23,6 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * StorageAccess implementation wrapping a Hazelcast {@link RegionCache} reference.
@@ -121,7 +120,8 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
     @Override
     public void release() {
         try {
-            delegate.destroy(); // TODO why noop was here?
+            // TODO why noop was here?
+            delegate.destroy();
         } catch (Exception e) {
             if (fallback) {
                 Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
