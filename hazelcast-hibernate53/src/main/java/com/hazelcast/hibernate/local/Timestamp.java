@@ -21,6 +21,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Hazelcast compatible implementation of a timestamp for internal eviction
@@ -29,13 +30,15 @@ public class Timestamp implements IdentifiedDataSerializable {
 
     private Object key;
     private long timestamp;
+    private UUID senderId;
 
     public Timestamp() {
     }
 
-    public Timestamp(final Object key, final long timestamp) {
+    public Timestamp(final Object key, final long timestamp, final UUID senderId) {
         this.key = key;
         this.timestamp = timestamp;
+        this.senderId = senderId;
     }
 
     public Object getKey() {
@@ -46,16 +49,22 @@ public class Timestamp implements IdentifiedDataSerializable {
         return timestamp;
     }
 
+    public UUID getSenderId() {
+        return senderId;
+    }
+
     @Override
     public void writeData(final ObjectDataOutput out) throws IOException {
         out.writeObject(key);
         out.writeLong(timestamp);
+        out.writeUTF(senderId.toString());
     }
 
     @Override
     public void readData(final ObjectDataInput in) throws IOException {
         key = in.readObject();
         timestamp = in.readLong();
+        senderId = UUID.fromString(in.readUTF());
     }
 
     @Override
@@ -70,6 +79,6 @@ public class Timestamp implements IdentifiedDataSerializable {
 
     @Override
     public String toString() {
-        return "Timestamp" + "{key=" + key + ", timestamp=" + timestamp + '}';
+        return "Timestamp{ key=" + key + ", timestamp=" + timestamp + ", senderId=" + senderId + '}';
     }
 }
