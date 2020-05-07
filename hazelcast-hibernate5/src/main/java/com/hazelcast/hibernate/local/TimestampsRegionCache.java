@@ -20,14 +20,21 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.util.UuidUtil;
+
+import java.util.UUID;
 
 /**
  * A timestamp based local RegionCache
  */
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
 
+    // Identifier to prevent handling messages sent by this.
+    private UUID regionId;
+
     public TimestampsRegionCache(final String name, final HazelcastInstance hazelcastInstance) {
         super(name, hazelcastInstance, null);
+        this.regionId = UuidUtil.newSecureUUID();
     }
 
     @Override
@@ -45,8 +52,11 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     @Override
     protected void maybeInvalidate(final Object messageObject) {
         final Timestamp ts = (Timestamp) messageObject;
-        final Object key = ts.getKey();
+        if (ts.getSenderId().equals(regionId)) {
+            return;
+        }
 
+        final Object key = ts.getKey();
         if (key == null) {
             // Invalidate the entire region cache.
             cache.clear();
@@ -58,7 +68,8 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {
                 if (ts.getTimestamp() > current) {
-                    if (cache.replace(key, value, new Value(value.getVersion(), nextTimestamp(), ts.getTimestamp()))) {
+                    long nextTime = nextTimestamp();
+                    if (cache.replace(key, value, new Value(value.getVersion(), nextTime, nextTime))) {
                         return;
                     }
                 } else {
@@ -74,7 +85,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
 
     @Override
     protected Object createMessage(final Object key, final Object value, final Object currentVersion) {
-        return new Timestamp(key, (Long) value);
+        return new Timestamp(key, (Long) value, this.regionId);
     }
 
     @Override
