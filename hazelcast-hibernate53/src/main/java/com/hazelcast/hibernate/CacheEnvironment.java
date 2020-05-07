@@ -18,8 +18,10 @@ package com.hazelcast.hibernate;
 import com.hazelcast.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.internal.util.StringHelper;
+import org.hibernate.internal.util.config.ConfigurationException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
+import java.time.Duration;
 import java.util.Properties;
 
 /**
@@ -65,9 +67,9 @@ public final class CacheEnvironment {
     public static final String SHUTDOWN_ON_STOP = "hibernate.cache.hazelcast.shutdown_on_session_factory_close";
 
     /**
-     * Property to configure the timeout delay before a lock eventually times out
+     * Property to configure the IMDG cluster connection timeout
      */
-    public static final String LOCK_TIMEOUT = "hibernate.cache.hazelcast.lock_timeout";
+    public static final String CLUSTER_TIMEOUT = "hibernate.cache.hazelcast.cluster_timeout";
 
     /**
      * Property to configure the Hazelcast instance internal name
@@ -97,9 +99,6 @@ public final class CacheEnvironment {
      */
     public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
 
-    // milliseconds
-    private static final int MAXIMUM_LOCK_TIMEOUT = 10000;
-
     // one hour in milliseconds
     private static final int DEFAULT_CACHE_TIMEOUT = (3600 * 1000);
 
@@ -126,24 +125,15 @@ public final class CacheEnvironment {
         return DEFAULT_CACHE_TIMEOUT;
     }
 
-    public static int getLockTimeoutInMillis(final Properties props) {
-        int timeout = -1;
-        try {
-            timeout = ConfigurationHelper.getInt(LOCK_TIMEOUT, props, -1);
-        } catch (Exception e) {
-            Logger.getLogger(CacheEnvironment.class).finest(e);
+    public static Duration getClusterTimeout(final Properties props) {
+        int timeoutMillis = ConfigurationHelper.getInt(CLUSTER_TIMEOUT, props, Integer.MAX_VALUE);
+        if (timeoutMillis <= 0) {
+            throw new ConfigurationException("Invalid cluster timeout [" + timeoutMillis + "]");
         }
-        if (timeout < 0) {
-            timeout = MAXIMUM_LOCK_TIMEOUT;
-        }
-        return timeout;
+        return Duration.ofMillis(timeoutMillis);
     }
 
     public static boolean shutdownOnStop(final Properties props, final boolean defaultValue) {
         return ConfigurationHelper.getBoolean(CacheEnvironment.SHUTDOWN_ON_STOP, props, defaultValue);
-    }
-
-    public static boolean isExplicitVersionCheckEnabled(final Properties props) {
-        return ConfigurationHelper.getBoolean(CacheEnvironment.EXPLICIT_VERSION_CHECK, props, false);
     }
 }
