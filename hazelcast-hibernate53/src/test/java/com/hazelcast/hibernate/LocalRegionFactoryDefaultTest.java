@@ -20,6 +20,7 @@ import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
+import org.awaitility.Awaitility;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
@@ -32,7 +33,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -80,13 +83,18 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
         }
 
         Statistics stats = sf.getStatistics();
-        assertEquals((childCount + 1) * count, stats.getEntityInsertCount());
-        // twice put of entity and properties (on load and update) and once put of collection
-        assertEquals((childCount + 1) * count * 2 + count, stats.getSecondLevelCachePutCount());
-        assertEquals(childCount * count, stats.getEntityLoadCount());
-        assertEquals(count, stats.getSecondLevelCacheHitCount());
-        // collection cache miss
-        assertEquals(count, stats.getSecondLevelCacheMissCount());
+        await()
+          .atMost(1, TimeUnit.SECONDS)
+          .untilAsserted(() -> {
+              assertEquals((childCount + 1) * count, stats.getEntityInsertCount());
+              // twice put of entity and properties (on load and update) and once put of collection
+              assertEquals((childCount + 1) * count * 2 + count, stats.getSecondLevelCachePutCount());
+              assertEquals(childCount * count, stats.getEntityLoadCount());
+              assertEquals(count, stats.getSecondLevelCacheHitCount());
+              // collection cache miss
+              assertEquals(count, stats.getSecondLevelCacheMissCount());
+          });
         stats.logSummary();
+
     }
 }
