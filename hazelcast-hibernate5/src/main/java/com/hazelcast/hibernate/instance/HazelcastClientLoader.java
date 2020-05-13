@@ -51,6 +51,7 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
         String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
         String configResourcePath = CacheEnvironment.getConfigFilePath(props);
+        long clusterTimeout = CacheEnvironment.getClusterTimeout(props).toMillis();
 
         if (configResourcePath != null) {
             try {
@@ -77,6 +78,7 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setInitialBackoffMillis(INITIAL_BACKOFF_MS);
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMaxBackoffMillis(MAX_BACKOFF_MS);
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMultiplier(BACKOFF_MULTIPLIER);
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(clusterTimeout);
     }
 
     @Override
