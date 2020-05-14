@@ -98,8 +98,7 @@ public final class CacheEnvironment {
      */
     public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
 
-    // one hour in milliseconds
-    private static final int DEFAULT_CACHE_TIMEOUT = (3600 * 1000);
+    private static final Duration DEFAULT_CACHE_TIMEOUT = Duration.ofHours(1);
 
     private CacheEnvironment() {
     }
@@ -121,7 +120,7 @@ public final class CacheEnvironment {
     }
 
     public static int getDefaultCacheTimeoutInMillis() {
-        return DEFAULT_CACHE_TIMEOUT;
+        return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
     }
 
     public static Duration getClusterTimeout(final Properties props) {
