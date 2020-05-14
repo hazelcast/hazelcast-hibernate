@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.UUID;
 
@@ -69,6 +70,44 @@ public class LocalRegionCacheTest {
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance, never()).getTopic(anyString());
+    }
+
+    @Test
+    public void testEvictionConfigIsDerivedFromMapConfig() {
+        MapConfig mapConfig = mock(MapConfig.class);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        com.hazelcast.config.EvictionConfig maxSizeConfig = mock(com.hazelcast.config.EvictionConfig.class);
+        when(mapConfig.getEvictionConfig()).thenReturn(maxSizeConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        new LocalRegionCache(CACHE_NAME, instance, null, false)
+          .cleanup();
+
+        verify(maxSizeConfig).getSize();
+        verify(mapConfig).getTimeToLiveSeconds();
+    }
+
+    @Test
+    public void testEvictionConfigIsNotDerivedFromMapConfig() {
+        MapConfig mapConfig = mock(MapConfig.class);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        LocalRegionCache.EvictionConfig evictionConfig = mock(LocalRegionCache.EvictionConfig.class);
+        when(evictionConfig.getTimeToLive()).thenReturn(Duration.ofSeconds(1));
+
+        new LocalRegionCache(CACHE_NAME, null, null, false, evictionConfig)
+          .cleanup();
+
+        verify(evictionConfig).getMaxSize();
+        verify(evictionConfig).getTimeToLive();
+        verifyZeroInteractions(mapConfig);
     }
 
     // Verifies that the three-argument constructor still registers a listener with a topic if the HazelcastInstance

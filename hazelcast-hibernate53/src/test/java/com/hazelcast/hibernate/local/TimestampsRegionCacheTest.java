@@ -21,6 +21,7 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +58,62 @@ public class TimestampsRegionCacheTest {
         this.listener = listener.getValue();
     }
 
+    @Test
+    public void shouldUpdateTimestampAfterPreInvalidationMessage_issue_33() {
+        long firstTimestamp = 1;
+        long secondTimestamp = 2;
+        long preInvalidationPublishTime = 3;
+        long thirdTimestamp = 4;
+        long invalidationPublishTime = 5;
+        long afterUpdateReadTime = 6;
+
+        when(cluster.getClusterTime()).thenReturn(firstTimestamp, secondTimestamp, thirdTimestamp);
+
+        assertThat(target.put("Entity", firstTimestamp, firstTimestamp, null), is(true));
+        assertThat("primed value should be in the cache", (Long) target.get("Entity",
+                firstTimestamp), is(firstTimestamp));
+
+        // During an update of an entity <E>, two calls are made to update-timestamps-cache such
+        // that the first call updates the timestamp for <E> about an hour offset. This is because
+        // during a transaction happening for table <E>, no cached entry for <E> must be served
+        // from the cache. This is simply a temporary invalidation mechanism for cached entries.
+        // When the transaction ends, the second update to timestamps-cache is made with the recent
+        // timestamp.
+
+        long invalidationOffset = 100L;
+
+        UUID regionUuid = UUID.randomUUID();
+
+        Message<Object> preInvalidate = new Message<Object>("topicName",
+                new Timestamp("Entity", secondTimestamp + invalidationOffset, regionUuid),
+                preInvalidationPublishTime, member);
+
+
+        // process the pre invalidation update.
+        listener.onMessage(preInvalidate);
+
+        // It's set to update local timestamp with cluster time when a message is received over
+        // topic no matter what the received timestamp value is. This is preferred in favor of
+        // query cache functionality. However, the reliable way would be updating the timestamp
+        // with a large value to prevent serving cached entries for <E> between preInvalidation
+        // and invalidation calls.
+        assertTrue("Timestamp cache must be updated by preInvalidation.",
+                (Long) target.get("Entity", afterUpdateReadTime) == secondTimestamp);
+
+        Message<Object> invalidate = new Message<Object>("topicName",
+                new Timestamp("Entity", thirdTimestamp, regionUuid),
+                invalidationPublishTime, member);
+
+        // process the invalidation update.
+        listener.onMessage(invalidate);
+
+        // Cache must be updated with the invalidation call. If it is ignored due to having a
+        // smaller timestamp than the preInvalidation call timestamp, this will make cache
+        // unusable until invalidationOffset expires.
+        assertTrue("Timestamp cache must be updated after preInvalidation",
+                (Long) target.get("Entity", afterUpdateReadTime) < invalidationOffset);
+    }
+
     @SuppressWarnings("Duplicates")
     @Test
     public void shouldUseClusterTimestampFromInvalidationmessageInsteadOfSystemTime() {
@@ -73,7 +130,7 @@ public class TimestampsRegionCacheTest {
         assertThat("primed value should be in the cache", (Long) target.get("QuerySpace", firstTimestamp), is(firstTimestamp));
 
         // a message is generated on a different cluster member informing us to update the timestamp region cache
-        Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp), publishTime, member);
+        Message<Object> message = new Message<Object>("topicName", new Timestamp("QuerySpace", secondTimestamp, UUID.randomUUID()), publishTime, member);
 
         // process the timestamp region update
         listener.onMessage(message);

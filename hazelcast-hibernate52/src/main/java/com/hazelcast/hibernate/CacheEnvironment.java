@@ -21,6 +21,7 @@ import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
+import java.time.Duration;
 import java.util.Properties;
 
 import static java.lang.String.format;
@@ -66,6 +67,11 @@ public final class CacheEnvironment {
      * Property to configure if the HazelcastInstance should going to shutdown when the RegionFactory is being stopped
      */
     public static final String SHUTDOWN_ON_STOP = "hibernate.cache.hazelcast.shutdown_on_session_factory_close";
+
+    /**
+     * Property to configure the IMDG cluster connection timeout
+     */
+    public static final String CLUSTER_TIMEOUT = "hibernate.cache.hazelcast.cluster_timeout";
 
     /**
      * Property to configure the timeout delay before a lock eventually times out
@@ -148,6 +154,14 @@ public final class CacheEnvironment {
             throw new ConfigurationException(format("[%d] is an illegal value for [%s]", delay, CLEANUP_DELAY));
         }
         return delay;
+    }
+
+    public static Duration getClusterTimeout(final Properties props) {
+        int timeoutMillis = ConfigurationHelper.getInt(CLUSTER_TIMEOUT, props, Integer.MAX_VALUE);
+        if (timeoutMillis <= 0) {
+            throw new ConfigurationException("Invalid cluster timeout [" + timeoutMillis + "]");
+        }
+        return Duration.ofMillis(timeoutMillis);
     }
 
     public static int getLockTimeoutInMillis(final Properties props) {
