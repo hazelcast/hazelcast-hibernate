@@ -15,6 +15,7 @@
 
 package com.hazelcast.hibernate;
 
+import com.hazelcast.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationException;
@@ -22,6 +23,8 @@ import org.hibernate.internal.util.config.ConfigurationHelper;
 
 import java.time.Duration;
 import java.util.Properties;
+
+import static java.lang.String.format;
 
 /**
  * This class is used to help in setup the internal caches. It searches for configuration files
@@ -71,6 +74,11 @@ public final class CacheEnvironment {
     public static final String CLUSTER_TIMEOUT = "hibernate.cache.hazelcast.cluster_timeout";
 
     /**
+     * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
+     */
+    public static final String CLEANUP_DELAY = "hibernate.cache.hazelcast.cleanup_delay";
+
+    /**
      * Property to configure the Hazelcast instance internal name
      */
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
@@ -100,6 +108,9 @@ public final class CacheEnvironment {
 
     // one hour in milliseconds
     private static final int DEFAULT_CACHE_TIMEOUT = (3600 * 1000);
+
+    // one minute in seconds
+    private static final int DEFAULT_CACHE_CLEANUP_DELAY = 60;
 
     private CacheEnvironment() {
     }
@@ -131,6 +142,20 @@ public final class CacheEnvironment {
         }
         return Duration.ofMillis(timeoutMillis);
     }
+
+    public static int getCacheCleanupInSeconds(final Properties props) {
+        int delay = DEFAULT_CACHE_CLEANUP_DELAY;
+        try {
+            delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, DEFAULT_CACHE_CLEANUP_DELAY);
+        } catch (Exception e) {
+            Logger.getLogger(CacheEnvironment.class).finest(e);
+        }
+        if (delay < 0) {
+            throw new ConfigurationException(format("[%d] is an illegal value for [%s]", delay, CLEANUP_DELAY));
+        }
+        return delay;
+    }
+
 
     public static boolean shutdownOnStop(final Properties props, final boolean defaultValue) {
         return ConfigurationHelper.getBoolean(CacheEnvironment.SHUTDOWN_ON_STOP, props, defaultValue);
