@@ -17,6 +17,7 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.DummyEntity;
+import com.hazelcast.hibernate.local.AtomicTimedLocalCacheRegionFactory;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
@@ -42,7 +43,7 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
 
     protected Properties getCacheProperties() {
         Properties props = new Properties();
-        props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastLocalCacheRegionFactory.class.getName());
+        props.setProperty(Environment.CACHE_REGION_FACTORY, AtomicTimedLocalCacheRegionFactory.class.getName());
         return props;
     }
 
