@@ -84,7 +84,7 @@ public final class CacheEnvironment {
     public static final String MAX_BACKOFF_MS = "hibernate.cache.hazelcast.max_backoff";
 
     /**
-     * Property to configure the IMDG cluster connection max backoff
+     * Property to configure the IMDG cluster connection backoff multiplier
      */
     public static final String BACKOFF_MULTIPLIER = "hibernate.cache.hazelcast.backoff_multiplier";
 
