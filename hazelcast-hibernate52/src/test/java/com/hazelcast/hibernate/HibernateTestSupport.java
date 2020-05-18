@@ -23,9 +23,9 @@ import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.hibernate.instance.HazelcastAccessor;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
+import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
-import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.test.HazelcastTestSupport;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -37,7 +37,13 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
@@ -84,7 +90,6 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
 
     protected SessionFactory createSessionFactory(final Properties props,
                                                   final IHazelcastInstanceLoader customInstanceLoader) {
-        props.put(CacheEnvironment.EXPLICIT_VERSION_CHECK, "true");
         if (customInstanceLoader != null) {
             HazelcastMockInstanceFactory.setThreadLocalLoader(customInstanceLoader);
             props.setProperty("hibernate.cache.hazelcast.factory", "com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory");
