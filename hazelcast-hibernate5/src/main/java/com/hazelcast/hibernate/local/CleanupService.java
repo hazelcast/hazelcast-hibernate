@@ -17,6 +17,7 @@ package com.hazelcast.hibernate.local;
 
 import com.hazelcast.instance.impl.OutOfMemoryErrorDispatcher;
 
+import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -27,18 +28,18 @@ import java.util.concurrent.TimeUnit;
  */
 public final class CleanupService {
 
-    private final long fixedDelay;
+    private final Duration fixedDelay;
     private final String name;
     private final ScheduledExecutorService executor;
 
-    public CleanupService(final String name, final long fixedDelay) {
+    public CleanupService(final String name, final Duration fixedDelay) {
         this.fixedDelay = fixedDelay;
         this.name = name;
         executor = Executors.newSingleThreadScheduledExecutor(new CleanupThreadFactory());
     }
 
     public void registerCache(final LocalRegionCache cache) {
-        executor.scheduleWithFixedDelay(cache::cleanup, fixedDelay, fixedDelay, TimeUnit.SECONDS);
+        executor.scheduleWithFixedDelay(cache::cleanup, fixedDelay.toMillis(), fixedDelay.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     public void stop() {

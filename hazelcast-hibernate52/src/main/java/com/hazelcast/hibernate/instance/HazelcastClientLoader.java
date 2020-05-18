@@ -33,10 +33,6 @@ import java.util.Properties;
  */
 class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
-    private static final int INITIAL_BACKOFF_MS = 2000;
-    private static final int MAX_BACKOFF_MS = 35000;
-    private static final double BACKOFF_MULTIPLIER = 1.5D;
-
     private HazelcastInstance client;
     private ClientConfig clientConfig;
     private String instanceName;
@@ -51,7 +47,6 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
         String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
         String configResourcePath = CacheEnvironment.getConfigFilePath(props);
-        long clusterTimeout = CacheEnvironment.getClusterTimeout(props).toMillis();
 
         if (configResourcePath != null) {
             try {
@@ -72,13 +67,16 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         clientConfig.getNetworkConfig().setSmartRouting(true);
         clientConfig.getNetworkConfig().setRedoOperation(true);
 
-        // Try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
-        // at each step. When the last waiting interval time exceeds 35 seconds, it fails.
-        // This corresponds to 8 trials in total.
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setInitialBackoffMillis(INITIAL_BACKOFF_MS);
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMaxBackoffMillis(MAX_BACKOFF_MS);
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setMultiplier(BACKOFF_MULTIPLIER);
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig().setClusterConnectTimeoutMillis(clusterTimeout);
+        // By default, try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
+        // at each step with max backoff of 35 seconds
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
+          .setInitialBackoffMillis((int) CacheEnvironment.getInitialBackoff(props).toMillis());
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
+          .setMaxBackoffMillis((int) CacheEnvironment.getMaxBackoff(props).toMillis());
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
+          .setMultiplier(CacheEnvironment.getBackoffMultiplier(props));
+        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
+          .setClusterConnectTimeoutMillis(CacheEnvironment.getClusterTimeout(props).toMillis());
     }
 
     @Override

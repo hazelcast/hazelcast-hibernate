@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Properties;
 
 import static java.lang.String.format;
+import static org.hibernate.internal.util.config.ConfigurationHelper.getString;
 
 /**
  * This class is used to help in setup the internal caches. It searches for configuration files
@@ -74,6 +75,21 @@ public final class CacheEnvironment {
     public static final String CLUSTER_TIMEOUT = "hibernate.cache.hazelcast.cluster_timeout";
 
     /**
+     * Property to configure the IMDG cluster connection initial backoff
+     */
+    public static final String INITIAL_BACKOFF_MS = "hibernate.cache.hazelcast.initial_backoff";
+
+    /**
+     * Property to configure the IMDG cluster connection max backoff
+     */
+    public static final String MAX_BACKOFF_MS = "hibernate.cache.hazelcast.max_backoff";
+
+    /**
+     * Property to configure the IMDG cluster connection max backoff
+     */
+    public static final String BACKOFF_MULTIPLIER = "hibernate.cache.hazelcast.backoff_multiplier";
+
+    /**
      * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
      */
     public static final String CLEANUP_DELAY = "hibernate.cache.hazelcast.cleanup_delay";
@@ -102,22 +118,28 @@ public final class CacheEnvironment {
 
     private static final Duration DEFAULT_CACHE_TIMEOUT = Duration.ofHours(1);
 
-    // one minute in seconds
-    private static final int DEFAULT_CACHE_CLEANUP_DELAY = 60;
+    private static final Duration DEFAULT_MAX_BACKOFF = Duration.ofMillis(35000);
+
+    private static final Duration DEFAULT_INITIAL_BACKOFF = Duration.ofMillis(2000);
+
+    private static final Duration DEFAULT_CACHE_CLEANUP_DELAY = Duration.ofMinutes(1);
+
+    private static final double DEFAULT_BACKOFF_MULTIPLIER = 1.5;
+
 
     private CacheEnvironment() {
     }
 
     public static String getConfigFilePath(final Properties props) {
-        String configResourcePath = ConfigurationHelper.getString(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, props, null);
+        String configResourcePath = getString(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, props, null);
         if (StringHelper.isEmpty(configResourcePath)) {
-            configResourcePath = ConfigurationHelper.getString(CacheEnvironment.CONFIG_FILE_PATH, props, null);
+            configResourcePath = getString(CacheEnvironment.CONFIG_FILE_PATH, props, null);
         }
         return configResourcePath;
     }
 
     public static String getInstanceName(final Properties props) {
-        return ConfigurationHelper.getString(HAZELCAST_INSTANCE_NAME, props, null);
+        return getString(HAZELCAST_INSTANCE_NAME, props, null);
     }
 
     public static boolean isNativeClient(final Properties props) {
@@ -128,29 +150,55 @@ public final class CacheEnvironment {
         return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
     }
 
-    public static Duration getClusterTimeout(final Properties props) {
-        int timeoutMillis = ConfigurationHelper.getInt(CLUSTER_TIMEOUT, props, Integer.MAX_VALUE);
-        if (timeoutMillis <= 0) {
-            throw new ConfigurationException("Invalid cluster timeout [" + timeoutMillis + "]");
-        }
-        return Duration.ofMillis(timeoutMillis);
-    }
-
-    public static int getCacheCleanupInSeconds(final Properties props) {
-        int delay = DEFAULT_CACHE_CLEANUP_DELAY;
+    public static Duration getCacheCleanup(final Properties props) {
+        int delay = -1;
         try {
-            delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, DEFAULT_CACHE_CLEANUP_DELAY);
+            delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, (int) (DEFAULT_CACHE_CLEANUP_DELAY.toMinutes() * 60));
         } catch (Exception e) {
             Logger.getLogger(CacheEnvironment.class).finest(e);
         }
         if (delay < 0) {
             throw new ConfigurationException(format("[%d] is an illegal value for [%s]", delay, CLEANUP_DELAY));
         }
-        return delay;
+        return Duration.ofSeconds(delay);
     }
 
 
     public static boolean shutdownOnStop(final Properties props, final boolean defaultValue) {
         return ConfigurationHelper.getBoolean(CacheEnvironment.SHUTDOWN_ON_STOP, props, defaultValue);
+    }
+
+    public static Duration getInitialBackoff(Properties props) {
+        int initialBackOff = ConfigurationHelper.getInt(INITIAL_BACKOFF_MS, props, (int) DEFAULT_INITIAL_BACKOFF.toMillis());
+        if (initialBackOff <= 0) {
+            throw new ConfigurationException("Invalid cluster timeout [" + initialBackOff + "]");
+        }
+        return Duration.ofMillis(initialBackOff);
+    }
+
+    public static Duration getMaxBackoff(Properties props) {
+        int maxBackoff = ConfigurationHelper.getInt(MAX_BACKOFF_MS, props, (int) DEFAULT_MAX_BACKOFF.toMillis());
+        if (maxBackoff <= 0) {
+            throw new ConfigurationException("Invalid cluster timeout [" + maxBackoff + "]");
+        }
+        return Duration.ofMillis(maxBackoff);
+    }
+
+    public static double getBackoffMultiplier(Properties props) {
+        double backoffMultiplier = Double.parseDouble(
+          getString(BACKOFF_MULTIPLIER, props, String.valueOf(DEFAULT_BACKOFF_MULTIPLIER)));
+
+        if (backoffMultiplier <= 0) {
+            throw new ConfigurationException("Invalid cluster timeout [" + backoffMultiplier + "]");
+        }
+        return backoffMultiplier;
+    }
+
+    public static Duration getClusterTimeout(final Properties props) {
+        int timeoutMillis = ConfigurationHelper.getInt(CLUSTER_TIMEOUT, props, Integer.MAX_VALUE);
+        if (timeoutMillis <= 0) {
+            throw new ConfigurationException("Invalid cluster timeout [" + timeoutMillis + "]");
+        }
+        return Duration.ofMillis(timeoutMillis);
     }
 }
