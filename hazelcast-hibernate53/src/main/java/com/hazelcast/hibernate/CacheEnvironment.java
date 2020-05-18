@@ -84,12 +84,6 @@ public final class CacheEnvironment {
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
 
     /**
-     * Property to configure explicitly checks the CacheEntry's version while updating RegionCache.
-     * If new entry's version is not higher then previous, update will be cancelled.
-     */
-    public static final String EXPLICIT_VERSION_CHECK = "hibernate.cache.hazelcast.explicit_version_check";
-
-    /**
      * Property to configure the Hazelcast operation timeout
      */
     public static final String HAZELCAST_OPERATION_TIMEOUT = "hazelcast.operation.call.timeout.millis";
@@ -106,8 +100,7 @@ public final class CacheEnvironment {
      */
     public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
 
-    // one hour in milliseconds
-    private static final int DEFAULT_CACHE_TIMEOUT = (3600 * 1000);
+    private static final Duration DEFAULT_CACHE_TIMEOUT = Duration.ofHours(1);
 
     // one minute in seconds
     private static final int DEFAULT_CACHE_CLEANUP_DELAY = 60;
@@ -132,7 +125,7 @@ public final class CacheEnvironment {
     }
 
     public static int getDefaultCacheTimeoutInMillis() {
-        return DEFAULT_CACHE_TIMEOUT;
+        return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
     }
 
     public static Duration getClusterTimeout(final Properties props) {
