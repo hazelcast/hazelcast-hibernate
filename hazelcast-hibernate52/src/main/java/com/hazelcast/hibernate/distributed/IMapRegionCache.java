@@ -112,7 +112,7 @@ public class IMapRegionCache implements RegionCache {
     public boolean update(final Object key, final Object newValue, final Object newVersion, final SoftLock lock) {
         if (lock instanceof MarkerWrapper) {
             final ExpiryMarker unwrappedMarker = ((MarkerWrapper) lock).getMarker();
-            return (Boolean) map.executeOnKey(key, new UpdateEntryProcessor(unwrappedMarker, newValue, newVersion,
+            return map.executeOnKey(key, new UpdateEntryProcessor(unwrappedMarker, newValue, newVersion,
                     nextMarkerId(), nextTimestamp(hazelcastInstance)));
         } else {
             return false;

@@ -24,6 +24,8 @@ import org.hibernate.internal.util.config.ConfigurationHelper;
 import java.time.Duration;
 import java.util.Properties;
 
+import static java.lang.String.format;
+
 /**
  * This class is used to help in setup the internal caches. It searches for configuration files
  * and contains all property names for hibernate based configuration properties.
@@ -77,6 +79,11 @@ public final class CacheEnvironment {
     public static final String LOCK_TIMEOUT = "hibernate.cache.hazelcast.lock_timeout";
 
     /**
+     * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
+     */
+    public static final String CLEANUP_DELAY = "hibernate.cache.hazelcast.cleanup_delay";
+
+    /**
      * Property to configure the Hazelcast instance internal name
      */
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
@@ -108,6 +115,10 @@ public final class CacheEnvironment {
 
     private static final Duration DEFAULT_CACHE_TIMEOUT = Duration.ofHours(1);
 
+    // one minute in seconds
+    private static final int DEFAULT_CACHE_CLEANUP_DELAY = 60;
+
+
     private CacheEnvironment() {
     }
 
@@ -129,6 +140,19 @@ public final class CacheEnvironment {
 
     public static int getDefaultCacheTimeoutInMillis() {
         return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
+    }
+
+    public static int getCacheCleanupInSeconds(final Properties props) {
+        int delay = DEFAULT_CACHE_CLEANUP_DELAY;
+        try {
+            delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, DEFAULT_CACHE_CLEANUP_DELAY);
+        } catch (Exception e) {
+            Logger.getLogger(CacheEnvironment.class).finest(e);
+        }
+        if (delay < 0) {
+            throw new ConfigurationException(format("[%d] is an illegal value for [%s]", delay, CLEANUP_DELAY));
+        }
+        return delay;
     }
 
     public static Duration getClusterTimeout(final Properties props) {
