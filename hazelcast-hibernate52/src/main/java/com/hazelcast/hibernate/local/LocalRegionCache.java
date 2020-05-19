@@ -50,7 +50,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class LocalRegionCache implements RegionCache {
 
-    private static final long SEC_TO_MS = 1000L;
     private static final int MAX_SIZE = 100000;
     private static final float BASE_EVICTION_RATE = 0.2F;
 
