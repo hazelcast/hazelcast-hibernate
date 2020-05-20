@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import static com.hazelcast.hibernate.CacheEnvironment.HAZELCAST_FACTORY;
-import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanupInSeconds;
+import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanup;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
@@ -154,7 +154,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instance = instanceLoader.loadInstance();
         }
 
-        cleanupService = new CleanupService(instance.getName(), getCacheCleanupInSeconds(toProperties(configValues)));
+        cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
     }
 
     @SuppressWarnings("Duplicates")
