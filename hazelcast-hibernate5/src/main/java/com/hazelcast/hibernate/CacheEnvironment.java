@@ -156,7 +156,7 @@ public final class CacheEnvironment {
         return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
     }
 
-    public static Duration getCacheCleanupInSeconds(final Properties props) {
+    public static Duration getCacheCleanup(final Properties props) {
         int delay = -1;
         try {
             delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, (int) (DEFAULT_CACHE_CLEANUP_DELAY.toMinutes() * 60));

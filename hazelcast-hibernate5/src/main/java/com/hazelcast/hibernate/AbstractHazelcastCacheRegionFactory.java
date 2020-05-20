@@ -31,7 +31,7 @@ import org.hibernate.cache.spi.access.AccessType;
 
 import java.util.Properties;
 
-import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanupInSeconds;
+import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanup;
 
 /**
  * Abstract superclass of Hazelcast based {@link RegionFactory} implementations
@@ -94,7 +94,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
             instance = instanceLoader.loadInstance();
         }
 
-        cleanupService = new CleanupService(instance.getName(), getCacheCleanupInSeconds(properties));
+        cleanupService = new CleanupService(instance.getName(), getCacheCleanup(properties));
     }
 
     @Override
