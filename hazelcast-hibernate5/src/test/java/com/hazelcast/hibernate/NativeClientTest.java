@@ -1,6 +1,10 @@
 package com.hazelcast.hibernate;
 
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.client.impl.clientside.HazelcastClientProxy;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.DummyEntity;
+import com.hazelcast.hibernate.instance.HazelcastAccessor;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Session;
@@ -18,6 +22,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
@@ -41,6 +46,21 @@ public class NativeClientTest
     }
 
     @Test
+    public void testNativeClient() {
+        // This test has been moved from CustomPropertiesTest to here only for hazelcast-hibernate5
+        // module due to MockLoader complaints. 52 and 53 modules still test the behavior under
+        // CustomPropertiesTest. See the error at:
+        // https://github.com/hazelcast/hazelcast-hibernate5/issues/30#issuecomment-623319465
+        final HazelcastInstance clientInstance = HazelcastAccessor.getHazelcastInstance(clientSf);
+        assertTrue(clientInstance instanceof HazelcastClientProxy);
+        HazelcastClientProxy client = (HazelcastClientProxy) clientInstance;
+        ClientConfig clientConfig = client.getClientConfig();
+        assertEquals("dev-custom", clientConfig.getClusterName());
+        assertTrue(clientConfig.getNetworkConfig().isSmartRouting());
+        assertTrue(clientConfig.getNetworkConfig().isRedoOperation());
+    }
+
+    @Test
     public void testInsertLoad() {
         Session session = clientSf.openSession();
         Transaction tx = session.beginTransaction();
@@ -58,6 +78,9 @@ public class NativeClientTest
     public void tearDown() {
         if(clientSf !=null) {
             clientSf.close();
+        }
+        if(sf !=null) {
+            sf.close();
         }
     }
 
