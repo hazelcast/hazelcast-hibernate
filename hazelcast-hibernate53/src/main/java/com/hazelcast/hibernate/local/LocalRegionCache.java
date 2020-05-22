@@ -43,6 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -61,6 +62,7 @@ public class LocalRegionCache implements RegionCache {
     private final String name;
     private final RegionFactory regionFactory;
     private final ITopic<Object> topic;
+    private final UUID listenerRegistrationId;
     private final Comparator versionComparator;
     private final EvictionConfig evictionConfig;
 
@@ -128,9 +130,10 @@ public class LocalRegionCache implements RegionCache {
 
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
-            topic.addMessageListener(createMessageListener());
+            listenerRegistrationId = topic.addMessageListener(createMessageListener());
         } else {
             topic = null;
+            listenerRegistrationId = null;
         }
 
         versionComparator = findVersionComparator(regionConfig);
@@ -240,6 +243,13 @@ public class LocalRegionCache implements RegionCache {
             if (evictionRate > 0 && entries != null) {
                 evictEntries(entries, evictionRate);
             }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (topic != null && listenerRegistrationId != null) {
+            topic.removeMessageListener(listenerRegistrationId);
         }
     }
 

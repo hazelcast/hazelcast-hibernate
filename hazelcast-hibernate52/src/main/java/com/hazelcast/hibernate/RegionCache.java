@@ -43,6 +43,9 @@ public interface RegionCache {
 
     void clear();
 
+    default void destroy() {
+    }
+
     long size();
 
     long getSizeInMemory();

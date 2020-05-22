@@ -46,9 +46,7 @@ abstract class AbstractHazelcastRegion<Cache extends RegionCache> implements Haz
 
     @Override
     public void destroy() throws CacheException {
-        // Destroy of the region should not propagate
-        // to other nodes of cluster.
-        // Do nothing on destroy.
+        this.getCache().destroy();
     }
 
     /**

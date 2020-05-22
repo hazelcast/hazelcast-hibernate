@@ -82,7 +82,7 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
 
     @Override
     public void release() {
-        // no-op
+        delegate.destroy();
     }
 
     @Override
