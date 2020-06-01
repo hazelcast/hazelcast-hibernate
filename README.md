@@ -1,12 +1,8 @@
 # Hibernate Second Level Cache
 
-Hazelcast provides a distributed second level cache for your Hibernate entities, collections and queries.
+Hazelcast provides a distributed second-level cache for your Hibernate entities, collections, and queries.
 
 You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or ConcurrentHashMap-based near-cache(`HazelcastLocalCacheRegionFactory`) with updates synchronized via `ITopic`.
-
-## Code Samples
-
-Please see our <a href="https://github.com/hazelcast/hazelcast-code-samples/tree/master/hazelcast-integration/hibernate-2ndlevel-cache" target="_blank">sample application</a> for Hibernate Second Level Cache.
 
 ## Supported Versions
 
@@ -19,7 +15,6 @@ Please see our <a href="https://github.com/hazelcast/hazelcast-code-samples/tree
 # Table of Contents
 
 * [Hibernate Second Level Cache](#hibernate-second-level-cache)
-  * [Sample Code for Hibernate](#sample-code-for-hibernate)
   * [Supported Hibernate and Hazelcast Versions](#supported-hibernate-and-hazelcast-versions)
   * [Configuring Hibernate for Hazelcast](#configuring-hibernate-for-hazelcast)
     * [Enabling Second Level Cache](#enabling-second-level-cache)
@@ -40,8 +35,10 @@ To configure Hibernate for Hazelcast:
 
 - Add the jar to your classpath (depending on your Hibernate/Hazelcast versions)
 - Enable Second-Level Cache
-- Choose `RegionFactory` implementation
-- Add remaining properties into your Hibernate configuration file, e.g., `hibernate.cfg.xml`.
+- Choose a desired `RegionFactory` implementation
+- Configure remaining properties by:
+    - Adding them to your Hibernate configuration file, e.g., `hibernate.cfg.xml`
+    - Adding them to Spring Boot's `application.properties` prefixed with `spring.jpa.properties`, e.g., `spring.jpa.properties.hibernate.cache.use_second_level_cache=true`
 
 ### Enabling Second Level Cache
 
@@ -75,7 +72,7 @@ With `HazelcastCacheRegionFactory`, all below caches are distributed across Haze
 
 #### HazelcastLocalCacheRegionFactory
 
-You can use `HazelcastLocalCacheRegionFactory` which stores data in a local member and sends invalidation messages when an entry is changed locally.
+You can use `HazelcastLocalCacheRegionFactory`, which stores data in a local member and sends invalidation messages when an entry is changed locally.
 
 ```xml
 <property name="hibernate.cache.region.factory_class">
@@ -83,52 +80,52 @@ You can use `HazelcastLocalCacheRegionFactory` which stores data in a local memb
 </property>
 ```
 
-With `HazelcastLocalCacheRegionFactory`, each cluster member has a local map and each of them is registered to a Hazelcast Topic (ITopic). 
+With `HazelcastLocalCacheRegionFactory`, each cluster member has a local map, and each of them is registered to a Hazelcast Topic (ITopic). 
 Whenever a `put` or `remove` operation is performed on a member, `hazelcast-hibernate` sends an invalidation message to other members, 
-which remove related entries from their local storage. 
+which removes related entries from their local storage. 
 
-In the case of `get` operations, invalidation messages are not generated and reads are performed on the local map.
+In the `get` operations, invalidation messages are not generated, and reads are performed on the local map.
 
-An illustration of the above logic is shown below.
+An illustration of the above logic is shown below:
 
 ![Invalidation with Local Cache Region Factory](images/HZLocalCacheRgnFactory.jpg)
 
-If your operations are mostly reads, then this option gives better performance.
+If your operations consist mostly of reads, then this option gives better performance.
 
-![image](images/NoteSmall.jpg) ***NOTE:*** *If you use `HazelcastLocalCacheRegionFactory`, you cannot see your maps on [Management Center](https://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
+***NOTE:*** *If you use `HazelcastLocalCacheRegionFactory`, you cannot see your maps on [Management Center](https://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
 
-With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally in the Hazelcast member.
+With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally in the Hazelcast member:
 
 - Entity Cache
 - Collection Cache
 - Timestamp Cache
 
-Entity and Collection are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. When needed, each member reads that data from the underlying DB. 
+_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. When needed, each member reads that data from the underlying datasource. 
 
-Timestamp cache is replicated. On every update, a replication message is sent to all the other members.
+On every _Timestamp_ cache update, `hazelcast-hibernate` publishes an invalidation message to a topic (see #hazelcastlocalcacheregionfactory for details).
 
-Eviction support is limited to maximum size of the map (defined by `max-size` configuration element) and TTL only. When maximum size is hit, 20% of the entries will be evicted automatically.
+Eviction support is limited to the maximum size of the map (defined by `max-size` configuration element) and TTL only. When maximum size is hit, 20% of the entries will be evicted automatically.
 
 ### Configuring Query Cache and Other Settings
 
 - To enable use of query cache:
 
-	```xml
-	<property name="hibernate.cache.use_query_cache">true</property>
-	```
+    ```xml
+    <property name="hibernate.cache.use_query_cache">true</property>
+    ```
 
 - To force minimal puts into query cache:
 
-	```xml
-	<property name="hibernate.cache.use_minimal_puts">true</property>
-	```
+    ```xml
+    <property name="hibernate.cache.use_minimal_puts">true</property>
+    ```
 
 - To avoid `NullPointerException` when you have entities that have composite keys (using `@IdClass`):
 
     ```xml
-	<property name="hibernate.session_factory_name">yourFactoryName</property>
-	```
-	
+    <property name="hibernate.session_factory_name">yourFactoryName</property>
+    ```
+    
 ***NOTE:*** *QueryCache is always LOCAL to the member and never distributed across Hazelcast Cluster.*
 
 ## Configuring Hazelcast for Hibernate
@@ -158,7 +155,10 @@ Hazelcast creates a separate distributed map for each Hibernate cache region. Yo
 
 Hibernate Second Level Cache can use Hazelcast in two modes: Peer-to-Peer (P2P) and Client/Server (next section).
 
-With P2P mode, each Hibernate deployment launches its own Hazelcast Instance. You can also configure Hibernate to use an existing instance, instead of creating a new `HazelcastInstance` for each `SessionFactory`. 
+When using the _Peer-to-Peer_ mode, each Hibernate deployment launches its Hazelcast instance. 
+
+However, there's an option to configure Hibernate to use an existing instance instead of creating a new `HazelcastInstance` for each `SessionFactory`.
+ 
 To achieve this, set the `hibernate.cache.hazelcast.instance_name` Hibernate property to the `HazelcastInstance`'s name. 
 
 For more information, please see <a href="http://docs.hazelcast.org/docs/latest-dev/manual/html-single/index.html#binding-to-a-named-instance" target="_blank">Named Instance Scope</a>
@@ -172,11 +172,11 @@ You can disable shutting down `HazelcastInstance` during `SessionFactory.close()
 
 You can set up Hazelcast to connect to the cluster as Native Client. 
 
-Native client is not a member, it connects to one of the cluster members and delegates all cluster-wide operations to it. 
+The native client is not a member; it connects to one of the cluster members and delegates all cluster-wide operations to it. 
 
 A client instance started in the Native Client mode uses smart routing: when the related cluster member dies, the client transparently switches to another live member. 
 
-All client operations are retry-able meaning that the client resends the request as many as 10 times in case of a failure. 
+All client operations are retry-able, meaning that the client resends the request as many as ten times in case of a failure. 
 
 After the 10th retry, it throws an exception. You cannot change the routing mode and retry-able operation configurations of the Native Client instance used by Hibernate 2nd Level Cache. 
 
@@ -249,7 +249,3 @@ public class Cat implements Serializable {
 **Changing/setting lock timeout value of *read-write* strategy in hazelcast-hibernate5 and hazelcast-hibernate52**
 
 You can set a lock timeout value using the `hibernate.cache.hazelcast.lock_timeout` Hibernate property. The value should be in milliseconds.
-
-
-
-
