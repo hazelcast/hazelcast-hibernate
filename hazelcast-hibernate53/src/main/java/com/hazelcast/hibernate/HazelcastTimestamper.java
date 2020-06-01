@@ -15,18 +15,13 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.logging.Logger;
 
 /**
  * Helper class to create timestamps and calculate timeouts based on either Hazelcast
  * configuration of by requesting values on the cluster.
  */
 public final class HazelcastTimestamper {
-
-    private static final int SEC_TO_MS = 1000;
 
     private HazelcastTimestamper() {
     }
@@ -40,34 +35,5 @@ public final class HazelcastTimestamper {
 
         // System time in ms.
         return instance.getCluster().getClusterTime();
-    }
-
-    public static int getTimeout(final HazelcastInstance instance, final String regionName) {
-        try {
-            final MapConfig cfg = instance.getConfig().findMapConfig(regionName);
-            if (cfg.getTimeToLiveSeconds() > 0) {
-                // TTL in ms
-                return cfg.getTimeToLiveSeconds() * SEC_TO_MS;
-            }
-        } catch (UnsupportedOperationException e) {
-            // HazelcastInstance is instance of HazelcastClient.
-            Logger.getLogger(HazelcastTimestamper.class).finest(e);
-        }
-        return CacheEnvironment.getDefaultCacheTimeoutInMillis();
-    }
-
-    public static long getMaxOperationTimeout(final HazelcastInstance instance) {
-        String maxOpTimeoutProp = null;
-        try {
-            Config config = instance.getConfig();
-            maxOpTimeoutProp = config.getProperty(CacheEnvironment.HAZELCAST_OPERATION_TIMEOUT);
-        } catch (UnsupportedOperationException e) {
-            // HazelcastInstance is instance of HazelcastClient.
-            Logger.getLogger(HazelcastTimestamper.class).finest(e);
-        }
-        if (maxOpTimeoutProp != null) {
-            return Long.parseLong(maxOpTimeoutProp);
-        }
-        return Long.MAX_VALUE;
     }
 }

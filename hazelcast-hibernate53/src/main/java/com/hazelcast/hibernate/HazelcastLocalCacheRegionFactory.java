@@ -72,8 +72,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     }
 
     public long nextTimestamp() {
-        long result = instance == null ? Clock.currentTimeMillis()
-                : HazelcastTimestamper.nextTimestamp(instance);
-        return result;
+        return instance == null
+          ? Clock.currentTimeMillis()
+          : HazelcastTimestamper.nextTimestamp(instance);
     }
 }

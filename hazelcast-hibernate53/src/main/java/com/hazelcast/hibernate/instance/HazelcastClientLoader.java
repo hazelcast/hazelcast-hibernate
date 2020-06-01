@@ -17,6 +17,7 @@ package com.hazelcast.hibernate.instance;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.client.config.ClientConnectionStrategyConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
@@ -64,18 +65,18 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
             clientConfig.getNetworkConfig().addAddress(address);
         }
 
-        clientConfig.getNetworkConfig().setSmartRouting(true);
-        clientConfig.getNetworkConfig().setRedoOperation(true);
+        clientConfig.getNetworkConfig()
+          .setSmartRouting(true)
+          .setRedoOperation(true);
 
         // By default, try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
         // at each step with max backoff of 35 seconds
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setInitialBackoffMillis((int) CacheEnvironment.getInitialBackoff(props).toMillis());
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setMaxBackoffMillis((int) CacheEnvironment.getMaxBackoff(props).toMillis());
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setMultiplier(CacheEnvironment.getBackoffMultiplier(props));
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
+        clientConfig.getConnectionStrategyConfig()
+          .setReconnectMode(ClientConnectionStrategyConfig.ReconnectMode.ASYNC)
+          .getConnectionRetryConfig()
+          .setInitialBackoffMillis((int) CacheEnvironment.getInitialBackoff(props).toMillis())
+          .setMaxBackoffMillis((int) CacheEnvironment.getMaxBackoff(props).toMillis())
+          .setMultiplier(CacheEnvironment.getBackoffMultiplier(props))
           .setClusterConnectTimeoutMillis(CacheEnvironment.getClusterTimeout(props).toMillis());
     }
 

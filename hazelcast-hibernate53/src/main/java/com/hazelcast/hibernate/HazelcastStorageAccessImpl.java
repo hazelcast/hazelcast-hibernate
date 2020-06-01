@@ -15,69 +15,57 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.core.OperationTimeoutException;
 import com.hazelcast.logging.Logger;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 /**
- * StorageAccess implementation wrapping a Hazelcast {@link RegionCache} reference.
+ * A custom {@link org.hibernate.cache.spi.support.DomainDataStorageAccess} implementation delegating
+ * to one of Hazelcast {@link RegionCache} implementations.
  */
-@SuppressWarnings("unchecked")
 public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
 
     private final RegionCache delegate;
+    private final boolean fallback;
 
-    HazelcastStorageAccessImpl(final RegionCache delegate) {
+    HazelcastStorageAccessImpl(final RegionCache delegate, boolean fallback) {
         this.delegate = delegate;
+        this.fallback = fallback;
     }
 
     @Override
     public void afterUpdate(final Object key, final Object newValue, final Object newVersion) {
-        delegate.afterUpdate(key, newValue, newVersion);
+        tryWithFallback(cache -> cache.afterUpdate(key, newValue, newVersion));
     }
 
     @Override
     public boolean contains(final Object key) {
-        return delegate.contains(key);
+        return tryWithFallback(cache -> cache.contains(key), false);
     }
 
     @Override
     public void evictData() throws CacheException {
-        try {
-            delegate.evictData();
-        } catch (OperationTimeoutException e) {
-            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e);
-        }
+        tryWithFallback(RegionCache::evictData);
     }
 
     @Override
     public void evictData(final Object key) throws CacheException {
-        try {
-            delegate.evictData(key);
-        } catch (OperationTimeoutException e) {
-            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e);
-        }
+        tryWithFallback(cache -> cache.evictData(key));
     }
 
     @Override
     public Object getFromCache(final Object key, final SharedSessionContractImplementor session) throws CacheException {
-        try {
-            return delegate.get(key, nextTimestamp());
-        } catch (OperationTimeoutException e) {
-            return null;
-        }
+        return tryWithFallback(cache -> cache.get(key, delegate.nextTimestamp()), null);
     }
 
     @Override
     public void putIntoCache(final Object key, final Object value, final SharedSessionContractImplementor session)
-            throws CacheException {
-        try {
-            delegate.put(key, value, nextTimestamp(), null);
-        } catch (OperationTimeoutException e) {
-            Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e);
-        }
+      throws CacheException {
+        tryWithFallback(cache -> cache.put(key, value, delegate.nextTimestamp(), null));
     }
 
     @Override
@@ -87,14 +75,33 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
 
     @Override
     public void unlockItem(final Object key, final SoftLock lock) {
-        delegate.unlockItem(key, lock);
+        tryWithFallback(cache -> cache.unlockItem(key, lock));
     }
 
     RegionCache getDelegate() {
         return delegate;
     }
 
-    private long nextTimestamp() {
-        return delegate.nextTimestamp();
+    private void tryWithFallback(Consumer<RegionCache> action) {
+        tryWithFallback(cache -> {
+            action.accept(cache);
+            return null;
+        }, null);
+    }
+
+    private <T> T tryWithFallback(Function<RegionCache, T> action, T fallbackValue) {
+        try {
+            return action.apply(delegate);
+        } catch (Exception e) {
+            if (fallback) {
+                Logger.getLogger(HazelcastStorageAccessImpl.class).finest(e.getMessage(), e);
+                return fallbackValue;
+            }
+            if (e instanceof CacheException) {
+                throw e;
+            } else {
+                throw new CacheException(e);
+            }
+        }
     }
 }

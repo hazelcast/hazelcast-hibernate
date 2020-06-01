@@ -40,7 +40,7 @@ public class NativeClientFailoverTest extends HibernateSlowTestSupport {
         clientSf = createClientSessionFactory(getCacheProperties());
     }
 
-    @Test(timeout = 2000)
+    @Test(timeout = 5000)
     public void shouldBypassCacheWhenClientDisconnected() {
         Session session = clientSf.openSession();
 
@@ -70,9 +70,6 @@ public class NativeClientFailoverTest extends HibernateSlowTestSupport {
         addHbmMappings(conf);
         conf.addProperties(props);
 
-        final SessionFactory sf = conf.buildSessionFactory();
-        sf.getStatistics().setStatisticsEnabled(true);
-
-        return sf;
+        return conf.buildSessionFactory();
     }
 }
