@@ -99,13 +99,13 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
 
     @Override
     public void stop() {
+        cleanupService.stop();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();
             instance = null;
             instanceLoader = null;
         }
-        cleanupService.stop();
     }
 
     public HazelcastInstance getHazelcastInstance() {

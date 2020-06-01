@@ -68,7 +68,9 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                 sessionFactory.getSessionFactoryOptions()
         );
 
-        return new TimestampsRegionCache(this, qualifiedRegionName, instance);
+        TimestampsRegionCache timestampsRegionCache = new TimestampsRegionCache(this, qualifiedRegionName, instance);
+        cleanupService.registerCache(timestampsRegionCache);
+        return timestampsRegionCache;
     }
 
     public long nextTimestamp() {
