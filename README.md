@@ -6,9 +6,9 @@ You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or 
 
 ## Supported Versions
 
-`hazelcast-hibernate5` supports Hibernate 5.0.x, Hibernate 5.1.x and Hazelcast 3.7+
-`hazelcast-hibernate52` supports Hibernate 5.2.x and Hazelcast 3.7+
-`hazelcast-hibernate53` supports Hibernate 5.3.x/5.4.x and Hazelcast 3.7+
+- `hazelcast-hibernate5` supports Hibernate 5.0.x, Hibernate 5.1.x and Hazelcast 3.7+
+- `hazelcast-hibernate52` supports Hibernate 5.2.x and Hazelcast 3.7+
+- `hazelcast-hibernate53` supports Hibernate 5.3.x/5.4.x and Hazelcast 3.7+
 
 ## Documentation
 
