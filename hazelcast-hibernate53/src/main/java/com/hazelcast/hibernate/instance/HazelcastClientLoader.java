@@ -17,12 +17,9 @@ package com.hazelcast.hibernate.instance;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.config.ClientConnectionStrategyConfig;
-import com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.hibernate.CacheEnvironment;
 import org.hibernate.cache.CacheException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
@@ -31,8 +28,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode.*;
-import static com.hazelcast.hibernate.CacheEnvironment.*;
+import static com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode.ASYNC;
+import static com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode.ON;
+import static com.hazelcast.hibernate.CacheEnvironment.NATIVE_CLIENT_ADDRESS;
+import static com.hazelcast.hibernate.CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME;
+import static com.hazelcast.hibernate.CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME;
+import static com.hazelcast.hibernate.CacheEnvironment.getBackoffMultiplier;
+import static com.hazelcast.hibernate.CacheEnvironment.getClusterTimeout;
+import static com.hazelcast.hibernate.CacheEnvironment.getConfigFilePath;
 import static com.hazelcast.hibernate.CacheEnvironment.getFallback;
 import static com.hazelcast.hibernate.CacheEnvironment.getInitialBackoff;
 import static com.hazelcast.hibernate.CacheEnvironment.getMaxBackoff;
