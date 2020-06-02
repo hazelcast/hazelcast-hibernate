@@ -106,11 +106,6 @@ public final class CacheEnvironment {
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
 
     /**
-     * Property to configure the Hazelcast operation timeout
-     */
-    public static final String HAZELCAST_OPERATION_TIMEOUT = "hazelcast.operation.call.timeout.millis";
-
-    /**
      * Property to configure Hazelcast Shutdown Hook
      */
     public static final String HAZELCAST_SHUTDOWN_HOOK_ENABLED = "hazelcast.shutdownhook.enabled";

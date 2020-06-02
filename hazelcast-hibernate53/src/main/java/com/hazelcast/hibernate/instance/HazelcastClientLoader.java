@@ -18,6 +18,7 @@ package com.hazelcast.hibernate.instance;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientConnectionStrategyConfig;
+import com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
@@ -26,7 +27,15 @@ import org.hibernate.cache.CacheException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
+import static com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode.*;
+import static com.hazelcast.hibernate.CacheEnvironment.*;
+import static com.hazelcast.hibernate.CacheEnvironment.getFallback;
+import static com.hazelcast.hibernate.CacheEnvironment.getInitialBackoff;
+import static com.hazelcast.hibernate.CacheEnvironment.getMaxBackoff;
 
 /**
  * A factory implementation to build up a {@link HazelcastInstance}
@@ -40,14 +49,14 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     @Override
     public void configure(final Properties props) {
-        instanceName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME, props, null);
+        instanceName = ConfigurationHelper.getString(NATIVE_CLIENT_INSTANCE_NAME, props, null);
         if (instanceName != null) {
             return;
         }
 
-        String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
-        String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
-        String configResourcePath = CacheEnvironment.getConfigFilePath(props);
+        String address = ConfigurationHelper.getString(NATIVE_CLIENT_ADDRESS, props, null);
+        String clientClusterName = ConfigurationHelper.getString(NATIVE_CLIENT_CLUSTER_NAME, props, null);
+        String configResourcePath = getConfigFilePath(props);
 
         if (configResourcePath != null) {
             try {
@@ -72,12 +81,16 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         // By default, try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
         // at each step with max backoff of 35 seconds
         clientConfig.getConnectionStrategyConfig()
-          .setReconnectMode(ClientConnectionStrategyConfig.ReconnectMode.ASYNC)
+          .setReconnectMode(getFallback(toMap(props)) ? ASYNC : ON)
           .getConnectionRetryConfig()
-          .setInitialBackoffMillis((int) CacheEnvironment.getInitialBackoff(props).toMillis())
-          .setMaxBackoffMillis((int) CacheEnvironment.getMaxBackoff(props).toMillis())
-          .setMultiplier(CacheEnvironment.getBackoffMultiplier(props))
-          .setClusterConnectTimeoutMillis(CacheEnvironment.getClusterTimeout(props).toMillis());
+          .setInitialBackoffMillis((int) getInitialBackoff(props).toMillis())
+          .setMaxBackoffMillis((int) getMaxBackoff(props).toMillis())
+          .setMultiplier(getBackoffMultiplier(props))
+          .setClusterConnectTimeoutMillis(getClusterTimeout(props).toMillis());
+    }
+
+    private Map<String, Object> toMap(Properties props) {
+        return props.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), Map.Entry::getValue));
     }
 
     @Override
