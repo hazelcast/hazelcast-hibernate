@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,6 +56,7 @@ public class LocalRegionCache implements RegionCache {
 
     protected final HazelcastInstance hazelcastInstance;
     protected final ITopic<Object> topic;
+    protected final UUID listenerRegistrationId;
     protected final MessageListener<Object> messageListener;
     protected final ConcurrentMap<Object, Expirable> cache;
     protected final Comparator versionComparator;
@@ -120,9 +122,10 @@ public class LocalRegionCache implements RegionCache {
         messageListener = createMessageListener();
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
-            topic.addMessageListener(messageListener);
+            listenerRegistrationId = topic.addMessageListener(messageListener);
         } else {
             topic = null;
+            listenerRegistrationId = null;
         }
 
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
@@ -292,6 +295,13 @@ public class LocalRegionCache implements RegionCache {
     public void clear() {
         cache.clear();
         maybeNotifyTopic(null, null, null);
+    }
+
+    @Override
+    public void destroy() {
+        if (topic != null && listenerRegistrationId != null) {
+            topic.removeMessageListener(listenerRegistrationId);
+        }
     }
 
     @Override

@@ -162,13 +162,13 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @SuppressWarnings("Duplicates")
     @Override
     protected void releaseFromUse() {
+        cleanupService.stop();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();
             instance = null;
             instanceLoader = null;
         }
-        cleanupService.stop();
     }
 
     private Properties toProperties(final Map configValues) {
