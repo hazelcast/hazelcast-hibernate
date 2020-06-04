@@ -16,37 +16,12 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
-import com.hazelcast.hibernate.entity.DummyEntity;
-import com.hazelcast.hibernate.entity.DummyProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cache.spi.access.AccessType;
 import org.junit.Test;
 
-import java.util.HashSet;
-
 public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport {
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testReplaceCollection() {
-        insertDummyEntities(2, 4);
-
-        Session session = sf.openSession();
-        Transaction transaction = session.beginTransaction();
-
-        DummyProperty property = new DummyProperty("somekey");
-        session.save(property);
-
-        DummyEntity entity = session.get(DummyEntity.class, 1L);
-        HashSet<DummyProperty> updatedProperties = new HashSet<DummyProperty>();
-        updatedProperties.add(property);
-        entity.setProperties(updatedProperties);
-
-        session.update(entity);
-
-        transaction.commit();
-        session.close();
-    }
 
     @Test
     public void testUpdateOneEntityByNaturalId() {
@@ -117,15 +92,6 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
 
         assertTopicNotifications(4, CACHE_ANNOTATED_ENTITY + "##NaturalId");
         assertTopicNotifications(4, getTimestampsRegionName());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateOneEntity() {
-        insertDummyEntities(10, 4);
-
-        getDummyEntities(10);
-
-        updateDummyEntityName(2, "updated");
     }
 
     @Override

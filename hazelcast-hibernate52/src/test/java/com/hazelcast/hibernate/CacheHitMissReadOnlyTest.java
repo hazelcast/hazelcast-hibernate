@@ -15,8 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.hibernate.access.ReadOnlyAccessDelegate;
-import com.hazelcast.hibernate.region.HazelcastRegion;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
@@ -30,8 +28,6 @@ import org.junit.runner.RunWith;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Read-only access cache concurrency strategy of Hibernate.
@@ -57,8 +53,10 @@ public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
     public void testGetUpdateRemoveGet() throws Exception {
         insertDummyEntities(10, 4);
         //all 10 entities and 40 properties are cached
-        SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
-        SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_PROPERTY);
+        SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics()
+          .getSecondLevelCacheStatistics(CACHE_ENTITY);
+        SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics()
+          .getSecondLevelCacheStatistics(CACHE_PROPERTY);
 
         sf.getCache().evictEntityRegions();
         sf.getCache().evictCollectionRegions();
@@ -71,34 +69,5 @@ public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
         assertEquals(0, dummyPropertyCacheStats.getMissCount());
         assertEquals(1, dummyEntityCacheStats.getHitCount());
         assertEquals(10, dummyEntityCacheStats.getMissCount());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateQueryCausesInvalidationOfEntireRegion() {
-        insertDummyEntities(10);
-        executeUpdateQuery("UPDATE DummyEntity set name = 'manually-updated' where id=2");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testReadOnlyUpdate() {
-        insertDummyEntities(1, 0);
-        updateDummyEntityName(0, "updated");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testAfterUpdateShouldThrowOnReadOnly() {
-        HazelcastRegion hzRegion = mock(HazelcastRegion.class);
-        when(hzRegion.getCache()).thenReturn(null);
-        when(hzRegion.getLogger()).thenReturn(null);
-        ReadOnlyAccessDelegate readOnlyAccessDelegate = new ReadOnlyAccessDelegate(hzRegion, null);
-        readOnlyAccessDelegate.afterUpdate(null, null, null, null, null);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateQueryCausesInvalidationOfEntireCollectionRegion() {
-        insertDummyEntities(1, 10);
-
-        //attempt to evict properties reference in DummyEntity because of custom SQL query on Collection region
-        executeUpdateQuery("update DummyProperty ent set ent.key='manually-updated'");
     }
 }

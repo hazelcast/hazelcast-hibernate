@@ -19,9 +19,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.cache.spi.UpdateTimestampsCache;
 import org.hibernate.cache.spi.access.AccessType;
 import org.junit.Test;
@@ -77,67 +74,6 @@ public class TopicReadOnlyTest extends TopicReadOnlyTestSupport {
         assertTopicNotifications(6, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(24, CACHE_PROPERTY);
         assertTopicNotifications(67, getTimestampsRegionName());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateEntities() {
-        insertDummyEntities(1, 10);
-
-        executeUpdateQuery("update DummyEntity set name = 'updated-name' where id < 2");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateEntitiesAndProperties() {
-        insertDummyEntities(1, 10);
-
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id < 2");
-            query.setCacheable(true);
-            query.executeUpdate();
-
-            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
-            query2.setCacheable(true);
-            query2.executeUpdate();
-
-            txn.commit();
-        } catch (RuntimeException e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateOneEntityAndProperties() {
-        insertDummyEntities(1, 10);
-
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id = 0");
-            query.setCacheable(true);
-            query.executeUpdate();
-
-            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
-            query2.setCacheable(true);
-            query2.executeUpdate();
-
-            txn.commit();
-        } catch (RuntimeException e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
     }
 
     protected AccessType getCacheStrategy() {

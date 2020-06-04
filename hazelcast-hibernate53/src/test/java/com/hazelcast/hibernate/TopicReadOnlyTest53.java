@@ -19,11 +19,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.cache.spi.RegionFactory;
-import org.hibernate.query.Query;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -84,75 +80,5 @@ public class TopicReadOnlyTest53 extends TopicReadOnlyTestSupport {
         assertTopicNotifications(3, CACHE_ENTITY_PROPERTIES);
         assertTopicNotifications(24, CACHE_PROPERTY);
         assertTopicNotifications(67, getTimestampsRegionName());
-    }
-
-    // This test should throw an UnsupportedOperationException, for attempting an update on a read-only cache,
-    // but in Hibernate 5.3 the exception is not thrown.
-    @Ignore
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateEntities() {
-        insertDummyEntities(1, 10);
-
-        executeUpdateQuery("update DummyEntity set name = 'updated-name' where id < 2");
-    }
-
-    // This test should throw an UnsupportedOperationException, for attempting an update on a read-only cache,
-    // but in Hibernate 5.3 the exception is not thrown.
-    @Ignore
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateEntitiesAndProperties() {
-        insertDummyEntities(1, 10);
-
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id < 2");
-            query.setCacheable(true);
-            query.executeUpdate();
-
-            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
-            query2.setCacheable(true);
-            query2.executeUpdate();
-
-            txn.commit();
-        } catch (RuntimeException e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-
-    // This test should throw an UnsupportedOperationException, for attempting an update on a read-only cache,
-    // but in Hibernate 5.3 the exception is not thrown.
-    @Ignore
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateOneEntityAndProperties() {
-        insertDummyEntities(1, 10);
-
-        Session session = null;
-        Transaction txn = null;
-        try {
-            session = sf.openSession();
-            txn = session.beginTransaction();
-            Query query = session.createQuery("update DummyEntity set name = 'updated-name' where id = 0");
-            query.setCacheable(true);
-            query.executeUpdate();
-
-            Query query2 = session.createQuery("update DummyProperty set version = version + 1");
-            query2.setCacheable(true);
-            query2.executeUpdate();
-
-            txn.commit();
-        } catch (RuntimeException e) {
-            txn.rollback();
-            e.printStackTrace();
-            throw e;
-        } finally {
-            session.close();
-        }
     }
 }

@@ -91,4 +91,16 @@ public class DummyEntity {
     public Set<DummyProperty> getProperties() {
         return properties;
     }
+
+    @Override
+    public String toString() {
+        return "DummyEntity{" +
+          "id=" + id +
+          ", version=" + version +
+          ", name='" + name + '\'' +
+          ", value=" + value +
+          ", date=" + date +
+          ", properties=" + properties +
+          '}';
+    }
 }

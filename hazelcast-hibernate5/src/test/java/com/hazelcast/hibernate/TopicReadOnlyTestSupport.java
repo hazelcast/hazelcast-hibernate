@@ -27,27 +27,6 @@ import java.util.HashSet;
 
 public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport {
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testReplaceCollection() {
-        insertDummyEntities(2, 4);
-
-        Session session = sf.openSession();
-        Transaction transaction = session.beginTransaction();
-
-        DummyProperty property = new DummyProperty("somekey");
-        session.save(property);
-
-        DummyEntity entity = session.get(DummyEntity.class, 1L);
-        HashSet<DummyProperty> updatedProperties = new HashSet<DummyProperty>();
-        updatedProperties.add(property);
-        entity.setProperties(updatedProperties);
-
-        session.update(entity);
-
-        transaction.commit();
-        session.close();
-    }
-
     @Test
     public void testUpdateOneEntityByNaturalId() {
         insertAnnotatedEntities(2);
@@ -117,15 +96,6 @@ public abstract class TopicReadOnlyTestSupport extends HibernateTopicTestSupport
 
         assertTopicNotifications(4, CACHE_ANNOTATED_ENTITY + "##NaturalId");
         assertTopicNotifications(4, getTimestampsRegionName());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUpdateOneEntity() {
-        insertDummyEntities(10, 4);
-
-        getDummyEntities(10);
-
-        updateDummyEntityName(2, "updated");
     }
 
     @Override

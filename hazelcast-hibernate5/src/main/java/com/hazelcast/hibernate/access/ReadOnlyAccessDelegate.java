@@ -37,14 +37,11 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
         return cache.insert(key, value, version);
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     @Override
     public boolean afterUpdate(final Object key, final Object value, final Object currentVersion,
                                final Object previousVersion, final SoftLock lock) throws CacheException {
-        throw new UnsupportedOperationException("Cannot update an item in a read-only cache: "
-                + getHazelcastRegion().getName());
+        log.warning("Cannot update an item in a read-only cache: " + getHazelcastRegion().getName());
+        return false;
     }
 
     /**
@@ -59,16 +56,16 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
 
     @Override
     public SoftLock lockItem(final Object key, final Object version) throws CacheException {
+        log.warning("Attempting to lock an item in a read-only cache region: " + getHazelcastRegion().getName());
+
         return null;
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     @Override
     public SoftLock lockRegion() throws CacheException {
-        throw new UnsupportedOperationException("Attempting to lock a read-only cache region: "
-                + getHazelcastRegion().getName());
+        log.warning("Attempting to lock a read-only cache region: " + getHazelcastRegion().getName());
+
+        return null;
     }
 
     @Override
@@ -95,16 +92,14 @@ public class ReadOnlyAccessDelegate<T extends HazelcastRegion> extends NonStrict
      */
     @Override
     public void unlockRegion(final SoftLock lock) throws CacheException {
-        log.warning("Attempting to unlock a read-only cache region");
+        log.warning("Attempting to unlock a read-only cache region: " + getHazelcastRegion().getName());
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     @Override
     public boolean update(final Object key, final Object value, final Object currentVersion,
                           final Object previousVersion) throws CacheException {
-        throw new UnsupportedOperationException("Attempting to update an item in a read-only cache: "
-                + getHazelcastRegion().getName());
+        log.warning("Attempting to update an item in a read-only cache: " + getHazelcastRegion().getName());
+
+        return false;
     }
 }
