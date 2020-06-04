@@ -22,6 +22,7 @@ import org.hibernate.internal.util.config.ConfigurationException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Properties;
 
 import static java.lang.String.format;
@@ -70,6 +71,11 @@ public final class CacheEnvironment {
     public static final String SHUTDOWN_ON_STOP = "hibernate.cache.hazelcast.shutdown_on_session_factory_close";
 
     /**
+     * Property to enable fallback on datasource if Hazelcast cluster is not available
+     */
+    public static final String FALLBACK = "hibernate.cache.hazelcast.fallback";
+
+    /**
      * Property to configure the IMDG cluster connection timeout
      */
     public static final String CLUSTER_TIMEOUT = "hibernate.cache.hazelcast.cluster_timeout";
@@ -98,11 +104,6 @@ public final class CacheEnvironment {
      * Property to configure the Hazelcast instance internal name
      */
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
-
-    /**
-     * Property to configure the Hazelcast operation timeout
-     */
-    public static final String HAZELCAST_OPERATION_TIMEOUT = "hazelcast.operation.call.timeout.millis";
 
     /**
      * Property to configure Hazelcast Shutdown Hook
@@ -200,5 +201,9 @@ public final class CacheEnvironment {
             throw new ConfigurationException("Invalid cluster timeout [" + timeoutMillis + "]");
         }
         return Duration.ofMillis(timeoutMillis);
+    }
+
+    public static boolean getFallback(final Map<String, Object> props) {
+        return ConfigurationHelper.getBoolean(CacheEnvironment.FALLBACK, props, true);
     }
 }

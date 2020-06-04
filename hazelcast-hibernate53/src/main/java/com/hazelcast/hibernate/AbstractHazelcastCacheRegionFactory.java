@@ -73,11 +73,11 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     public DomainDataRegion buildDomainDataRegion(final DomainDataRegionConfig regionConfig,
                                                   final DomainDataRegionBuildingContext buildingContext) {
         return new HazelcastDomainDataRegionImpl(
-                regionConfig,
-                this,
-                createDomainDataStorageAccess(regionConfig, buildingContext),
-                cacheKeysFactory,
-                buildingContext
+          regionConfig,
+          this,
+          createDomainDataStorageAccess(regionConfig, buildingContext),
+          cacheKeysFactory,
+          buildingContext
         );
     }
 
@@ -89,7 +89,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     protected DomainDataStorageAccess createDomainDataStorageAccess(final DomainDataRegionConfig regionConfig,
                                                                     final DomainDataRegionBuildingContext buildingContext) {
         return new HazelcastStorageAccessImpl(
-                createRegionCache(regionConfig.getRegionName(), buildingContext.getSessionFactory(), regionConfig)
+          createRegionCache(regionConfig.getRegionName(), buildingContext.getSessionFactory(), regionConfig),
+          CacheEnvironment.getFallback(buildingContext.getSessionFactory().getProperties())
         );
     }
 
@@ -100,7 +101,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         // queries
         final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false);
         cleanupService.registerCache(regionCache);
-        return new HazelcastStorageAccessImpl(regionCache);
+        return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
+          .getFallback(sessionFactory.getProperties()));
     }
 
     protected abstract RegionCache createRegionCache(final String unqualifiedRegionName,
@@ -111,8 +113,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     protected StorageAccess createTimestampsRegionStorageAccess(final String regionName,
                                                                 final SessionFactoryImplementor sessionFactory) {
         return new HazelcastStorageAccessImpl(
-                createTimestampsRegionCache(regionName, sessionFactory)
-        );
+          createTimestampsRegionCache(regionName, sessionFactory),
+          CacheEnvironment.getFallback(sessionFactory.getProperties()));
     }
 
     protected abstract RegionCache createTimestampsRegionCache(final String regionName,
@@ -146,7 +148,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             final ClassLoader cl = Thread.currentThread().getContextClassLoader();
             try {
                 final Class<IHazelcastInstanceFactory> factory =
-                        (Class<IHazelcastInstanceFactory>) Class.forName(factoryName, true, cl);
+                  (Class<IHazelcastInstanceFactory>) Class.forName(factoryName, true, cl);
                 instanceLoader = factory.newInstance().createInstanceLoader(toProperties(configValues));
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 throw new CacheException("Failed to set up hazelcast instance factory", e);

@@ -75,7 +75,7 @@ class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
             if (instance == null) {
                 throw new CacheException("No instance with name [" + existingInstanceName + "] could be found.");
             }
-        } else  {
+        } else {
             instance = Hazelcast.newHazelcastInstance(config);
         }
         return instance;
@@ -88,8 +88,8 @@ class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
         }
         if (!shutDown) {
             LOGGER.warning(CacheEnvironment.SHUTDOWN_ON_STOP + " property is set to 'false'. "
-                    + "Leaving current HazelcastInstance active! (Warning: Do not disable Hazelcast "
-                    + CacheEnvironment.HAZELCAST_SHUTDOWN_HOOK_ENABLED + " property!)");
+              + "Leaving current HazelcastInstance active! (Warning: Do not disable Hazelcast "
+              + CacheEnvironment.HAZELCAST_SHUTDOWN_HOOK_ENABLED + " property!)");
             return;
         }
         try {

@@ -20,12 +20,25 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.hibernate.CacheEnvironment;
 import org.hibernate.cache.CacheException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
+import static com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode.ASYNC;
+import static com.hazelcast.client.config.ClientConnectionStrategyConfig.ReconnectMode.ON;
+import static com.hazelcast.hibernate.CacheEnvironment.NATIVE_CLIENT_ADDRESS;
+import static com.hazelcast.hibernate.CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME;
+import static com.hazelcast.hibernate.CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME;
+import static com.hazelcast.hibernate.CacheEnvironment.getBackoffMultiplier;
+import static com.hazelcast.hibernate.CacheEnvironment.getClusterTimeout;
+import static com.hazelcast.hibernate.CacheEnvironment.getConfigFilePath;
+import static com.hazelcast.hibernate.CacheEnvironment.getFallback;
+import static com.hazelcast.hibernate.CacheEnvironment.getInitialBackoff;
+import static com.hazelcast.hibernate.CacheEnvironment.getMaxBackoff;
 
 /**
  * A factory implementation to build up a {@link HazelcastInstance}
@@ -39,14 +52,14 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     @Override
     public void configure(final Properties props) {
-        instanceName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_INSTANCE_NAME, props, null);
+        instanceName = ConfigurationHelper.getString(NATIVE_CLIENT_INSTANCE_NAME, props, null);
         if (instanceName != null) {
             return;
         }
 
-        String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
-        String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
-        String configResourcePath = CacheEnvironment.getConfigFilePath(props);
+        String address = ConfigurationHelper.getString(NATIVE_CLIENT_ADDRESS, props, null);
+        String clientClusterName = ConfigurationHelper.getString(NATIVE_CLIENT_CLUSTER_NAME, props, null);
+        String configResourcePath = getConfigFilePath(props);
 
         if (configResourcePath != null) {
             try {
@@ -64,19 +77,23 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
             clientConfig.getNetworkConfig().addAddress(address);
         }
 
-        clientConfig.getNetworkConfig().setSmartRouting(true);
-        clientConfig.getNetworkConfig().setRedoOperation(true);
+        clientConfig.getNetworkConfig()
+          .setSmartRouting(true)
+          .setRedoOperation(true);
 
         // By default, try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
         // at each step with max backoff of 35 seconds
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setInitialBackoffMillis((int) CacheEnvironment.getInitialBackoff(props).toMillis());
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setMaxBackoffMillis((int) CacheEnvironment.getMaxBackoff(props).toMillis());
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setMultiplier(CacheEnvironment.getBackoffMultiplier(props));
-        clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig()
-          .setClusterConnectTimeoutMillis(CacheEnvironment.getClusterTimeout(props).toMillis());
+        clientConfig.getConnectionStrategyConfig()
+          .setReconnectMode(getFallback(toMap(props)) ? ASYNC : ON)
+          .getConnectionRetryConfig()
+          .setInitialBackoffMillis((int) getInitialBackoff(props).toMillis())
+          .setMaxBackoffMillis((int) getMaxBackoff(props).toMillis())
+          .setMultiplier(getBackoffMultiplier(props))
+          .setClusterConnectTimeoutMillis(getClusterTimeout(props).toMillis());
+    }
+
+    private Map<String, Object> toMap(Properties props) {
+        return props.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), Map.Entry::getValue));
     }
 
     @Override
