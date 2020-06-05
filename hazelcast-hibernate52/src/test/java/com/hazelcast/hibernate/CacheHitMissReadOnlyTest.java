@@ -17,6 +17,8 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.hibernate.access.ReadOnlyAccessDelegate;
 import com.hazelcast.hibernate.region.HazelcastRegion;
+import com.hazelcast.logging.LoggerFactory;
+import com.hazelcast.logging.NoLogFactory;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
@@ -73,10 +75,19 @@ public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
         assertEquals(10, dummyEntityCacheStats.getMissCount());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testUpdateQueryCausesInvalidationOfEntireRegion() {
         insertDummyEntities(10);
-        executeUpdateQuery("UPDATE DummyEntity set name = 'manually-updated' where id=2");
+
+        executeUpdateQuery(sf, "UPDATE DummyEntity set name = 'manually-updated' where id=2");
+
+        sf.getStatistics().clear();
+
+        getDummyEntities(sf, 10);
+
+        SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
+        assertEquals(10, dummyEntityCacheStats.getMissCount());
+        assertEquals(0, dummyEntityCacheStats.getHitCount());
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -89,16 +100,24 @@ public class CacheHitMissReadOnlyTest extends HibernateStatisticsTestSupport {
     public void testAfterUpdateShouldThrowOnReadOnly() {
         HazelcastRegion hzRegion = mock(HazelcastRegion.class);
         when(hzRegion.getCache()).thenReturn(null);
-        when(hzRegion.getLogger()).thenReturn(null);
+        when(hzRegion.getLogger()).thenReturn(new NoLogFactory().getLogger(""));
         ReadOnlyAccessDelegate readOnlyAccessDelegate = new ReadOnlyAccessDelegate(hzRegion, null);
         readOnlyAccessDelegate.afterUpdate(null, null, null, null, null);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testUpdateQueryCausesInvalidationOfEntireCollectionRegion() {
         insertDummyEntities(1, 10);
 
-        //attempt to evict properties reference in DummyEntity because of custom SQL query on Collection region
-        executeUpdateQuery("update DummyProperty ent set ent.key='manually-updated'");
+        //properties reference in DummyEntity is evicted because of custom SQL query on Collection region
+        executeUpdateQuery(sf, "update DummyProperty ent set ent.key='manually-updated'");
+        sf.getStatistics().clear();
+
+        //property reference missed in cache.
+        getPropertiesOfEntity(0);
+
+        SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY + ".properties");
+        assertEquals(0, dummyPropertyCacheStats.getHitCount());
+        assertEquals(1, dummyPropertyCacheStats.getMissCount());
     }
 }
