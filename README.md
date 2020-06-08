@@ -10,6 +10,9 @@ You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or 
 - `hazelcast-hibernate52` supports Hibernate 5.2.x and Hazelcast 3.7+
 - `hazelcast-hibernate53` supports Hibernate 5.3.x/5.4.x and Hazelcast 3.7+
 
+## Examples
+- [Spring Boot Data JPA](https://github.com/hazelcast/hazelcast-code-samples/tree/master/hazelcast-integration/spring-hibernate-2ndlevel-cache) 
+
 ## Documentation
 
 # Table of Contents
