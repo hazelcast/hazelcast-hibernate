@@ -15,9 +15,6 @@
 
 package com.hazelcast.hibernate.serialization;
 
-import com.hazelcast.hibernate.distributed.LockEntryProcessor;
-import com.hazelcast.hibernate.distributed.UnlockEntryProcessor;
-import com.hazelcast.hibernate.distributed.UpdateEntryProcessor;
 import com.hazelcast.hibernate.local.Invalidation;
 import com.hazelcast.hibernate.local.Timestamp;
 import com.hazelcast.internal.serialization.DataSerializerHook;
@@ -44,18 +41,7 @@ public class HibernateDataSerializerHook implements DataSerializerHook {
      * @see ExpiryMarker
      */
     public static final int EXPIRY_MARKER = 1;
-    /**
-     * @see LockEntryProcessor
-     */
-    public static final int LOCK = 2;
-    /**
-     * @see UnlockEntryProcessor
-     */
-    public static final int UNLOCK = 3;
-    /**
-     * @see UpdateEntryProcessor
-     */
-    public static final int UPDATE = 4;
+
     /**
      * @see Invalidation
      */
@@ -85,15 +71,6 @@ public class HibernateDataSerializerHook implements DataSerializerHook {
                     break;
                 case EXPIRY_MARKER:
                     result = new ExpiryMarker();
-                    break;
-                case LOCK:
-                    result = new LockEntryProcessor();
-                    break;
-                case UNLOCK:
-                    result = new UnlockEntryProcessor();
-                    break;
-                case UPDATE:
-                    result = new UpdateEntryProcessor();
                     break;
                 case INVALIDATION:
                     result = new Invalidation();
