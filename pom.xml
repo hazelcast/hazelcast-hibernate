@@ -39,9 +39,6 @@
 
         <hazelcast.version>4.0.1</hazelcast.version>
 
-        <!-- Not using 3.1 at the moment since it recompiles all classes every time -->
-        <!-- https://jira.codehaus.org/browse/MCOMPILER-205 -->
-        <!--<maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>-->
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.2.0</maven.jar.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
@@ -99,7 +96,7 @@
     <scm>
         <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate5.git</connection>
         <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate5.git</developerConnection>
-        <url>https://github.com/hazelcast/hazelcast/</url>
+        <url>https://github.com/hazelcast/hazelcast-hibernate5/</url>
     </scm>
     <developers>
         <developer>
@@ -246,7 +243,6 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
@@ -303,13 +299,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>${javassist.version}</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.core.version}</version>
@@ -320,23 +309,6 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- These dependencies are just workaround to prevent master build failures at jenkins:
-             CustomPropertiesTest.testNamedInstance_noInstance()
-             CustomPropertiesTest.testNamedClient_noInstance()
-        -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>15.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.12</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <profiles>
@@ -464,12 +436,8 @@
                             <doclint>none</doclint>
                             <javaApiLinks>
                                 <property>
-                                    <name>api_1.6</name>
-                                    <value>http://download.oracle.com/javase/1.6.0/docs/api/</value>
-                                </property>
-                                <property>
-                                    <name>api_1.7</name>
-                                    <value>http://download.oracle.com/javase/1.7.0/docs/api/</value>
+                                    <name>api_1.8</name>
+                                    <value>http://download.oracle.com/javase/1.8.0/docs/api/</value>
                                 </property>
                             </javaApiLinks>
                             <maxmemory>1024</maxmemory>
@@ -513,12 +481,8 @@
                             <doclint>none</doclint>
                             <javaApiLinks>
                                 <property>
-                                    <name>api_1.6</name>
-                                    <value>http://download.oracle.com/javase/1.6.0/docs/api/</value>
-                                </property>
-                                <property>
-                                    <name>api_1.7</name>
-                                    <value>http://download.oracle.com/javase/1.7.0/docs/api/</value>
+                                    <name>api_1.8</name>
+                                    <value>http://download.oracle.com/javase/1.8.0/docs/api/</value>
                                 </property>
                             </javaApiLinks>
                             <excludePackageNames>
@@ -546,24 +510,6 @@
             <properties>
                 <hazelcast.version>4.1-SNAPSHOT</hazelcast.version>
             </properties>
-            <!-- These dependencies are just workaround to prevent master build failures at jenkins:
-                    CustomPropertiesTest.testNamedInstance_noInstance()
-                    CustomPropertiesTest.testNamedClient_noInstance()
-            -->
-            <dependencies>
-                <dependency>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                    <version>15.0</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.reflections</groupId>
-                    <artifactId>reflections</artifactId>
-                    <version>0.9.12</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
