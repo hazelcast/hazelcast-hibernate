@@ -1,6 +1,6 @@
 # Hibernate Second Level Cache
 
-<a href="https://github.com/actions/toolkit"><img alt="GitHub Actions status" src="https://github.com/hazelcast/hazelcast-hibernate5/workflows/build/badge.svg"></a>
+<a href="https://github.com/hazelcast/hazelcast-hibernate5/actions?query=event%3Apush+branch%3Amaster"><img alt="GitHub Actions status" src="https://github.com/hazelcast/hazelcast-hibernate5/workflows/build/badge.svg"></a>
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.hazelcast/hazelcast-hibernate5/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.hazelcast/hazelcast-hibernate53) 
 
 Hazelcast provides a distributed second-level cache for your Hibernate entities, collections, and queries.
