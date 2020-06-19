@@ -1,6 +1,3 @@
-### Those modules are not actively developed anymore, please refer to http://github.com/hazelcast/hazelcast-hibernate5 for Hibernate5-compatible integrations.
-
-----
 
 # Table of Contents
 
