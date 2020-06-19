@@ -1,7 +1,7 @@
 name-template: $NEXT_PATCH_VERSION
 tag-template: $NEXT_PATCH_VERSION
 template: |
-  This document includes the new features, enhancements, and fixed issues for Hazelcast Spring Data release.
+  This document includes the new features, enhancements, and fixed issues for Hazelcast Hibernate release.
 
   ## New Features
   None.
