@@ -26,35 +26,8 @@
 
     <properties>
         <hibernate.core.version>5.2.5.Final</hibernate.core.version>
-        <jdk.version>1.8</jdk.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
-                <configuration combine.self="override">
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <runOrder>failedfirst</runOrder>
-                    <argLine>
-                        -Xms128m -Xmx1G -XX:MaxPermSize=128M
-                        -Dhazelcast.phone.home.enabled=false
-                        -Dhazelcast.mancenter.enabled=false
-                        -Dhazelcast.logging.type=none
-                        -Dhazelcast.test.use.network=false
-                    </argLine>
-                    <excludes>
-                        <exclude>**/HibernateSerializationHookAvailableTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
