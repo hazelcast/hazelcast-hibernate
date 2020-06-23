@@ -38,8 +38,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.hazelcast.hibernate.CacheEnvironment.HAZELCAST_FACTORY;
 import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanup;
+import static java.lang.Class.forName;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
@@ -133,30 +133,30 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         return super.isStarted() && instance.getLifecycleService().isRunning();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void prepareForUse(final SessionFactoryOptions settings, final Map configValues) {
         log.info("Starting up " + getClass().getSimpleName());
         if (instance == null || !instance.getLifecycleService().isRunning()) {
-            final String defaultFactory = DefaultHazelcastInstanceFactory.class.getName();
-
-            String factoryName = (String) configValues.get(HAZELCAST_FACTORY);
-            if (factoryName == null) {
-                factoryName = defaultFactory;
-            }
-
-            final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            try {
-                final Class<IHazelcastInstanceFactory> factory =
-                  (Class<IHazelcastInstanceFactory>) Class.forName(factoryName, true, cl);
-                instanceLoader = factory.newInstance().createInstanceLoader(toProperties(configValues));
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                throw new CacheException("Failed to set up hazelcast instance factory", e);
-            }
+            instanceLoader = resolveInstanceLoader(toProperties(configValues));
             instance = instanceLoader.loadInstance();
         }
 
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
+    }
+
+    private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {
+        String factoryName = properties.getProperty(CacheEnvironment.HAZELCAST_FACTORY);
+        if (factoryName != null) {
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            try {
+                Class<IHazelcastInstanceFactory> factory = (Class<IHazelcastInstanceFactory>) forName(factoryName, true, cl);
+                return factory.newInstance().createInstanceLoader(properties);
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                throw new CacheException("Failed to set up hazelcast instance factory", e);
+            }
+        } else {
+            return new DefaultHazelcastInstanceFactory().createInstanceLoader(properties);
+        }
     }
 
     @SuppressWarnings("Duplicates")
