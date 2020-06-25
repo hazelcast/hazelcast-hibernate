@@ -43,9 +43,14 @@ public interface RegionCache extends Region, ExtendedStatisticsSupport {
 
     Object get(final Object key, final long txTimestamp);
 
+    /**
+     * Hazelcast does not support pushing elements to disk.
+     *
+     * @return -1 this value means "unsupported"
+     */
     @Override
     default long getElementCountOnDisk() {
-        return 0;
+        return -1;
     }
 
     default long nextTimestamp() {
