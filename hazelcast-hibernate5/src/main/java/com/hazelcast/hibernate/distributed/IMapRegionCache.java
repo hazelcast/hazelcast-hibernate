@@ -15,16 +15,16 @@
 
 package com.hazelcast.hibernate.distributed;
 
-import com.hazelcast.core.EntryView;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.IMap;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.hibernate.HazelcastTimestamper;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
-import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.ExpiryMarker;
+import com.hazelcast.hibernate.serialization.MarkerWrapper;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.map.IMap;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.access.SoftLock;
 
@@ -59,6 +59,7 @@ public class IMapRegionCache implements RegionCache {
     private final int lockTimeout;
     private final long tryLockAndGetTimeout;
     private final AtomicLong markerIdCounter;
+    private final boolean isMember;
 
     public IMapRegionCache(final String name, final HazelcastInstance hazelcastInstance,
                            final Properties props, final CacheDataDescription metadata) {
@@ -66,6 +67,7 @@ public class IMapRegionCache implements RegionCache {
         this.hazelcastInstance = hazelcastInstance;
         this.versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
         this.map = hazelcastInstance.getMap(this.name);
+        this.isMember = isMemberInstance(hazelcastInstance);
         lockTimeout = CacheEnvironment.getLockTimeoutInMillis(props);
         final long maxOperationTimeout = HazelcastTimestamper.getMaxOperationTimeout(hazelcastInstance);
         tryLockAndGetTimeout = Math.min(maxOperationTimeout, COMPARISON_VALUE);
@@ -156,16 +158,14 @@ public class IMapRegionCache implements RegionCache {
         return map.size();
     }
 
+    /**
+     * Returns the total in-memory cost in bytes (including IMap, Near Cache, backup, Merkle trees)
+     * for a particular application instance
+     * or -1 if using Hazelcast Client
+     */
     @Override
     public long getSizeInMemory() {
-        long size = 0;
-        for (final Object key : map.keySet()) {
-            final EntryView entry = map.getEntryView(key);
-            if (entry != null) {
-                size += entry.getCost();
-            }
-        }
-        return size;
+        return isMember ? map.getLocalMapStats().getHeapCost() : -1;
     }
 
     @Override
@@ -177,4 +177,7 @@ public class IMapRegionCache implements RegionCache {
         return hazelcastInstance.getLocalEndpoint().getUuid().toString() + markerIdCounter.getAndIncrement();
     }
 
+    private static boolean isMemberInstance(HazelcastInstance instance) {
+        return instance.getLocalEndpoint() instanceof Member;
+    }
 }

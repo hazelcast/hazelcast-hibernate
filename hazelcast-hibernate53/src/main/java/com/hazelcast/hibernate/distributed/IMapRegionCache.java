@@ -15,12 +15,12 @@
 
 package com.hazelcast.hibernate.distributed;
 
-import com.hazelcast.core.EntryView;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.IMap;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
+import com.hazelcast.map.IMap;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cache.spi.access.SoftLock;
 
@@ -42,12 +42,15 @@ public class IMapRegionCache implements RegionCache {
     private final IMap<Object, Expirable> map;
     private final String name;
     private final RegionFactory regionFactory;
+    private final boolean isMember;
 
-    public IMapRegionCache(final RegionFactory regionFactory, final String name,
-                           final HazelcastInstance hazelcastInstance) {
+    public IMapRegionCache(
+      RegionFactory regionFactory,
+      String name,
+      HazelcastInstance hazelcastInstance) {
         this.name = name;
         this.regionFactory = regionFactory;
-
+        this.isMember = isMemberInstance(hazelcastInstance);
         this.map = hazelcastInstance.getMap(this.name);
     }
 
@@ -77,9 +80,13 @@ public class IMapRegionCache implements RegionCache {
         return entry == null ? null : entry.getValue(txTimestamp);
     }
 
+    /**
+     * Returns the number of in-memory entries (without backups) for a particular application instance
+     * or -1 if using Hazelcast Client
+     */
     @Override
     public long getElementCountInMemory() {
-        return map.size();
+        return isMember ? map.getLocalMapStats().getOwnedEntryCount() : -1;
     }
 
     @Override
@@ -92,16 +99,14 @@ public class IMapRegionCache implements RegionCache {
         return regionFactory;
     }
 
+    /**
+     * Returns the total in-memory cost in bytes (including IMap, Near Cache, backup, Merkle trees)
+     * for a particular application instance
+     * or -1 if using Hazelcast Client
+     */
     @Override
     public long getSizeInMemory() {
-        long size = 0;
-        for (final Object key : map.keySet()) {
-            final EntryView entry = map.getEntryView(key);
-            if (entry != null) {
-                size += entry.getCost();
-            }
-        }
-        return size;
+        return isMember ? map.getLocalMapStats().getHeapCost() : -1;
     }
 
     @Override
@@ -114,5 +119,9 @@ public class IMapRegionCache implements RegionCache {
     @Override
     public void unlockItem(final Object key, final SoftLock lock) {
         // no-op
+    }
+
+    private static boolean isMemberInstance(HazelcastInstance instance) {
+        return instance.getLocalEndpoint() instanceof Member;
     }
 }
