@@ -160,6 +160,7 @@ public class IMapRegionCache implements RegionCache {
 
     /**
      * Returns the total in-memory cost in bytes (including IMap, Near Cache, backup, Merkle trees)
+     * for a particular application instance
      * or -1 if using Hazelcast Client
      */
     @Override
