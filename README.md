@@ -141,7 +141,7 @@ Eviction support is limited to the maximum size of the map (defined by `max-size
 
 #### Other Properties
 - _cleanup_delay_ - the duration of physical local cache cleanups
-- _cluster_timeout_ - after how many milliseconds the client should stop retrying to establish a cluster connection
+- _cluster_timeout_ - the number of milliseconds the client should retry to establish a cluster connection
 - _initial_backoff_ - initial backoff value after failed connection attempt in milliseconds
 - _backoff_multiplier_ - a multiplier used to derive a new backoff value if the connection fails after the previous attempt
 - _max_backoff_ - maximum possible backoff value
