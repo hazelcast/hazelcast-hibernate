@@ -25,7 +25,6 @@ import java.time.Duration;
 import java.util.Properties;
 
 import static java.lang.String.format;
-import static org.hibernate.internal.util.config.ConfigurationHelper.getString;
 
 /**
  * This class is used to help in setup the internal caches. It searches for configuration files
@@ -189,7 +188,7 @@ public final class CacheEnvironment {
     public static Duration getInitialBackoff(Properties props) {
         int initialBackOff = ConfigurationHelper.getInt(INITIAL_BACKOFF_MS, props, (int) DEFAULT_INITIAL_BACKOFF.toMillis());
         if (initialBackOff <= 0) {
-            throw new ConfigurationException("Invalid cluster timeout [" + initialBackOff + "]");
+            throw new ConfigurationException("Invalid initial backoff [" + initialBackOff + "]");
         }
         return Duration.ofMillis(initialBackOff);
     }
@@ -197,17 +196,16 @@ public final class CacheEnvironment {
     public static Duration getMaxBackoff(Properties props) {
         int maxBackoff = ConfigurationHelper.getInt(MAX_BACKOFF_MS, props, (int) DEFAULT_MAX_BACKOFF.toMillis());
         if (maxBackoff <= 0) {
-            throw new ConfigurationException("Invalid cluster timeout [" + maxBackoff + "]");
+            throw new ConfigurationException("Invalid max backoff [" + maxBackoff + "]");
         }
         return Duration.ofMillis(maxBackoff);
     }
 
     public static double getBackoffMultiplier(Properties props) {
-        double backoffMultiplier = Double.parseDouble(
-          getString(BACKOFF_MULTIPLIER, props, String.valueOf(DEFAULT_BACKOFF_MULTIPLIER)));
-
+        double backoffMultiplier = Double.parseDouble(ConfigurationHelper.getString(BACKOFF_MULTIPLIER, props,
+          String.valueOf(DEFAULT_BACKOFF_MULTIPLIER)));
         if (backoffMultiplier <= 0) {
-            throw new ConfigurationException("Invalid cluster timeout [" + backoffMultiplier + "]");
+            throw new ConfigurationException("Invalid backoff multiplier [" + backoffMultiplier + "]");
         }
         return backoffMultiplier;
     }
