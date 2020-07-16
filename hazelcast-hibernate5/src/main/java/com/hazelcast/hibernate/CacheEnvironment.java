@@ -44,7 +44,7 @@ public final class CacheEnvironment {
     public static final String CONFIG_FILE_PATH = "hibernate.cache.hazelcast.configuration_file_path";
 
     /**
-     * Property to configure weather a Hazelcast client or node will be used for connection to the cluster
+     * Property to configure whether a Hazelcast client or node will be used for connection to the cluster
      */
     public static final String USE_NATIVE_CLIENT = "hibernate.cache.hazelcast.use_native_client";
 
