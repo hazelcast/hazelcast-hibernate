@@ -25,7 +25,6 @@ import java.time.Duration;
 import java.util.Properties;
 
 import static java.lang.String.format;
-import static org.hibernate.internal.util.config.ConfigurationHelper.getString;
 
 /**
  * This class is used to help in setup the internal caches. It searches for configuration files
