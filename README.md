@@ -16,8 +16,6 @@ The newest version of:
 
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
 
-
-
 ## Examples
 - [Spring Boot Data JPA](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-springboot/index.html)
 - [Hibernate with JCache](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-jcache-l2c/index.html) 
@@ -34,12 +32,12 @@ The newest version of:
       * [HazelcastCacheRegionFactory](#hazelcastcacheregionfactory)
       * [HazelcastLocalCacheRegionFactory](#hazelcastlocalcacheregionfactory)
     * [Configuring Query Cache and Other Settings](#configuring-query-cache-and-other-settings)
+    * [Spring Boot Configuration](#spring-boot-configuration)
   * [Configuring Hazelcast for Hibernate](#configuring-hazelcast-for-hibernate)
   * [Setting P2P for Hibernate](#setting-p2p-for-hibernate)
   * [Setting Client/Server for Hibernate](#setting-client-server-for-hibernate)
   * [Configuring Cache Concurrency Strategy](#configuring-cache-concurrency-strategy)
   * [Advanced Settings](#advanced-settings)
-
 
 ## Configuring Hibernate for Hazelcast
 
@@ -148,7 +146,7 @@ Eviction support is limited to the maximum size of the map (defined by `max-size
 - _max_backoff_ - maximum possible backoff value
 - _fallback_ - if Hibernate should fall back onto the original datasource when Hazelcast cluster is not accessible
 
-## Spring Boot Configuration
+### Spring Boot Configuration
 
 In order to configure Hibernate using Spring Boot, you can provide all config entries via `application.properties` file by prefixing them with `spring.jpa.properties`.
 
@@ -172,7 +170,6 @@ You can define a custom-named Hazelcast configuration XML file with one of these
   hazelcast-custom-config.xml
 </property>
 ```
-
 
 ```xml
 <property name="hibernate.cache.hazelcast.configuration_file_path">
