@@ -104,7 +104,7 @@ If your operations consist mostly of reads, then this option gives better perfor
 
 ***NOTE:*** *If you use `HazelcastLocalCacheRegionFactory`, you cannot see your maps on [Management Center](https://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
 
-With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally in the Hazelcast member:
+With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally:
 
 - Entity Cache
 - Collection Cache
