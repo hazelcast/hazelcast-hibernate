@@ -148,6 +148,19 @@ Eviction support is limited to the maximum size of the map (defined by `max-size
 - _max_backoff_ - maximum possible backoff value
 - _fallback_ - if Hibernate should fall back onto the original datasource when Hazelcast cluster is not accessible
 
+## Spring Boot Configuration
+
+In order to configure Hibernate using Spring Boot, you can provide all config entries via `application.properties` file by prefixing them with `spring.jpa.properties`.
+
+For example:
+
+```
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=com.hazelcast.hibernate.HazelcastCacheRegionFactory
+spring.jpa.properties.hibernate.cache.hazelcast.use_native_client=true
+spring.jpa.properties.hibernate.show_sql=true
+```
+
 ## Configuring Hazelcast for Hibernate
 
 To configure Hazelcast for Hibernate, put the configuration file named `hazelcast.xml` into the root of your classpath. If Hazelcast cannot find `hazelcast.xml`, then it will use the default configuration.
