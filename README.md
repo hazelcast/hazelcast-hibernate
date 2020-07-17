@@ -32,6 +32,7 @@ The newest version of:
       * [HazelcastCacheRegionFactory](#hazelcastcacheregionfactory)
       * [HazelcastLocalCacheRegionFactory](#hazelcastlocalcacheregionfactory)
     * [Configuring Query Cache and Other Settings](#configuring-query-cache-and-other-settings)
+    * [Asynchronous Reconnect](#async-reconnect)
     * [Spring Boot Configuration](#spring-boot-configuration)
   * [Configuring Hazelcast for Hibernate](#configuring-hazelcast-for-hibernate)
   * [Setting P2P for Hibernate](#setting-p2p-for-hibernate)
@@ -145,6 +146,15 @@ Eviction support is limited to the maximum size of the map (defined by `max-size
 - _backoff_multiplier_ - a multiplier used to derive a new backoff value if the connection fails after the previous attempt
 - _max_backoff_ - maximum possible backoff value
 - _fallback_ - if Hibernate should fall back onto the original datasource when Hazelcast cluster is not accessible
+
+### Asynchronous Reconnect with Fallback
+
+Whenever a connection between a client and a server is lost, the second-level cache is bypassed. 
+
+At the same time, the client tries to reconnect asynchronously to a cluster which can be configured using parameters mentioned above.
+
+If you want to switch back to blocking client operations, you can achieve this by setting the _fallback_ configuration property to _false. 
+
 
 ### Spring Boot Configuration
 
