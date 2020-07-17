@@ -8,7 +8,7 @@ template: |
   ## Contributors
   $CONTRIBUTORS
 
-  Special thanks to all external contributors! 👏
+  Special thanks to all contributors! 👏
   
 categories:
   - title: Features & Enhancements
@@ -22,5 +22,8 @@ categories:
       - 'bug'
   - title: Dependencies
     label: dependencies
-  - title: Other
-    label: other
+  - title: Documentation
+    label: documentation
+    
+exclude-labels:
+  - 'internal'
