@@ -19,7 +19,8 @@ The newest version of:
 
 
 ## Examples
-- [Spring Boot Data JPA](https://github.com/hazelcast/hazelcast-code-samples/tree/master/hazelcast-integration/spring-hibernate-2ndlevel-cache) 
+- [Spring Boot Data JPA](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-springboot/index.html)
+- [Hibernate with JCache](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-jcache-l2c/index.html) 
 
 ## Documentation
 
