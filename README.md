@@ -16,10 +16,9 @@ The newest version of:
 
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
 
-
-
 ## Examples
-- [Spring Boot Data JPA](https://github.com/hazelcast/hazelcast-code-samples/tree/master/hazelcast-integration/spring-hibernate-2ndlevel-cache) 
+- [Spring Boot Data JPA](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-springboot/index.html)
+- [Hibernate with JCache](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-jcache-l2c/index.html) 
 
 ## Documentation
 
@@ -33,12 +32,13 @@ The newest version of:
       * [HazelcastCacheRegionFactory](#hazelcastcacheregionfactory)
       * [HazelcastLocalCacheRegionFactory](#hazelcastlocalcacheregionfactory)
     * [Configuring Query Cache and Other Settings](#configuring-query-cache-and-other-settings)
+    * [Asynchronous Reconnect](#async-reconnect)
+    * [Spring Boot Configuration](#spring-boot-configuration)
   * [Configuring Hazelcast for Hibernate](#configuring-hazelcast-for-hibernate)
   * [Setting P2P for Hibernate](#setting-p2p-for-hibernate)
   * [Setting Client/Server for Hibernate](#setting-client-server-for-hibernate)
   * [Configuring Cache Concurrency Strategy](#configuring-cache-concurrency-strategy)
   * [Advanced Settings](#advanced-settings)
-
 
 ## Configuring Hibernate for Hazelcast
 
@@ -105,7 +105,7 @@ If your operations consist mostly of reads, then this option gives better perfor
 
 ***NOTE:*** *If you use `HazelcastLocalCacheRegionFactory`, you cannot see your maps on [Management Center](https://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
 
-With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally in the Hazelcast member:
+With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally:
 
 - Entity Cache
 - Collection Cache
@@ -147,6 +147,28 @@ Eviction support is limited to the maximum size of the map (defined by `max-size
 - _max_backoff_ - maximum possible backoff value
 - _fallback_ - if Hibernate should fall back onto the original datasource when Hazelcast cluster is not accessible
 
+### Asynchronous Reconnect with Fallback
+
+Whenever a connection between a client and a server is lost, the second-level cache is bypassed. 
+
+At the same time, the client tries to reconnect asynchronously to a cluster which can be configured using parameters mentioned above.
+
+If you want to switch back to blocking client operations, you can achieve this by setting the _fallback_ configuration property to _false. 
+
+
+### Spring Boot Configuration
+
+In order to configure Hibernate using Spring Boot, you can provide all config entries via `application.properties` file by prefixing them with `spring.jpa.properties`.
+
+For example:
+
+```
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=com.hazelcast.hibernate.HazelcastCacheRegionFactory
+spring.jpa.properties.hibernate.cache.hazelcast.use_native_client=true
+spring.jpa.properties.hibernate.show_sql=true
+```
+
 ## Configuring Hazelcast for Hibernate
 
 To configure Hazelcast for Hibernate, put the configuration file named `hazelcast.xml` into the root of your classpath. If Hazelcast cannot find `hazelcast.xml`, then it will use the default configuration.
@@ -158,7 +180,6 @@ You can define a custom-named Hazelcast configuration XML file with one of these
   hazelcast-custom-config.xml
 </property>
 ```
-
 
 ```xml
 <property name="hibernate.cache.hazelcast.configuration_file_path">
