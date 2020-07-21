@@ -133,6 +133,10 @@ In order to configure the TTL and maximum size, you need to place the below in y
 </map>
 ```
 
+When no configuration provided, the values default to:
+- 1 hour for _time-to-live_
+- 100000 for _eviction size_
+
 ### Configuring Query Cache and Other Settings
 
 - To enable use of query cache:
