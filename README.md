@@ -72,9 +72,9 @@ You can configure Hibernate RegionFactory with `HazelcastCacheRegionFactory` or 
 ```
 
 All operations like `get`, `put`, and `remove` will be performed on a distributed map. The only downside of using `HazelcastCacheRegionFactory` may be lower performance compared to `HazelcastLocalCacheRegionFactory` since operations are handled as distributed calls.
-
+___
 ***NOTE:*** *If you use `HazelcastCacheRegionFactory`, you can see your maps on [Management Center](http://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
-
+___
 With `HazelcastCacheRegionFactory`, all below caches are distributed across Hazelcast Cluster:
 
 - Entity Cache
@@ -102,20 +102,37 @@ An illustration of the above logic is shown below:
 ![Invalidation with Local Cache Region Factory](images/HZLocalCacheRgnFactory.jpg)
 
 If your operations consist mostly of reads, then this option gives better performance.
-
+___
 ***NOTE:*** *If you use `HazelcastLocalCacheRegionFactory`, you cannot see your maps on [Management Center](https://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
-
+___
 With `HazelcastLocalCacheRegionFactory`, all of the following caches are not distributed and are kept locally:
 
 - Entity Cache
 - Collection Cache
 - Timestamp Cache
 
-_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. When needed, each member reads that data from the underlying datasource. 
+_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. 
+
+When needed, each member reads that data from the underlying datasource. 
 
 On every _Timestamp_ cache update, `hazelcast-hibernate` publishes an invalidation message to a topic (see #hazelcastlocalcacheregionfactory for details).
 
-Eviction support is limited to the maximum size of the map (defined by `max-size` configuration element) and TTL only. When maximum size is hit, 20% of the entries will be evicted automatically.
+#### Configuration
+
+Local region cache eviction can be configured using two parameters:
+ - _time-to-live_ - defining the lifespan of cache entries (defaults to 1 hour)
+ - -eviction-size_ - defining the maximum cache size (defaults to 100000)
+
+When maximum size is hit, 20% of the entries will be evicted automatically.
+
+Above can be configured in your Hazelcast configuration file:
+
+```xml
+<map name="your-cache-name">
+    <time-to-live-seconds>60</time-to-live-seconds>
+    <eviction size="150" />
+</map>
+```
 
 ### Configuring Query Cache and Other Settings
 
@@ -136,9 +153,9 @@ Eviction support is limited to the maximum size of the map (defined by `max-size
     ```xml
     <property name="hibernate.session_factory_name">yourFactoryName</property>
     ```
-    
+___
 ***NOTE:*** *QueryCache is always LOCAL to the member and never distributed across Hazelcast Cluster.*
-
+___
 #### Other Properties
 - _cleanup_delay_ - the duration of physical local cache cleanups
 - _cluster_timeout_ - the number of milliseconds the client should retry to establish a cluster connection
@@ -239,11 +256,11 @@ You can use an existing client instead of creating a new one by adding the follo
 ```xml
 <property name="hibernate.cache.hazelcast.native_client_instance_name">my-client</property>
 ```
-
+___
 ***NOTE***: *To configure a Hazelcast Native Client for Hibernate, put the configuration file named `hazelcast-client.xml` into the root of your classpath.*
-
+___
 ***NOTE***: *To be able to use native client mode, add `hazelcast-hibernate(5,52,53)` and `hibernate-core` to your remote cluster's classpath.*
-
+___
 ***NOTE***: *If your persisted classes only contain Java primitive type fields, you do not need to add your classes into your remote cluster's classpath. However, if your classes have non-primitive type fields, you need to add only these fields' classes (not your domain class) to your cluster's classpath.*
 
 ## Configuring Cache Concurrency Strategy
