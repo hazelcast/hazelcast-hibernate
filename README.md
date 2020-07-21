@@ -118,13 +118,15 @@ When needed, each member reads that data from the underlying datasource.
 
 On every _Timestamp_ cache update, `hazelcast-hibernate` publishes an invalidation message to a topic (see #hazelcastlocalcacheregionfactory for details).
 
-Eviction support is limited to the maximum size of the map (defined by `max-size` configuration element) and TTL only. 
+#### Configuration
+
+Local region cache eviction can be configured using two parameters:
+ - _time-to-live_ - defining the lifespan of cache entries (defaults to 1 hour)
+ - -eviction-size_ - defining the maximum cache size (defaults to 100000)
 
 When maximum size is hit, 20% of the entries will be evicted automatically.
 
-#### Example Configuration
-
-In order to configure the TTL and maximum size, you need to place the below in your Hazelcast configuration file:
+Above can be configured in your Hazelcast configuration file:
 
 ```xml
 <map name="your-cache-name">
@@ -132,10 +134,6 @@ In order to configure the TTL and maximum size, you need to place the below in y
     <eviction size="150" />
 </map>
 ```
-
-When no configuration provided, the values default to:
-- 1 hour for _time-to-live_
-- 100000 for _eviction size_
 
 ### Configuring Query Cache and Other Settings
 
