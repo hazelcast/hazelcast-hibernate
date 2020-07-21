@@ -73,8 +73,7 @@ You can configure Hibernate RegionFactory with `HazelcastCacheRegionFactory` or 
 
 All operations like `get`, `put`, and `remove` will be performed on a distributed map. The only downside of using `HazelcastCacheRegionFactory` may be lower performance compared to `HazelcastLocalCacheRegionFactory` since operations are handled as distributed calls.
 
-***NOTE:*** *If you use 
-`HazelcastCacheRegionFactory`, you can see your maps on [Management Center](http://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
+***NOTE:*** *If you use `HazelcastCacheRegionFactory`, you can see your maps on [Management Center](http://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
 
 With `HazelcastCacheRegionFactory`, all below caches are distributed across Hazelcast Cluster:
 
