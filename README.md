@@ -73,7 +73,8 @@ You can configure Hibernate RegionFactory with `HazelcastCacheRegionFactory` or 
 
 All operations like `get`, `put`, and `remove` will be performed on a distributed map. The only downside of using `HazelcastCacheRegionFactory` may be lower performance compared to `HazelcastLocalCacheRegionFactory` since operations are handled as distributed calls.
 
-***NOTE:*** *If you use `HazelcastCacheRegionFactory`, you can see your maps on [Management Center](http://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
+***NOTE:*** *If you use 
+`HazelcastCacheRegionFactory`, you can see your maps on [Management Center](http://docs.hazelcast.org/docs/management-center/latest/manual/html/index.html).*
 
 With `HazelcastCacheRegionFactory`, all below caches are distributed across Hazelcast Cluster:
 
@@ -111,11 +112,26 @@ With `HazelcastLocalCacheRegionFactory`, all of the following caches are not dis
 - Collection Cache
 - Timestamp Cache
 
-_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. When needed, each member reads that data from the underlying datasource. 
+_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. 
+
+When needed, each member reads that data from the underlying datasource. 
 
 On every _Timestamp_ cache update, `hazelcast-hibernate` publishes an invalidation message to a topic (see #hazelcastlocalcacheregionfactory for details).
 
-Eviction support is limited to the maximum size of the map (defined by `max-size` configuration element) and TTL only. When maximum size is hit, 20% of the entries will be evicted automatically.
+Eviction support is limited to the maximum size of the map (defined by `max-size` configuration element) and TTL only. 
+
+When maximum size is hit, 20% of the entries will be evicted automatically.
+
+#### Example Configuration
+
+In order to configure the TTL and maximum size, you need to place the below in your Hazelcast configuration file:
+
+```xml
+<map name="your-cache-name">
+    <time-to-live-seconds>60</time-to-live-seconds>
+    <eviction size="150" />
+</map>
+```
 
 ### Configuring Query Cache and Other Settings
 
@@ -186,6 +202,7 @@ You can define a custom-named Hazelcast configuration XML file with one of these
   hazelcast-custom-config.xml
 </property>
 ```
+
 
 If you're using Hazelcast client (`hibernate.cache.hazelcast.use_native_client=true`), you can specify a custom Hazelcast client configuration file by using the same parameters.
 
