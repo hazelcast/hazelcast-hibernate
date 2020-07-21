@@ -204,7 +204,6 @@ You can define a custom-named Hazelcast configuration XML file with one of these
 </property>
 ```
 
-
 If you're using Hazelcast client (`hibernate.cache.hazelcast.use_native_client=true`), you can specify a custom Hazelcast client configuration file by using the same parameters.
 
 Hazelcast creates a separate distributed map for each Hibernate cache region. You can easily configure these regions via Hazelcast map configuration. You can define **backup**, **eviction**, **TTL** and **Near Cache** properties.
