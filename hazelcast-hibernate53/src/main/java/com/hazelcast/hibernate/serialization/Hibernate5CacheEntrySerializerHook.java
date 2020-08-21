@@ -15,6 +15,7 @@
 
 package com.hazelcast.hibernate.serialization;
 
+import com.hazelcast.logging.Logger;
 import com.hazelcast.nio.serialization.Serializer;
 import com.hazelcast.nio.serialization.SerializerHook;
 
@@ -24,15 +25,26 @@ import com.hazelcast.nio.serialization.SerializerHook;
  */
 public class Hibernate5CacheEntrySerializerHook implements SerializerHook {
 
-    private final Class<?> cacheEntryClass = CacheEntryImpl.class;
+    private static final String SKIP_INIT_MSG = "Hibernate 5 not available, skipping serializer initialization";
 
-    @Override
-    public Serializer createSerializer() {
-        return new Hibernate53CacheEntrySerializer();
+    private final Class<?> cacheEntryClass = tryLoadCacheEntryImpl();
+
+    private static Class<?> tryLoadCacheEntryImpl() {
+        try {
+            return CacheEntryImpl.class;
+        } catch (Throwable e) {
+            Logger.getLogger(Hibernate5CacheEntrySerializerHook.class).finest(SKIP_INIT_MSG);
+            return null;
+        }
     }
 
     @Override
-    public Class getSerializationType() {
+    public Serializer createSerializer() {
+        return cacheEntryClass == null ? null : new Hibernate53CacheEntrySerializer();
+    }
+
+    @Override
+    public Class<?> getSerializationType() {
         return cacheEntryClass;
     }
 
