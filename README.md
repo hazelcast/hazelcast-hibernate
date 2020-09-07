@@ -17,8 +17,8 @@ The newest version of:
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
 
 ## Examples
-- [Spring Boot Data JPA](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-springboot/index.html)
-- [Hibernate with JCache](https://hazelcast-guides.github.io/guides-site/hazelcast-hibernate-jcache-l2c/index.html) 
+- [Spring Boot Data JPA](https://guides.hazelcast.org/springboot-hibernate/)
+- [Hibernate with JCache](https://guides.hazelcast.org/hibernate-jcache/) 
 
 ## Documentation
 
