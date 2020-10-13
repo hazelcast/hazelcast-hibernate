@@ -20,6 +20,7 @@ import com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.hibernate.local.CleanupService;
+import com.hazelcast.hibernate.phone.PhoneHomeService;
 import com.hazelcast.hibernate.region.HazelcastQueryResultsRegion;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -44,6 +45,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
     private final ILogger log = Logger.getLogger(getClass());
 
     private IHazelcastInstanceLoader instanceLoader;
+    private PhoneHomeService phoneHomeService = new PhoneHomeService();
 
 
     public AbstractHazelcastCacheRegionFactory() {
@@ -86,6 +88,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
             instance = instanceLoader.loadInstance();
         }
 
+        phoneHomeService.start();
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(properties));
     }
 
@@ -106,6 +109,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
 
     @Override
     public void stop() {
+        phoneHomeService.shutdown();
         cleanupService.stop();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
