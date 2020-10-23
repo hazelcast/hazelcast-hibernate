@@ -16,4 +16,4 @@
 /**
  * Provides services and utils for phone home calls.
  */
-package com.hazelcast.hibernate.phone;
+package com.hazelcast.hibernate.telemetry;

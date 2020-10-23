@@ -20,7 +20,7 @@ import com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.hibernate.local.CleanupService;
-import com.hazelcast.hibernate.phone.PhoneHomeService;
+import com.hazelcast.hibernate.telemetry.PhoneHomeService;
 import com.hazelcast.hibernate.region.HazelcastQueryResultsRegion;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;

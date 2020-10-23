@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.hazelcast.hibernate.phone;
+package com.hazelcast.hibernate.telemetry;
 
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;

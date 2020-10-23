@@ -13,10 +13,11 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.hazelcast.hibernate.phone;
+package com.hazelcast.hibernate.telemetry;
 
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
+import org.hibernate.Hibernate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +76,7 @@ final class PhoneHomeInfo {
         return new QueryStringBuilder()
                 .addParam("name", MODULE_NAME)
                 .addParam("version", version)
+                .addParam("hibernate-version", Hibernate.class.getPackage().getImplementationVersion())
                 .build();
     }
 
