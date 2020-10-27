@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '8' ]
+        java: [ '8', '11' ]
         architecture: [ 'x64' ]
         module: ['hazelcast-hibernate5', 'hazelcast-hibernate52', 'hazelcast-hibernate53']
     name: Build ${{ matrix.module }} with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
