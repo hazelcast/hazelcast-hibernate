@@ -101,9 +101,12 @@ public class LocalRegionCacheTest {
     @Test
     public void testFourArgConstructorDoesNotRegisterTopicListenerIfNotRequested() {
         MapConfig mapConfig = mock(MapConfig.class);
+        EvictionConfig evictionConfig = mock(EvictionConfig.class);
+        when(evictionConfig.getSize()).thenReturn(42);
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
 
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
@@ -130,8 +133,8 @@ public class LocalRegionCacheTest {
         new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false)
           .cleanup();
 
-        verify(maxSizeConfig).getSize();
-        verify(mapConfig).getTimeToLiveSeconds();
+        verify(maxSizeConfig, atLeastOnce()).getSize();
+        verify(mapConfig, atLeastOnce()).getTimeToLiveSeconds();
     }
 
     @Test
@@ -147,8 +150,8 @@ public class LocalRegionCacheTest {
         new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig)
           .cleanup();
 
-        verify(evictionConfig).getMaxSize();
-        verify(evictionConfig).getTimeToLive();
+        verify(evictionConfig, atLeastOnce()).getMaxSize();
+        verify(evictionConfig, atLeastOnce()).getTimeToLive();
         verifyZeroInteractions(mapConfig);
     }
 
@@ -157,6 +160,9 @@ public class LocalRegionCacheTest {
     @Test
     public void testThreeArgConstructorRegistersTopicListener() {
         MapConfig mapConfig = mock(MapConfig.class);
+        EvictionConfig evictionConfig = mock(EvictionConfig.class);
+        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
+        when(evictionConfig.getSize()).thenReturn(42);
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
