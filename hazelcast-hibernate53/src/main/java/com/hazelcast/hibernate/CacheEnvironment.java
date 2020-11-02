@@ -94,11 +94,6 @@ public final class CacheEnvironment {
     public static final String BACKOFF_MULTIPLIER = "hibernate.cache.hazelcast.backoff_multiplier";
 
     /**
-     * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
-     */
-    public static final String CLEANUP_DELAY = "hibernate.cache.hazelcast.cleanup_delay";
-
-    /**
      * Property to configure the Hazelcast instance internal name
      */
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
@@ -120,8 +115,6 @@ public final class CacheEnvironment {
     private static final Duration DEFAULT_MAX_BACKOFF = Duration.ofMillis(35000);
 
     private static final Duration DEFAULT_INITIAL_BACKOFF = Duration.ofMillis(2000);
-
-    private static final Duration DEFAULT_CACHE_CLEANUP_DELAY = Duration.ofMinutes(1);
 
     private static final double DEFAULT_BACKOFF_MULTIPLIER = 1.5;
 
