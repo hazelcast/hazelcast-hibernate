@@ -38,7 +38,6 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanup;
 import static java.lang.Class.forName;
 
 /**
@@ -101,7 +100,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         // queries
         final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false);
         cleanupService.registerCache(regionCache);
-        return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment.getFallback(sessionFactory.getProperties()));
+        return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
+          .getFallback(sessionFactory.getProperties()));
     }
 
     protected abstract RegionCache createRegionCache(final String unqualifiedRegionName,
@@ -140,7 +140,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instance = instanceLoader.loadInstance();
         }
 
-        cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
+        cleanupService = new CleanupService(instance.getName());
     }
 
     private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {

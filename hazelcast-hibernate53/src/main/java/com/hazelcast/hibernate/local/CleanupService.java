@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate.local;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +22,12 @@ import java.util.List;
  * An internal service to clean cache regions
  */
 public final class CleanupService {
-
+    private final String name;
     private final List<LocalRegionCache> localRegionCaches;
 
-    public CleanupService(final String name, final Duration fixedDelay) {
-        localRegionCaches = new ArrayList<>();
+    public CleanupService(final String name) {
+        this.name = name;
+        this.localRegionCaches = new ArrayList<>();
     }
 
     public void registerCache(final LocalRegionCache cache) {

@@ -63,8 +63,7 @@ public class LocalRegionCacheTest {
         EntityDataCachingConfig entityDataCachingConfig = mock(EntityDataCachingConfig.class);
         when(domainDataRegionConfig.getEntityCaching()).thenReturn(Collections.singletonList(entityDataCachingConfig));
         when(entityDataCachingConfig.isVersioned()).thenReturn(true);
-        Supplier x = () -> comparator;
-        when(entityDataCachingConfig.getVersionComparatorAccess()).thenReturn(x);
+        when(entityDataCachingConfig.getVersionComparatorAccess()).thenReturn((Supplier) () -> comparator);
 
         new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false);
         verify(entityDataCachingConfig).isVersioned();
@@ -130,8 +129,7 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false)
-          .cleanup();
+        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false);
 
         verify(maxSizeConfig, atLeastOnce()).getSize();
         verify(mapConfig, atLeastOnce()).getTimeToLiveSeconds();
@@ -147,8 +145,7 @@ public class LocalRegionCacheTest {
         LocalRegionCache.EvictionConfig evictionConfig = mock(LocalRegionCache.EvictionConfig.class);
         when(evictionConfig.getTimeToLive()).thenReturn(Duration.ofSeconds(1));
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig)
-          .cleanup();
+        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig);
 
         verify(evictionConfig, atLeastOnce()).getMaxSize();
         verify(evictionConfig, atLeastOnce()).getTimeToLive();
@@ -179,10 +176,5 @@ public class LocalRegionCacheTest {
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
         verify(topic).addMessageListener(isNotNull(MessageListener.class));
-    }
-
-    @SuppressWarnings("unused")
-    public static void runCleanup(LocalRegionCache cache) {
-        cache.cleanup();
     }
 }

@@ -106,8 +106,4 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             }
         }
     }
-
-    @Override
-    final void cleanup() {
-    }
 }

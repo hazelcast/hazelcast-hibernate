@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationException;
@@ -25,7 +24,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.lang.String.format;
 import static org.hibernate.internal.util.config.ConfigurationHelper.getString;
 
 /**
@@ -150,20 +148,6 @@ public final class CacheEnvironment {
     public static int getDefaultCacheTimeoutInMillis() {
         return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
     }
-
-    public static Duration getCacheCleanup(final Properties props) {
-        int delay = -1;
-        try {
-            delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, (int) (DEFAULT_CACHE_CLEANUP_DELAY.toMinutes() * 60));
-        } catch (Exception e) {
-            Logger.getLogger(CacheEnvironment.class).finest(e);
-        }
-        if (delay < 0) {
-            throw new ConfigurationException(format("[%d] is an illegal value for [%s]", delay, CLEANUP_DELAY));
-        }
-        return Duration.ofSeconds(delay);
-    }
-
 
     public static boolean shutdownOnStop(final Properties props, final boolean defaultValue) {
         return ConfigurationHelper.getBoolean(CacheEnvironment.SHUTDOWN_ON_STOP, props, defaultValue);
