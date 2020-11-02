@@ -43,7 +43,6 @@ public class PhoneHomeService {
     private static final String ENV_PHONE_HOME_ENABLED = "HZ_PHONE_HOME_ENABLED";
 
     private static final String BASE_PHONE_HOME_URL = "http://phonehome.hazelcast.com/pingIntegrations";
-    private static final String QUERY_STRING = PhoneHomeInfo.getQueryString();
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
@@ -51,7 +50,10 @@ public class PhoneHomeService {
     private final ScheduledExecutorService executor = newSingleThreadScheduledExecutor(r
             -> new Thread(r, "PhoneHomeService"));
 
-    public PhoneHomeService() {
+    private PhoneHomeInfo phoneHomeInfo;
+
+    public PhoneHomeService(PhoneHomeInfo phoneHomeInfo) {
+        this.phoneHomeInfo = phoneHomeInfo;
     }
 
     public void start() {
@@ -77,7 +79,7 @@ public class PhoneHomeService {
         // be updated before each call.
         InputStream in = null;
         try {
-            URL url = new URL(BASE_PHONE_HOME_URL + QUERY_STRING);
+            URL url = new URL(BASE_PHONE_HOME_URL + phoneHomeInfo.getQueryString());
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
             conn.setConnectTimeout((int) TIMEOUT.toMillis());

@@ -48,13 +48,13 @@ import static java.lang.Class.forName;
 public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryTemplate {
 
     protected CleanupService cleanupService;
+    protected PhoneHomeService phoneHomeService;
     protected HazelcastInstance instance;
 
     private final CacheKeysFactory cacheKeysFactory;
     private final ILogger log = Logger.getLogger(getClass());
 
     private IHazelcastInstanceLoader instanceLoader;
-    private PhoneHomeService phoneHomeService = new PhoneHomeService();
 
     @SuppressWarnings("unused")
     public AbstractHazelcastCacheRegionFactory() {
@@ -143,7 +143,6 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instance = instanceLoader.loadInstance();
         }
 
-        phoneHomeService.start();
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
     }
 

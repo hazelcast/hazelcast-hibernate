@@ -29,6 +29,7 @@ import java.util.Properties;
  * Creates query string according to plugin properties to be sent to phone home
  * server by {@link PhoneHomeService}.
  *
+ * TODO: Edit below properly.
  * Since no dynamic information is sent by phone home calls, the query string is
  * constructed statically here. In case of the addition of a new field to home
  * calls, this class needs to be changed such that it creates appropriate query
@@ -36,23 +37,20 @@ import java.util.Properties;
  *
  * @since 2.1.2
  */
-final class PhoneHomeInfo {
+public class PhoneHomeInfo {
 
     private static final String PROPERTIES_RESOURCE = "/phone.home.properties";
-    private static final String MODULE_NAME = "hazelcast-hibernate52";
 
-    private static String version;
-    private static String queryString;
+    private final String moduleName = "hazelcast-hibernate52";
+    private String version;
+    private String queryString;
 
-    static {
-        version = resolveVersion();
-        queryString = buildQueryString();
+    public PhoneHomeInfo(boolean isLocalRegion) {
+        this.version = resolveVersion();
+        this.queryString = buildQueryString(isLocalRegion);
     }
 
-    private PhoneHomeInfo() {
-    }
-
-    public static String getQueryString() {
+    public String getQueryString() {
         return queryString;
     }
 
@@ -69,14 +67,15 @@ final class PhoneHomeInfo {
         }
     }
 
-    private static String buildQueryString() {
+    private String buildQueryString(boolean isLocalRegion) {
         // Any change committed here must correspond to the phone
         // home server changes. Do not make standalone changes
         // especially for the parameter keys.
         return new QueryStringBuilder()
-                .addParam("name", MODULE_NAME)
+                .addParam("name", moduleName)
                 .addParam("version", version)
                 .addParam("hibernate-version", Hibernate.class.getPackage().getImplementationVersion())
+                .addParam("region", isLocalRegion ? "local" : "distributed")
                 .build();
     }
 
