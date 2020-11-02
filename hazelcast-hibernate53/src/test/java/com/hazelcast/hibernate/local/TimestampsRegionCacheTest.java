@@ -52,6 +52,7 @@ public class TimestampsRegionCacheTest {
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
 
         when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
+        when(mapConfig.getTimeToLiveSeconds()).thenReturn(5);
         when(evictionConfig.getSize()).thenReturn(42);
 
         // make the message appear that it is coming from a different member of the cluster
