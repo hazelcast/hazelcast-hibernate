@@ -21,6 +21,7 @@ import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.hibernate.local.CleanupService;
 import com.hazelcast.hibernate.local.LocalRegionCache;
+import com.hazelcast.hibernate.telemetry.PhoneHomeService;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import org.hibernate.boot.spi.SessionFactoryOptions;
@@ -53,6 +54,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     private final ILogger log = Logger.getLogger(getClass());
 
     private IHazelcastInstanceLoader instanceLoader;
+    private PhoneHomeService phoneHomeService = new PhoneHomeService();
 
     @SuppressWarnings("unused")
     public AbstractHazelcastCacheRegionFactory() {
@@ -141,6 +143,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instance = instanceLoader.loadInstance();
         }
 
+        phoneHomeService.start();
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
     }
 
@@ -162,6 +165,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @SuppressWarnings("Duplicates")
     @Override
     protected void releaseFromUse() {
+        phoneHomeService.shutdown();
         cleanupService.stop();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
