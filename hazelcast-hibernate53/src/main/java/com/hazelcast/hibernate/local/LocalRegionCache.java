@@ -15,6 +15,8 @@
 
 package com.hazelcast.hibernate.local;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
@@ -126,7 +128,8 @@ public class LocalRegionCache implements RegionCache {
         } catch (UnsupportedOperationException ignored) {
             EmptyStatement.ignore(ignored);
         }
-        cache = new ConcurrentHashMap<>();
+        Cache<Object, Expirable> build = Caffeine.newBuilder().build();
+        cache = build.asMap();
 
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
