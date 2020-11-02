@@ -101,8 +101,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         // queries
         final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false);
         cleanupService.registerCache(regionCache);
-        return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
-          .getFallback(sessionFactory.getProperties()));
+        return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment.getFallback(sessionFactory.getProperties()));
     }
 
     protected abstract RegionCache createRegionCache(final String unqualifiedRegionName,

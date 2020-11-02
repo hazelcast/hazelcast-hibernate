@@ -128,8 +128,6 @@ public class LocalRegionCache implements RegionCache {
         } catch (UnsupportedOperationException ignored) {
             EmptyStatement.ignore(ignored);
         }
-        Cache<Object, Expirable> build = Caffeine.newBuilder().build();
-        cache = build.asMap();
 
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
@@ -141,6 +139,11 @@ public class LocalRegionCache implements RegionCache {
 
         versionComparator = findVersionComparator(regionConfig);
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
+
+        cache = Caffeine.newBuilder()
+          .maximumSize(this.evictionConfig.getMaxSize())
+          .expireAfterWrite(this.evictionConfig.getTimeToLive())
+          .<Object, Expirable>build().asMap();
     }
 
     @Override

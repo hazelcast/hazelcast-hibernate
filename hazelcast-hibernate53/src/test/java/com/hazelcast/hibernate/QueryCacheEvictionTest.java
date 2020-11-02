@@ -36,7 +36,7 @@ import static org.awaitility.Awaitility.await;
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(HazelcastSerialParametersRunnerFactory.class)
 @Category(SlowTest.class)
-public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSupport {
+public class QueryCacheEvictionTest extends HibernateSlowTestSupport {
 
     @Parameterized.Parameter
     public String configFile;
@@ -71,7 +71,6 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
 
         // Use a specific hazelcast xml config file for these tests
         props.setProperty(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, configFile);
-        props.setProperty(CacheEnvironment.CLEANUP_DELAY, "4");
         props.setProperty(Environment.CACHE_REGION_FACTORY, regionFactory);
 
         return props;
@@ -80,10 +79,11 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
     @Test
     public void testQueryCacheCleanup() {
         MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("default-query-results-region");
-        final float baseEvictionRate = 0.2f;
         final int numberOfEntities = 100;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
-        final int evictedItemCount = Math.max(0, numberOfEntities - maxSize + (int) (maxSize * baseEvictionRate));
+        int initialEntries = Math.min(maxSize, numberOfEntities);
+
+
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {
             executeQuery(sf, i);
@@ -93,11 +93,11 @@ public class RegionFactoryQueryCacheEvictionSlowTest extends HibernateSlowTestSu
           .getDefaultQueryResultsCache().getRegion();
         RegionCache cache = ((HazelcastStorageAccessImpl) regionTemplate.getStorageAccess()).getDelegate();
 
-        await().atMost(5, TimeUnit.SECONDS)
-          .until(() -> numberOfEntities == cache.getElementCountInMemory());
+        await().atMost(1, TimeUnit.SECONDS)
+          .until(() -> initialEntries == cache.getElementCountInMemory());
 
         await()
-          .atMost(4 + 2, TimeUnit.SECONDS)
-          .until(() -> (numberOfEntities - cache.getElementCountInMemory()) == evictedItemCount);
+          .atMost(2, TimeUnit.SECONDS)
+          .until(() -> (numberOfEntities - cache.getElementCountInMemory()) == Math.max(0, numberOfEntities - maxSize));
     }
 }
