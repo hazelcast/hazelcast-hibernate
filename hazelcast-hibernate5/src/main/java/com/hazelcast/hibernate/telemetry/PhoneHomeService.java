@@ -55,12 +55,12 @@ public class PhoneHomeService {
     }
 
     public void start() {
-        if (started.compareAndSet(false, true) && isEnabled()) {
+        if (started.compareAndSet(false, true) && isPhoneHomeEnabled()) {
             executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
         }
     }
 
-    private boolean isEnabled() {
+    public static boolean isPhoneHomeEnabled() {
         String falseStr = FALSE.toString();
         if (falseStr.equalsIgnoreCase(getenv(ENV_PHONE_HOME_ENABLED))) {
             return false;

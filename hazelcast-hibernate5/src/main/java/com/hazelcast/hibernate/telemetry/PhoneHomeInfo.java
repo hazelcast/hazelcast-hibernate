@@ -56,7 +56,7 @@ final class PhoneHomeInfo {
         return queryString;
     }
 
-    private static String resolveVersion() {
+    public static String resolveVersion() {
         // To resolve the version described in the pom file, filtering for
         // phone.home.properties must be enabled in the resources section
         // of the pom.xml
