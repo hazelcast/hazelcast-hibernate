@@ -3,6 +3,7 @@ package com.hazelcast.hibernate.local;
 import com.hazelcast.cluster.Cluster;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.topic.ITopic;
@@ -32,6 +33,7 @@ public class TimestampsRegionCacheTest {
 
     @Mock private Config config;
     @Mock private MapConfig mapConfig;
+    @Mock private EvictionConfig evictionConfig;
     @Mock private ITopic<Object> topic;
     @Mock private HazelcastInstance instance;
     @Mock private Cluster cluster;
@@ -48,6 +50,9 @@ public class TimestampsRegionCacheTest {
         when(instance.getCluster()).thenReturn(cluster);
         when(instance.getConfig()).thenReturn(config);
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
+
+        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
+        when(evictionConfig.getSize()).thenReturn(42);
 
         // make the message appear that it is coming from a different member of the cluster
         when(member.localMember()).thenReturn(false);
@@ -149,5 +154,5 @@ public class TimestampsRegionCacheTest {
         target.clear();
 
         assertThat("value should not be in the cache", target.get("QuerySpace", aTimestamp), nullValue());
-    }    
+    }
 }
