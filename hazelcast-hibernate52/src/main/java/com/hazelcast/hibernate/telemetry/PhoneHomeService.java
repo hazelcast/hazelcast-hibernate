@@ -42,7 +42,7 @@ public class PhoneHomeService {
     private static final String SYS_PHONE_HOME_ENABLED = "hazelcast.phone.home.enabled";
     private static final String ENV_PHONE_HOME_ENABLED = "HZ_PHONE_HOME_ENABLED";
 
-    private static final String BASE_PHONE_HOME_URL = "http://phonehome.hazelcast.com/pingIntegrations";
+    private static final String PHONE_HOME_URL = "http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate52";
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
@@ -62,7 +62,7 @@ public class PhoneHomeService {
         }
     }
 
-    public static boolean isPhoneHomeEnabled() {
+    private static boolean isPhoneHomeEnabled() {
         String falseStr = FALSE.toString();
         if (falseStr.equalsIgnoreCase(getenv(ENV_PHONE_HOME_ENABLED))) {
             return false;
@@ -74,12 +74,9 @@ public class PhoneHomeService {
     }
 
     private void send() {
-        // If a value changing over time is sent to the server,
-        // QUERY_STRING - which contains the call data, must
-        // be updated before each call.
         InputStream in = null;
         try {
-            URL url = new URL(BASE_PHONE_HOME_URL + phoneHomeInfo.getQueryString());
+            URL url = new URL(PHONE_HOME_URL + phoneHomeInfo.getQueryString());
             URLConnection conn = url.openConnection();
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
             conn.setConnectTimeout((int) TIMEOUT.toMillis());

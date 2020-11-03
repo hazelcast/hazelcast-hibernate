@@ -11,14 +11,6 @@ import static org.junit.Assert.*;
 public class PhoneHomeTest {
 
     @Test
-    public void phoneHomeEnabledTest() {
-        System.setProperty("hazelcast.phone.home.enabled", "true");
-        assertTrue(PhoneHomeService.isPhoneHomeEnabled());
-        System.setProperty("hazelcast.phone.home.enabled", "false");
-        assertFalse(PhoneHomeService.isPhoneHomeEnabled());
-    }
-
-    @Test
     public void localRegionQueryStringTest() {
         String queryString = new PhoneHomeInfo(true).getQueryString();
         verifyQueryString(true, queryString);
@@ -34,9 +26,8 @@ public class PhoneHomeTest {
         Map<String, String> parameters = toParametersMap(queryString);
         String resolvedPluginVersion = PhoneHomeInfo.resolveVersion();
 
-        assertEquals(4, parameters.size());
-        assertEquals(isLocalRegion ? "local" : "distributed", parameters.get("region"));
-        assertEquals("hazelcast-hibernate53", parameters.get("name"));
+        assertEquals(3, parameters.size());
+        assertEquals(isLocalRegion ? "local" : "distributed", parameters.get("region-type"));
         assertEquals(resolvedPluginVersion, parameters.get("version"));
         assertEquals(Hibernate.class.getPackage().getImplementationVersion(), parameters.get("hibernate-version"));
         assertNotEquals("N/A", resolvedPluginVersion);

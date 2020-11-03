@@ -108,8 +108,8 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
 
     @Override
     public void stop() {
-        phoneHomeService.shutdown();
         cleanupService.stop();
+        phoneHomeService.shutdown();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();

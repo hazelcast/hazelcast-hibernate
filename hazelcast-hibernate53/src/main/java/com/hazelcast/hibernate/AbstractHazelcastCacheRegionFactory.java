@@ -164,8 +164,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @SuppressWarnings("Duplicates")
     @Override
     protected void releaseFromUse() {
-        phoneHomeService.shutdown();
         cleanupService.stop();
+        phoneHomeService.shutdown();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();

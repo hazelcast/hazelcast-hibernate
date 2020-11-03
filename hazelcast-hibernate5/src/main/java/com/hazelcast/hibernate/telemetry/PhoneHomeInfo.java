@@ -29,11 +29,11 @@ import java.util.Properties;
  * Creates query string according to plugin properties to be sent to phone home
  * server by {@link PhoneHomeService}.
  *
- * TODO: Edit below properly.
  * Since no dynamic information is sent by phone home calls, the query string is
- * constructed statically here. In case of the addition of a new field to home
- * calls, this class needs to be changed such that it creates appropriate query
- * strings with the additional fields.
+ * built once in the constructor. In case of the addition of a new field to home
+ * calls which requires query string to be updated before each call, this class
+ * needs to be changed such that it returns appropriate query string with up to
+ * date information rather than a static one.
  *
  * @since 2.1.2
  */
@@ -41,7 +41,6 @@ public class PhoneHomeInfo {
 
     private static final String PROPERTIES_RESOURCE = "/phone.home.properties";
 
-    private final String moduleName = "hazelcast-hibernate5";
     private String version;
     private String queryString;
 
@@ -72,10 +71,9 @@ public class PhoneHomeInfo {
         // home server changes. Do not make standalone changes
         // especially for the parameter keys.
         return new QueryStringBuilder()
-                .addParam("name", moduleName)
                 .addParam("version", version)
                 .addParam("hibernate-version", Hibernate.class.getPackage().getImplementationVersion())
-                .addParam("region", isLocalRegion ? "local" : "distributed")
+                .addParam("region-type", isLocalRegion ? "local" : "distributed")
                 .build();
     }
 
