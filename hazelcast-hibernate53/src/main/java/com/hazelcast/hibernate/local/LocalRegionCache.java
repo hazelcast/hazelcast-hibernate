@@ -30,6 +30,7 @@ import com.hazelcast.logging.Logger;
 import com.hazelcast.topic.ITopic;
 import com.hazelcast.topic.MessageListener;
 import org.hibernate.cache.cfg.spi.CollectionDataCachingConfig;
+import org.hibernate.cache.cfg.spi.DomainDataCachingConfig;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.cfg.spi.EntityDataCachingConfig;
 import org.hibernate.cache.spi.RegionFactory;
@@ -38,6 +39,7 @@ import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 
 import java.time.Duration;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
@@ -46,7 +48,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class LocalRegionCache implements RegionCache {
 
-    private static final int MAX_SIZE = 100000;
+    private static final int MAX_SIZE = 100_000;
 
     protected final ConcurrentMap<Object, Expirable> cache;
 
@@ -115,23 +117,23 @@ public class LocalRegionCache implements RegionCache {
         this.regionFactory = regionFactory;
 
         try {
-            config = hazelcastInstance == null ? null : hazelcastInstance.getConfig().findMapConfig(name);
+            this.config = hazelcastInstance == null ? null : hazelcastInstance.getConfig().findMapConfig(name);
         } catch (UnsupportedOperationException ignored) {
             EmptyStatement.ignore(ignored);
         }
 
         if (withTopic && hazelcastInstance != null) {
-            topic = hazelcastInstance.getTopic(name);
-            listenerRegistrationId = topic.addMessageListener(createMessageListener());
+            this.topic = hazelcastInstance.getTopic(name);
+            this.listenerRegistrationId = topic.addMessageListener(createMessageListener());
         } else {
-            topic = null;
-            listenerRegistrationId = null;
+            this.topic = null;
+            this.listenerRegistrationId = null;
         }
 
-        versionComparator = findVersionComparator(regionConfig);
+        this.versionComparator = findVersionComparator(regionConfig).orElse(null);
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
 
-        cache = Caffeine.newBuilder()
+        this.cache = Caffeine.newBuilder()
           .maximumSize(this.evictionConfig.getMaxSize())
           .expireAfterWrite(this.evictionConfig.getTimeToLive().isZero()
             ? Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis())
@@ -246,26 +248,26 @@ public class LocalRegionCache implements RegionCache {
         return message -> maybeInvalidate(message.getMessageObject());
     }
 
-    private Comparator findVersionComparator(final DomainDataRegionConfig regionConfig) {
+    private Optional<Comparator> findVersionComparator(final DomainDataRegionConfig regionConfig) {
         if (regionConfig == null) {
-            return null;
+            return Optional.empty();
         }
-        for (final EntityDataCachingConfig entityConfig : regionConfig.getEntityCaching()) {
+
+        for (EntityDataCachingConfig entityConfig : regionConfig.getEntityCaching()) {
             if (entityConfig.isVersioned()) {
                 try {
-                    return entityConfig.getVersionComparatorAccess().get();
+                    return Optional.ofNullable(entityConfig.getVersionComparatorAccess().get());
                 } catch (Throwable throwable) {
                     log.warning("Unable to get version comparator", throwable);
-                    return null;
+                    return Optional.empty();
                 }
             }
         }
-        for (final CollectionDataCachingConfig collectionConfig : regionConfig.getCollectionCaching()) {
-            if (collectionConfig.isVersioned()) {
-                return collectionConfig.getOwnerVersionComparator();
-            }
-        }
-        return null;
+
+        return regionConfig.getCollectionCaching().stream()
+          .filter(DomainDataCachingConfig::isVersioned)
+          .findFirst()
+          .map(CollectionDataCachingConfig::getOwnerVersionComparator);
     }
 
     @SuppressWarnings("Duplicates")
