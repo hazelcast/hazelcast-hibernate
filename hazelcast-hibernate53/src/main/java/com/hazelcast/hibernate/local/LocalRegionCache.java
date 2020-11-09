@@ -136,7 +136,7 @@ public class LocalRegionCache implements RegionCache {
         this.cache = Caffeine.newBuilder()
           .maximumSize(this.evictionConfig.getMaxSize())
           .expireAfterWrite(this.evictionConfig.getTimeToLive().isZero()
-            ? Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis())
+            ? Duration.ofDays(365)
             : this.evictionConfig.getTimeToLive())
           .<Object, Expirable>build().asMap();
     }
