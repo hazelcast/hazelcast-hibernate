@@ -22,7 +22,6 @@ import com.hazelcast.hibernate.region.HazelcastEntityRegion;
 import com.hazelcast.hibernate.region.HazelcastNaturalIdRegion;
 import com.hazelcast.hibernate.region.HazelcastTimestampsRegion;
 import com.hazelcast.hibernate.telemetry.PhoneHomeInfo;
-import com.hazelcast.hibernate.telemetry.PhoneHomeService;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
@@ -81,7 +80,7 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
     @Override
     public void start(final SessionFactoryOptions options, final Properties properties) throws CacheException {
         super.start(options, properties);
-        phoneHomeService = new PhoneHomeService(new PhoneHomeInfo(false));
+        phoneHomeService.setPhoneHomeInfo(new PhoneHomeInfo(false));
         phoneHomeService.start();
     }
 }

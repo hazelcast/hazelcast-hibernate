@@ -1,14 +1,46 @@
 package com.hazelcast.hibernate.telemetry;
 
+import com.hazelcast.hibernate.HazelcastCacheRegionFactory;
+import com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory;
 import org.hibernate.Hibernate;
+import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PhoneHomeTest {
+
+    @Mock
+    PhoneHomeService phoneHomeService;
+
+    @Mock
+    SessionFactoryOptions sessionFactoryOptions;
+
+    @Test
+    public void localRegionRegistryTest() {
+        HazelcastLocalCacheRegionFactory regionFactory = new HazelcastLocalCacheRegionFactory();
+        regionFactory.setPhoneHomeService(phoneHomeService);
+        regionFactory.start(sessionFactoryOptions, new Properties());
+        verify(phoneHomeService, times(1)).start();
+    }
+
+    @Test
+    public void distributedRegionRegistryTest() {
+        HazelcastCacheRegionFactory regionFactory = new HazelcastCacheRegionFactory();
+        regionFactory.setPhoneHomeService(phoneHomeService);
+        regionFactory.start(sessionFactoryOptions, new Properties());
+        verify(phoneHomeService, times(1)).start();
+    }
 
     @Test
     public void localRegionQueryStringTest() {

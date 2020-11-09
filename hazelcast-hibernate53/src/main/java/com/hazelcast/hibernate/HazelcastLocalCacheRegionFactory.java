@@ -19,7 +19,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.TimestampsRegionCache;
 import com.hazelcast.hibernate.telemetry.PhoneHomeInfo;
-import com.hazelcast.hibernate.telemetry.PhoneHomeService;
 import com.hazelcast.internal.util.Clock;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
@@ -81,7 +80,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     @Override
     protected void prepareForUse(final SessionFactoryOptions settings, final Map configValues) {
         super.prepareForUse(settings, configValues);
-        phoneHomeService = new PhoneHomeService(new PhoneHomeInfo(true));
+        phoneHomeService.setPhoneHomeInfo(new PhoneHomeInfo(true));
         phoneHomeService.start();
     }
 

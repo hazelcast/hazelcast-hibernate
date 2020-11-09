@@ -48,7 +48,7 @@ import static java.lang.Class.forName;
 public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryTemplate {
 
     protected CleanupService cleanupService;
-    protected PhoneHomeService phoneHomeService;
+    protected PhoneHomeService phoneHomeService = new PhoneHomeService();
     protected HazelcastInstance instance;
 
     private final CacheKeysFactory cacheKeysFactory;
@@ -179,4 +179,9 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         properties.putAll(configValues);
         return properties;
     }
+
+    public void setPhoneHomeService(PhoneHomeService phoneHomeService) {
+        this.phoneHomeService = phoneHomeService;
+    }
+
 }

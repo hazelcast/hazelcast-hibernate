@@ -42,7 +42,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
 
     protected HazelcastInstance instance;
     protected CleanupService cleanupService;
-    protected PhoneHomeService phoneHomeService;
+    protected PhoneHomeService phoneHomeService = new PhoneHomeService();
     private final ILogger log = Logger.getLogger(getClass());
 
     private IHazelcastInstanceLoader instanceLoader;
@@ -125,4 +125,9 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
     public AccessType getDefaultAccessType() {
         return AccessType.READ_WRITE;
     }
+
+    public void setPhoneHomeService(PhoneHomeService phoneHomeService) {
+        this.phoneHomeService = phoneHomeService;
+    }
+
 }

@@ -52,10 +52,6 @@ public class PhoneHomeService {
 
     private PhoneHomeInfo phoneHomeInfo;
 
-    public PhoneHomeService(PhoneHomeInfo phoneHomeInfo) {
-        this.phoneHomeInfo = phoneHomeInfo;
-    }
-
     public void start() {
         if (started.compareAndSet(false, true) && isPhoneHomeEnabled()) {
             executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
@@ -93,6 +89,10 @@ public class PhoneHomeService {
 
     public void shutdown() {
         executor.shutdown();
+    }
+
+    public void setPhoneHomeInfo(PhoneHomeInfo phoneHomeInfo) {
+        this.phoneHomeInfo = phoneHomeInfo;
     }
 
 }
