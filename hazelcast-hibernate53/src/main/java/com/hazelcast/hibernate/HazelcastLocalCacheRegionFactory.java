@@ -53,7 +53,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         );
 
         final LocalRegionCache regionCache = new LocalRegionCache(this, qualifiedRegionName, instance, regionConfig);
-        caches.add(regionCache);
+        localRegionCaches.add(regionCache);
         return regionCache;
     }
 
@@ -69,7 +69,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         );
 
         TimestampsRegionCache timestampsRegionCache = new TimestampsRegionCache(this, qualifiedRegionName, instance);
-        caches.add(timestampsRegionCache);
+        localRegionCaches.add(timestampsRegionCache);
         return timestampsRegionCache;
     }
 

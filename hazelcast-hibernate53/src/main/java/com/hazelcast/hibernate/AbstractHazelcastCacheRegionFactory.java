@@ -48,7 +48,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
 
     protected HazelcastInstance instance;
 
-    protected final List<LocalRegionCache> caches = new ArrayList<>();
+    protected final List<LocalRegionCache> localRegionCaches = new ArrayList<>();
 
     private final CacheKeysFactory cacheKeysFactory;
     private final ILogger log = Logger.getLogger(getClass());
@@ -101,7 +101,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         // Note: We don't want to use an ITopic for invalidation because the timestamps cache can take care of outdated
         // queries
         final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false);
-        caches.add(regionCache);
+        localRegionCaches.add(regionCache);
         return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
           .getFallback(sessionFactory.getProperties()));
     }
@@ -161,7 +161,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @SuppressWarnings("Duplicates")
     @Override
     protected void releaseFromUse() {
-        caches.forEach(LocalRegionCache::destroy);
+        localRegionCaches.forEach(LocalRegionCache::destroy);
 
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
