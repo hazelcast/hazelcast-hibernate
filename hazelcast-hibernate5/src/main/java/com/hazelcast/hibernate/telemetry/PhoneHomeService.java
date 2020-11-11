@@ -48,13 +48,17 @@ public class PhoneHomeService {
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
     private final AtomicBoolean started = new AtomicBoolean();
-    private final ScheduledExecutorService executor = newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "PhoneHomeService");
-        t.setDaemon(true);
-        return t;
-    });
+    private final ScheduledExecutorService executor;
 
     private PhoneHomeInfo phoneHomeInfo;
+
+    public PhoneHomeService() {
+        executor = newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "PhoneHomeService");
+            t.setDaemon(true);
+            return t;
+        });
+    }
 
     public void start() {
         if (started.compareAndSet(false, true) && isPhoneHomeEnabled()) {
