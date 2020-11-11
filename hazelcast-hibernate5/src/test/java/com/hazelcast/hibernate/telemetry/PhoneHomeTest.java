@@ -9,11 +9,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static java.util.stream.Collectors.toMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -66,11 +68,8 @@ public class PhoneHomeTest {
     }
 
     private Map<String, String> toParametersMap(String queryString) {
-        Map<String, String> parameters = new HashMap<>();
-        for (String param: queryString.substring(1).split("&")) { // trim '?' at the beginning of the query
-            String[] pair = param.split("=");
-            parameters.put(pair[0], pair[1]);
-        }
-        return parameters;
+        return Arrays.stream(queryString.substring(1).split("&")) // trim '?' at the beginning of the query
+                .map(param -> param.split("="))
+                .collect(toMap(pair -> pair[0], pair -> pair[1]));
     }
 }

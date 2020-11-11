@@ -44,11 +44,15 @@ public class PhoneHomeService {
 
     private static final String PHONE_HOME_URL = "http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate5";
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
+    private static final int RETRY_COUNT = 5;
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
     private final AtomicBoolean started = new AtomicBoolean();
-    private final ScheduledExecutorService executor = newSingleThreadScheduledExecutor(r
-            -> new Thread(r, "PhoneHomeService"));
+    private final ScheduledExecutorService executor = newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "PhoneHomeService");
+        t.setDaemon(true);
+        return t;
+    });
 
     private PhoneHomeInfo phoneHomeInfo;
 
@@ -59,31 +63,35 @@ public class PhoneHomeService {
     }
 
     private static boolean isPhoneHomeEnabled() {
-        String falseStr = FALSE.toString();
-        if (falseStr.equalsIgnoreCase(getenv(ENV_PHONE_HOME_ENABLED))) {
+        if (FALSE.toString().equalsIgnoreCase(System.getProperty(SYS_PHONE_HOME_ENABLED))) {
             return false;
         }
-        if (falseStr.equalsIgnoreCase(System.getProperty(SYS_PHONE_HOME_ENABLED))) {
+        if (FALSE.toString().equalsIgnoreCase(getenv(ENV_PHONE_HOME_ENABLED))) {
             return false;
         }
         return true;
     }
 
     private void send() {
-        InputStream in = null;
-        try {
-            URL url = new URL(PHONE_HOME_URL + phoneHomeInfo.getQueryString());
-            URLConnection conn = url.openConnection();
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-            conn.setConnectTimeout((int) TIMEOUT.toMillis());
-            conn.setReadTimeout((int) TIMEOUT.toMillis());
-            in = new BufferedInputStream(conn.getInputStream());
-        } catch (Exception e) {
-            if (logger.isFineEnabled()) {
-                logger.fine("Failed to establish home phone call.", e);
+        int retryCount = RETRY_COUNT;
+        boolean succeed = false;
+        while (retryCount-- > 0 && !succeed) {
+            InputStream in = null;
+            try {
+                URL url = new URL(PHONE_HOME_URL + phoneHomeInfo.getQueryString());
+                URLConnection conn = url.openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+                conn.setConnectTimeout((int) TIMEOUT.toMillis());
+                conn.setReadTimeout((int) TIMEOUT.toMillis());
+                in = new BufferedInputStream(conn.getInputStream());
+                succeed = true;
+            } catch (Exception e) {
+                if (logger.isFineEnabled()) {
+                    logger.fine("Failed to establish home phone call. Retries left: " + retryCount, e);
+                }
+            } finally {
+                closeResource(in);
             }
-        } finally {
-            closeResource(in);
         }
     }
 

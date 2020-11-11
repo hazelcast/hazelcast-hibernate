@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
@@ -85,18 +86,13 @@ public class PhoneHomeInfo {
         private final ILogger logger = Logger.getLogger(QueryStringBuilder.class);
         private final StringBuilder builder;
 
-        private boolean hasParameterBefore;
-
         QueryStringBuilder() {
-            builder = new StringBuilder();
-            builder.append("?");
+            builder = new StringBuilder("?");
         }
 
         QueryStringBuilder addParam(String key, String value) {
-            if (hasParameterBefore) {
+            if (builder.length() > 1) {
                 builder.append("&");
-            } else {
-                hasParameterBefore = true;
             }
             builder.append(key).append("=").append(tryEncode(value));
             return this;
@@ -104,7 +100,7 @@ public class PhoneHomeInfo {
 
         private String tryEncode(String value) {
             try {
-                return URLEncoder.encode(value, "UTF-8");
+                return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException e) {
                 if (logger.isFineEnabled()) {
                     logger.fine("Using <unknown> for the value which couldn't be encoded: " + value, e);
