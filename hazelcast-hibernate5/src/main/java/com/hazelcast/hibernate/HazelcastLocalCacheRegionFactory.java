@@ -22,7 +22,6 @@ import com.hazelcast.hibernate.region.HazelcastCollectionRegion;
 import com.hazelcast.hibernate.region.HazelcastEntityRegion;
 import com.hazelcast.hibernate.region.HazelcastNaturalIdRegion;
 import com.hazelcast.hibernate.region.HazelcastTimestampsRegion;
-import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.CollectionRegion;
@@ -38,7 +37,7 @@ import java.util.Properties;
  */
 public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegionFactory implements RegionFactory {
 
-    private static final PhoneHomeInfo phoneHomeInfo = new PhoneHomeInfo(true);
+    private static final PhoneHomeInfo PHONE_HOME_INFO = new PhoneHomeInfo(true);
     private static final int serialVersionUID = 1;
 
     public HazelcastLocalCacheRegionFactory() {
@@ -88,13 +87,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
     }
 
     @Override
-    public void start(final SessionFactoryOptions options, final Properties properties) throws CacheException {
-        super.start(options, properties);
-        phoneHomeService.start();
-    }
-
-    @Override
     PhoneHomeInfo phoneHomeInfo() {
-        return phoneHomeInfo;
+        return PHONE_HOME_INFO;
     }
 }

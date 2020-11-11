@@ -87,6 +87,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
         }
 
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(properties));
+        phoneHomeService.start();
     }
 
     private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {
