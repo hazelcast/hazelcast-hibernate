@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.hazelcast.hibernate.telemetry;
+package com.hazelcast.hibernate;
 
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -38,23 +38,23 @@ import java.util.Properties;
  *
  * @since 2.1.2
  */
-public class PhoneHomeInfo {
+class PhoneHomeInfo {
 
     private static final String PROPERTIES_RESOURCE = "/phone.home.properties";
 
     private String version;
     private String queryString;
 
-    public PhoneHomeInfo(boolean isLocalRegion) {
+    PhoneHomeInfo(boolean isLocalRegion) {
         this.version = resolveVersion();
         this.queryString = buildQueryString(isLocalRegion);
     }
 
-    public String getQueryString() {
+    String getQueryString() {
         return queryString;
     }
 
-    public static String resolveVersion() {
+    static String resolveVersion() {
         // To resolve the version described in the pom file, filtering for
         // phone.home.properties must be enabled in the resources section
         // of the pom.xml

@@ -20,7 +20,6 @@ import com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.hibernate.local.CleanupService;
-import com.hazelcast.hibernate.telemetry.PhoneHomeService;
 import com.hazelcast.hibernate.region.HazelcastQueryResultsRegion;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -42,7 +41,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
 
     protected HazelcastInstance instance;
     protected CleanupService cleanupService;
-    protected PhoneHomeService phoneHomeService = new PhoneHomeService();
+    protected PhoneHomeService phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     private final ILogger log = Logger.getLogger(getClass());
 
     private IHazelcastInstanceLoader instanceLoader;
@@ -129,5 +128,10 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
     public void setPhoneHomeService(PhoneHomeService phoneHomeService) {
         this.phoneHomeService = phoneHomeService;
     }
+
+    /**
+     * @return PhoneHomeInfo to be sent to the call home server based on region type.
+     */
+    abstract PhoneHomeInfo phoneHomeInfo();
 
 }

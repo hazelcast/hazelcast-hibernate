@@ -1,7 +1,5 @@
-package com.hazelcast.hibernate.telemetry;
+package com.hazelcast.hibernate;
 
-import com.hazelcast.hibernate.HazelcastCacheRegionFactory;
-import com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.junit.Test;
@@ -34,6 +32,8 @@ public class PhoneHomeTest {
         regionFactory.setPhoneHomeService(phoneHomeService);
         regionFactory.start(sessionFactoryOptions, new Properties());
         verify(phoneHomeService, times(1)).start();
+        regionFactory.stop();
+        verify(phoneHomeService, times(1)).shutdown();
     }
 
     @Test
@@ -42,6 +42,8 @@ public class PhoneHomeTest {
         regionFactory.setPhoneHomeService(phoneHomeService);
         regionFactory.start(sessionFactoryOptions, new Properties());
         verify(phoneHomeService, times(1)).start();
+        regionFactory.stop();
+        verify(phoneHomeService, times(1)).shutdown();
     }
 
     @Test

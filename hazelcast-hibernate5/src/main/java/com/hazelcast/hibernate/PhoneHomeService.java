@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.hazelcast.hibernate.telemetry;
+package com.hazelcast.hibernate;
 
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -37,7 +37,7 @@ import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
  *
  * @since 2.1.2
  */
-public class PhoneHomeService {
+class PhoneHomeService {
 
     private static final String SYS_PHONE_HOME_ENABLED = "hazelcast.phone.home.enabled";
     private static final String ENV_PHONE_HOME_ENABLED = "HZ_PHONE_HOME_ENABLED";
@@ -45,35 +45,42 @@ public class PhoneHomeService {
     private static final String PHONE_HOME_URL = "http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate5";
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
     private static final int RETRY_COUNT = 5;
+    private static final boolean PHONE_HOME_ENABLED = isPhoneHomeEnabled();
+    private static ScheduledExecutorService executor;
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
     private final AtomicBoolean started = new AtomicBoolean();
-    private final ScheduledExecutorService executor;
 
-    private PhoneHomeInfo phoneHomeInfo;
+    private final PhoneHomeInfo phoneHomeInfo;
 
-    public PhoneHomeService() {
-        executor = newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r, "PhoneHomeService");
-            t.setDaemon(true);
-            return t;
-        });
+    static {
+        if (PHONE_HOME_ENABLED) {
+            executor = newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "Hazelcast-Hibernate.PhoneHomeService");
+                t.setDaemon(true);
+                return t;
+            });
+        }
     }
 
-    public void start() {
-        if (started.compareAndSet(false, true) && isPhoneHomeEnabled()) {
-            executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
-        }
+    PhoneHomeService(PhoneHomeInfo phoneHomeInfo) {
+        this.phoneHomeInfo = phoneHomeInfo;
     }
 
     private static boolean isPhoneHomeEnabled() {
-        if (FALSE.toString().equalsIgnoreCase(System.getProperty(SYS_PHONE_HOME_ENABLED))) {
+        if (FALSE == Boolean.parseBoolean(System.getProperty(SYS_PHONE_HOME_ENABLED))) {
             return false;
         }
-        if (FALSE.toString().equalsIgnoreCase(getenv(ENV_PHONE_HOME_ENABLED))) {
+        if (FALSE == Boolean.parseBoolean(getenv(ENV_PHONE_HOME_ENABLED))) {
             return false;
         }
         return true;
+    }
+
+    void start() {
+        if (started.compareAndSet(false, true) && PHONE_HOME_ENABLED) {
+            executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
+        }
     }
 
     private void send() {
@@ -99,12 +106,10 @@ public class PhoneHomeService {
         }
     }
 
-    public void shutdown() {
-        executor.shutdown();
-    }
-
-    public void setPhoneHomeInfo(PhoneHomeInfo phoneHomeInfo) {
-        this.phoneHomeInfo = phoneHomeInfo;
+    void shutdown() {
+        if (executor != null) {
+            executor.shutdown();
+        }
     }
 
 }
