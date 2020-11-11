@@ -16,4 +16,7 @@
     <!-- Exclude Clover instrumented sources -->
     <suppress checks="" files="/src-instrumented/"/>
 
+    <!-- TODO: Failing due to the lambda in static block. To be removed with checkstyle version upgrade to 3.x -->
+    <suppress checks="" files="com/hazelcast/hibernate/PhoneHomeService"/>
+
 </suppressions>
