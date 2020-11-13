@@ -61,7 +61,6 @@ class PhoneHomeService {
                 t.setDaemon(true);
                 return t;
             });
-            executor.setMaximumPoolSize(1);
         }
     }
 
