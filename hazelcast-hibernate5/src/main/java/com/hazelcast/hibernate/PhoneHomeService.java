@@ -23,14 +23,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.hazelcast.internal.nio.IOUtil.closeResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.System.getenv;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 /**
  * Pings phone home server with plugin information daily.
@@ -45,21 +45,23 @@ class PhoneHomeService {
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
     private static final int RETRY_COUNT = 5;
     private static final boolean PHONE_HOME_ENABLED = isPhoneHomeEnabled();
-    private static ScheduledExecutorService executor;
+    private static ScheduledThreadPoolExecutor executor;
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
     private final AtomicBoolean started = new AtomicBoolean();
 
     private final String baseUrl;
     private final PhoneHomeInfo phoneHomeInfo;
+    private ScheduledFuture<?> sendFuture;
 
     static {
         if (PHONE_HOME_ENABLED) {
-            executor = newSingleThreadScheduledExecutor(r -> {
+            executor = new ScheduledThreadPoolExecutor(0, r -> {
                 Thread t = new Thread(r, "Hazelcast-Hibernate.PhoneHomeService");
                 t.setDaemon(true);
                 return t;
             });
+            executor.setMaximumPoolSize(1);
         }
     }
 
@@ -84,7 +86,7 @@ class PhoneHomeService {
 
     void start() {
         if (started.compareAndSet(false, true) && PHONE_HOME_ENABLED) {
-            executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
+            sendFuture = executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
         }
     }
 
@@ -112,8 +114,11 @@ class PhoneHomeService {
     }
 
     void shutdown() {
-        if (executor != null) {
-            executor.shutdown();
+        // Do not shutdown the executor directly. Instead, cancel the job
+        // as there might be other tasks scheduled by other factories.
+        // If no other task remains, pool size will be zero.
+        if (sendFuture != null) {
+            sendFuture.cancel(false);
         }
     }
 
