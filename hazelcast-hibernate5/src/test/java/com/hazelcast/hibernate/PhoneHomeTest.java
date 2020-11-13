@@ -28,8 +28,7 @@ public class PhoneHomeTest {
 
     @Test
     public void localRegionRegistryTest() {
-        HazelcastLocalCacheRegionFactory regionFactory = new HazelcastLocalCacheRegionFactory();
-        regionFactory.setPhoneHomeService(phoneHomeService);
+        HazelcastLocalCacheRegionFactory regionFactory = new HazelcastLocalCacheRegionFactory(phoneHomeService);
         regionFactory.start(sessionFactoryOptions, new Properties());
         verify(phoneHomeService, times(1)).start();
         regionFactory.stop();
@@ -38,8 +37,7 @@ public class PhoneHomeTest {
 
     @Test
     public void distributedRegionRegistryTest() {
-        HazelcastCacheRegionFactory regionFactory = new HazelcastCacheRegionFactory();
-        regionFactory.setPhoneHomeService(phoneHomeService);
+        HazelcastCacheRegionFactory regionFactory = new HazelcastCacheRegionFactory(phoneHomeService);
         regionFactory.start(sessionFactoryOptions, new Properties());
         verify(phoneHomeService, times(1)).start();
         regionFactory.stop();

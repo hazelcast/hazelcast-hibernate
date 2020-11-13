@@ -85,7 +85,7 @@ class PhoneHomeInfo {
 
         private final ILogger logger = Logger.getLogger(QueryStringBuilder.class);
         private final StringBuilder builder = new StringBuilder("?");
-        
+
         QueryStringBuilder addParam(String key, String value) {
             if (builder.length() > 1) {
                 builder.append("&");

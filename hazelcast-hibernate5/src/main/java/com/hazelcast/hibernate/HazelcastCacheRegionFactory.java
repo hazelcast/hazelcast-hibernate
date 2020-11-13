@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.distributed.IMapRegionCache;
 import com.hazelcast.hibernate.region.HazelcastCollectionRegion;
 import com.hazelcast.hibernate.region.HazelcastEntityRegion;
@@ -41,12 +40,12 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
     public HazelcastCacheRegionFactory() {
     }
 
-    public HazelcastCacheRegionFactory(final HazelcastInstance instance) {
-        super(instance);
-    }
-
     public HazelcastCacheRegionFactory(final Properties properties) {
         super(properties);
+    }
+
+    public HazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        super(phoneHomeService);
     }
 
     @Override
