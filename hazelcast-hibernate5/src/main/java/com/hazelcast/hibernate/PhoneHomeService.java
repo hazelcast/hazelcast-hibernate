@@ -42,7 +42,6 @@ class PhoneHomeService {
     private static final String SYS_PHONE_HOME_ENABLED = "hazelcast.phone.home.enabled";
     private static final String ENV_PHONE_HOME_ENABLED = "HZ_PHONE_HOME_ENABLED";
 
-    private static final String PHONE_HOME_URL = "http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate5";
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
     private static final int RETRY_COUNT = 5;
     private static final boolean PHONE_HOME_ENABLED = isPhoneHomeEnabled();
@@ -51,6 +50,7 @@ class PhoneHomeService {
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
     private final AtomicBoolean started = new AtomicBoolean();
 
+    private final String baseUrl;
     private final PhoneHomeInfo phoneHomeInfo;
 
     static {
@@ -64,14 +64,19 @@ class PhoneHomeService {
     }
 
     PhoneHomeService(PhoneHomeInfo phoneHomeInfo) {
+        this("http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate5", phoneHomeInfo);
+    }
+
+    PhoneHomeService(String baseUrl, PhoneHomeInfo phoneHomeInfo) {
+        this.baseUrl = baseUrl;
         this.phoneHomeInfo = phoneHomeInfo;
     }
 
     private static boolean isPhoneHomeEnabled() {
-        if (FALSE == Boolean.parseBoolean(System.getProperty(SYS_PHONE_HOME_ENABLED))) {
+        if (FALSE.toString().equalsIgnoreCase(System.getProperty(SYS_PHONE_HOME_ENABLED))) {
             return false;
         }
-        if (FALSE == Boolean.parseBoolean(getenv(ENV_PHONE_HOME_ENABLED))) {
+        if (FALSE.toString().equalsIgnoreCase(getenv(ENV_PHONE_HOME_ENABLED))) {
             return false;
         }
         return true;
@@ -89,7 +94,7 @@ class PhoneHomeService {
         while (retryCount-- > 0 && !succeed) {
             InputStream in = null;
             try {
-                URL url = new URL(PHONE_HOME_URL + phoneHomeInfo.getQueryString());
+                URL url = new URL(baseUrl + phoneHomeInfo.getQueryString());
                 URLConnection conn = url.openConnection();
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0");
                 conn.setConnectTimeout((int) TIMEOUT.toMillis());
