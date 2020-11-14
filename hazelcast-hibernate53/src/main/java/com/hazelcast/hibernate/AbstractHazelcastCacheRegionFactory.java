@@ -21,7 +21,6 @@ import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.hibernate.local.CleanupService;
 import com.hazelcast.hibernate.local.LocalRegionCache;
-import com.hazelcast.hibernate.telemetry.PhoneHomeService;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import org.hibernate.boot.spi.SessionFactoryOptions;
@@ -48,7 +47,6 @@ import static java.lang.Class.forName;
 public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryTemplate {
 
     protected CleanupService cleanupService;
-    protected PhoneHomeService phoneHomeService = new PhoneHomeService();
     protected HazelcastInstance instance;
 
     private final CacheKeysFactory cacheKeysFactory;
@@ -165,7 +163,6 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @Override
     protected void releaseFromUse() {
         cleanupService.stop();
-        phoneHomeService.shutdown();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();
@@ -179,9 +176,4 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         properties.putAll(configValues);
         return properties;
     }
-
-    public void setPhoneHomeService(PhoneHomeService phoneHomeService) {
-        this.phoneHomeService = phoneHomeService;
-    }
-
 }

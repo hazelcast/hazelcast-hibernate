@@ -17,14 +17,10 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.distributed.IMapRegionCache;
-import com.hazelcast.hibernate.telemetry.PhoneHomeInfo;
-import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.support.RegionNameQualifier;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-
-import java.util.Map;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based Region implementations
@@ -69,12 +65,5 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
         );
 
         return new IMapRegionCache(this, qualifiedRegionName, instance);
-    }
-
-    @Override
-    protected void prepareForUse(final SessionFactoryOptions settings, final Map configValues) {
-        super.prepareForUse(settings, configValues);
-        phoneHomeService.setPhoneHomeInfo(new PhoneHomeInfo(false));
-        phoneHomeService.start();
     }
 }

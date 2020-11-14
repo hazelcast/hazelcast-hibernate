@@ -18,15 +18,11 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.TimestampsRegionCache;
-import com.hazelcast.hibernate.telemetry.PhoneHomeInfo;
 import com.hazelcast.internal.util.Clock;
-import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.support.RegionNameQualifier;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-
-import java.util.Map;
 
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
@@ -75,13 +71,6 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         TimestampsRegionCache timestampsRegionCache = new TimestampsRegionCache(this, qualifiedRegionName, instance);
         cleanupService.registerCache(timestampsRegionCache);
         return timestampsRegionCache;
-    }
-
-    @Override
-    protected void prepareForUse(final SessionFactoryOptions settings, final Map configValues) {
-        super.prepareForUse(settings, configValues);
-        phoneHomeService.setPhoneHomeInfo(new PhoneHomeInfo(true));
-        phoneHomeService.start();
     }
 
     public long nextTimestamp() {
