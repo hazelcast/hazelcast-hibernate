@@ -61,6 +61,7 @@ class PhoneHomeService {
                 t.setDaemon(true);
                 return t;
             });
+            executor.setRemoveOnCancelPolicy(true);
         }
     }
 
