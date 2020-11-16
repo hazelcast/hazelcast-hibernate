@@ -85,7 +85,7 @@ class PhoneHomeService {
     }
 
     void start() {
-        if (started.compareAndSet(false, true) && PHONE_HOME_ENABLED) {
+       if (PHONE_HOME_ENABLED && started.compareAndSet(false, true)) {
             sendFuture = executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
         }
     }
