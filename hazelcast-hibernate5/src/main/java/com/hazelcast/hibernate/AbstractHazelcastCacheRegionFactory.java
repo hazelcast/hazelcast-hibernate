@@ -41,20 +41,21 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
 
     protected HazelcastInstance instance;
     protected CleanupService cleanupService;
+    private final PhoneHomeService phoneHomeService;
     private final ILogger log = Logger.getLogger(getClass());
 
     private IHazelcastInstanceLoader instanceLoader;
 
-
     public AbstractHazelcastCacheRegionFactory() {
+         phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     }
 
     public AbstractHazelcastCacheRegionFactory(final Properties properties) {
         this();
     }
 
-    public AbstractHazelcastCacheRegionFactory(final HazelcastInstance instance) {
-        this.instance = instance;
+    public AbstractHazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        this.phoneHomeService = phoneHomeService;
     }
 
     @Override
@@ -87,6 +88,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
         }
 
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(properties));
+        phoneHomeService.start();
     }
 
     private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {
@@ -107,6 +109,7 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
     @Override
     public void stop() {
         cleanupService.stop();
+        phoneHomeService.shutdown();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();
@@ -123,4 +126,10 @@ public abstract class AbstractHazelcastCacheRegionFactory implements RegionFacto
     public AccessType getDefaultAccessType() {
         return AccessType.READ_WRITE;
     }
+
+    /**
+     * @return PhoneHomeInfo to be sent to the call home server based on region type.
+     */
+    abstract PhoneHomeInfo phoneHomeInfo();
+
 }
