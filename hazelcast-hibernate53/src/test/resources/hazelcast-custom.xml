@@ -33,7 +33,7 @@
     </network>
 
     <map name="default-query-results-region">
-        <time-to-live-seconds>2</time-to-live-seconds>
+        <time-to-live-seconds>0</time-to-live-seconds>
         <eviction size="50" />
     </map>
 </hazelcast>
