@@ -49,6 +49,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     protected CleanupService cleanupService;
     protected HazelcastInstance instance;
 
+    private final PhoneHomeService phoneHomeService;
     private final CacheKeysFactory cacheKeysFactory;
     private final ILogger log = Logger.getLogger(getClass());
 
@@ -61,11 +62,11 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
 
     public AbstractHazelcastCacheRegionFactory(final CacheKeysFactory cacheKeysFactory) {
         this.cacheKeysFactory = cacheKeysFactory;
+        this.phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     }
 
-    public AbstractHazelcastCacheRegionFactory(final HazelcastInstance instance) {
-        this.instance = instance;
-
+    public AbstractHazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        this.phoneHomeService = phoneHomeService;
         cacheKeysFactory = DefaultCacheKeysFactory.INSTANCE;
     }
 
@@ -125,6 +126,11 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         return cacheKeysFactory;
     }
 
+    /**
+     * @return PhoneHomeInfo to be sent to the call home server based on region type.
+     */
+    abstract PhoneHomeInfo phoneHomeInfo();
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Lifecycle
 
@@ -142,6 +148,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         }
 
         cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
+        phoneHomeService.start();
     }
 
     private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {
@@ -163,6 +170,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @Override
     protected void releaseFromUse() {
         cleanupService.stop();
+        phoneHomeService.shutdown();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();

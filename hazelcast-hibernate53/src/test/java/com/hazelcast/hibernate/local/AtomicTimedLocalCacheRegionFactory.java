@@ -1,6 +1,5 @@
 package com.hazelcast.hibernate.local;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory;
 import org.hibernate.cache.spi.CacheKeysFactory;
 
@@ -21,10 +20,6 @@ public class AtomicTimedLocalCacheRegionFactory extends HazelcastLocalCacheRegio
 
     public AtomicTimedLocalCacheRegionFactory(final CacheKeysFactory cacheKeysFactory) {
         super(cacheKeysFactory);
-    }
-
-    public AtomicTimedLocalCacheRegionFactory(final HazelcastInstance instance) {
-        super(instance);
     }
 
     @Override

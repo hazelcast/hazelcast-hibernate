@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.distributed.IMapRegionCache;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.spi.CacheKeysFactory;
@@ -27,6 +26,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
  */
 public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFactory {
 
+    private static final PhoneHomeInfo PHONE_HOME_INFO = new PhoneHomeInfo(false);
+
     public HazelcastCacheRegionFactory() {
     }
 
@@ -34,8 +35,8 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
         super(cacheKeysFactory);
     }
 
-    public HazelcastCacheRegionFactory(final HazelcastInstance instance) {
-        super(instance);
+    public HazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        super(phoneHomeService);
     }
 
     @Override
@@ -65,5 +66,10 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
         );
 
         return new IMapRegionCache(this, qualifiedRegionName, instance);
+    }
+
+    @Override
+    PhoneHomeInfo phoneHomeInfo() {
+        return PHONE_HOME_INFO;
     }
 }

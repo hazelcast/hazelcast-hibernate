@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.TimestampsRegionCache;
 import com.hazelcast.internal.util.Clock;
@@ -29,6 +28,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
  */
 public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegionFactory {
 
+    private static final PhoneHomeInfo PHONE_HOME_INFO = new PhoneHomeInfo(true);
+
     public HazelcastLocalCacheRegionFactory() {
     }
 
@@ -36,8 +37,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         super(cacheKeysFactory);
     }
 
-    public HazelcastLocalCacheRegionFactory(final HazelcastInstance instance) {
-        super(instance);
+    public HazelcastLocalCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        super(phoneHomeService);
     }
 
     @Override
@@ -71,6 +72,11 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         TimestampsRegionCache timestampsRegionCache = new TimestampsRegionCache(this, qualifiedRegionName, instance);
         cleanupService.registerCache(timestampsRegionCache);
         return timestampsRegionCache;
+    }
+
+    @Override
+    PhoneHomeInfo phoneHomeInfo() {
+        return PHONE_HOME_INFO;
     }
 
     public long nextTimestamp() {
