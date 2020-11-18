@@ -135,9 +135,7 @@ public class LocalRegionCache implements RegionCache {
 
         this.cache = Caffeine.newBuilder()
           .maximumSize(this.evictionConfig.getMaxSize())
-          .expireAfterWrite(this.evictionConfig.getTimeToLive().isZero()
-            ? Duration.ofMillis(Integer.MAX_VALUE)
-            : this.evictionConfig.getTimeToLive())
+          .expireAfterWrite(resolveTTL())
           .<Object, Expirable>build().asMap();
     }
 
@@ -203,7 +201,8 @@ public class LocalRegionCache implements RegionCache {
     }
 
     public long nextTimestamp() {
-        return hazelcastInstance == null ? Clock.currentTimeMillis()
+        return hazelcastInstance == null
+          ? Clock.currentTimeMillis()
           : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
     }
 
@@ -248,7 +247,7 @@ public class LocalRegionCache implements RegionCache {
         return message -> maybeInvalidate(message.getMessageObject());
     }
 
-    private Optional<Comparator> findVersionComparator(final DomainDataRegionConfig regionConfig) {
+    private Optional<Comparator<?>> findVersionComparator(final DomainDataRegionConfig regionConfig) {
         if (regionConfig == null) {
             return Optional.empty();
         }
@@ -286,10 +285,18 @@ public class LocalRegionCache implements RegionCache {
         }
     }
 
+    private Duration resolveTTL() {
+        // zero is interpreted differently by Hazelcast and Caffeine
+        return Math.max(evictionConfig.getTimeToLive().toMillis(), 0) == 0
+          ? Duration.ofMillis(Integer.MAX_VALUE)
+          : evictionConfig.getTimeToLive();
+    }
+
     /**
-     * Defines the parameters used when evicting entries from the cache.
+     * Generic representation of eviction-related configuration
      */
     public interface EvictionConfig {
+
         /**
          * @return the duration for which an item should live in the cache
          */
