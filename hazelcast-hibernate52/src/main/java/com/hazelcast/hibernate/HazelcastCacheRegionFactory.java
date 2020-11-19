@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.distributed.IMapRegionCache;
 import com.hazelcast.hibernate.region.HazelcastCollectionRegion;
 import com.hazelcast.hibernate.region.HazelcastEntityRegion;
@@ -36,15 +35,17 @@ import java.util.Properties;
  */
 public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFactory implements RegionFactory {
 
-    public HazelcastCacheRegionFactory() {
-    }
+    private static final PhoneHomeInfo PHONE_HOME_INFO = new PhoneHomeInfo(false);
 
-    public HazelcastCacheRegionFactory(final HazelcastInstance instance) {
-        super(instance);
+    public HazelcastCacheRegionFactory() {
     }
 
     public HazelcastCacheRegionFactory(final Properties properties) {
         super(properties);
+    }
+
+    public HazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        super(phoneHomeService);
     }
 
     @Override
@@ -73,5 +74,10 @@ public class HazelcastCacheRegionFactory extends AbstractHazelcastCacheRegionFac
             throws CacheException {
         return new HazelcastTimestampsRegion<>(instance, regionName, properties,
           new IMapRegionCache(regionName, instance, properties, null));
+    }
+
+    @Override
+    PhoneHomeInfo phoneHomeInfo() {
+        return PHONE_HOME_INFO;
     }
 }

@@ -47,9 +47,9 @@ import static java.lang.Class.forName;
 public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryTemplate {
 
     protected HazelcastInstance instance;
-
     protected final List<LocalRegionCache> localRegionCaches = new ArrayList<>();
 
+    private final PhoneHomeService phoneHomeService;
     private final CacheKeysFactory cacheKeysFactory;
     private final ILogger log = Logger.getLogger(getClass());
 
@@ -62,11 +62,11 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
 
     public AbstractHazelcastCacheRegionFactory(final CacheKeysFactory cacheKeysFactory) {
         this.cacheKeysFactory = cacheKeysFactory;
+        this.phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     }
 
-    public AbstractHazelcastCacheRegionFactory(final HazelcastInstance instance) {
-        this.instance = instance;
-
+    public AbstractHazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+        this.phoneHomeService = phoneHomeService;
         cacheKeysFactory = DefaultCacheKeysFactory.INSTANCE;
     }
 
@@ -126,6 +126,11 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         return cacheKeysFactory;
     }
 
+    /**
+     * @return PhoneHomeInfo to be sent to the call home server based on region type.
+     */
+    abstract PhoneHomeInfo phoneHomeInfo();
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Lifecycle
 
@@ -141,6 +146,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instanceLoader = resolveInstanceLoader(toProperties(configValues));
             instance = instanceLoader.loadInstance();
         }
+        phoneHomeService.start();
     }
 
     private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {
@@ -161,8 +167,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @SuppressWarnings("Duplicates")
     @Override
     protected void releaseFromUse() {
+        phoneHomeService.shutdown();
         localRegionCaches.forEach(LocalRegionCache::destroy);
-
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();
