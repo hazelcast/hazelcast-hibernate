@@ -20,7 +20,7 @@
            http://www.hazelcast.com/schema/config/hazelcast-config-4.0.xsd">
     <cluster-name>dev-custom</cluster-name>
     <network>
-        <port auto-increment="true">5701</port>
+        <port>5701</port>
         <join>
             <multicast enabled="false">
                 <multicast-group>224.2.2.3</multicast-group>
@@ -30,34 +30,8 @@
                 <interface>127.0.0.1</interface>
             </tcp-ip>
         </join>
-        <interfaces enabled="false">
-            <interface>10.3.17.*</interface>
-        </interfaces>
     </network>
-    <map name="default">
-        <!--
-            Number of backups. If 1 is set as the backup-count for example,
-            then all entries of the map will be copied to another JVM for
-            fail-safety. Valid numbers are 0 (no backup), 1, 2, 3.
-        -->
-        <backup-count>1</backup-count>
-        <!--
-        eviction-policy:
-            Valid values are:
-            NONE (no eviction),
-            LRU (Least Recently Used),
-            LFU (Least Frequently Used).
-            NONE is the default.
-        size:
-            Maximum size of the map. When max size is reached,
-            map is evicted based on the policy defined.
-            Any integer between 0 and Integer.MAX_VALUE. 0 means
-            Integer.MAX_VALUE. Default is 0.
-        -->
-        <eviction eviction-policy="NONE" size="0" />
-    </map>
 
-    <!-- Config for query cache -->
     <map name="default-query-results-region">
         <time-to-live-seconds>0</time-to-live-seconds>
         <eviction size="50" />

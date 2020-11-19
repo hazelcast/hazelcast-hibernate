@@ -15,7 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import com.hazelcast.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationException;
@@ -25,7 +24,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.lang.String.format;
 import static org.hibernate.internal.util.config.ConfigurationHelper.getString;
 
 /**
@@ -96,11 +94,6 @@ public final class CacheEnvironment {
     public static final String BACKOFF_MULTIPLIER = "hibernate.cache.hazelcast.backoff_multiplier";
 
     /**
-     * Property to configure the fixed delay in seconds between scheduled cache cleanup jobs
-     */
-    public static final String CLEANUP_DELAY = "hibernate.cache.hazelcast.cleanup_delay";
-
-    /**
      * Property to configure the Hazelcast instance internal name
      */
     public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
@@ -122,8 +115,6 @@ public final class CacheEnvironment {
     private static final Duration DEFAULT_MAX_BACKOFF = Duration.ofMillis(35000);
 
     private static final Duration DEFAULT_INITIAL_BACKOFF = Duration.ofMillis(2000);
-
-    private static final Duration DEFAULT_CACHE_CLEANUP_DELAY = Duration.ofMinutes(1);
 
     private static final double DEFAULT_BACKOFF_MULTIPLIER = 1.5;
 
@@ -150,20 +141,6 @@ public final class CacheEnvironment {
     public static int getDefaultCacheTimeoutInMillis() {
         return (int) DEFAULT_CACHE_TIMEOUT.toMillis();
     }
-
-    public static Duration getCacheCleanup(final Properties props) {
-        int delay = -1;
-        try {
-            delay = ConfigurationHelper.getInt(CLEANUP_DELAY, props, (int) (DEFAULT_CACHE_CLEANUP_DELAY.toMinutes() * 60));
-        } catch (Exception e) {
-            Logger.getLogger(CacheEnvironment.class).finest(e);
-        }
-        if (delay < 0) {
-            throw new ConfigurationException(format("[%d] is an illegal value for [%s]", delay, CLEANUP_DELAY));
-        }
-        return Duration.ofSeconds(delay);
-    }
-
 
     public static boolean shutdownOnStop(final Properties props, final boolean defaultValue) {
         return ConfigurationHelper.getBoolean(CacheEnvironment.SHUTDOWN_ON_STOP, props, defaultValue);
