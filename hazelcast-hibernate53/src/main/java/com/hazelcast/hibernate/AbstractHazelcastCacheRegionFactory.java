@@ -19,7 +19,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
-import com.hazelcast.hibernate.local.CleanupService;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -35,10 +34,11 @@ import org.hibernate.cache.spi.support.RegionFactoryTemplate;
 import org.hibernate.cache.spi.support.StorageAccess;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.hazelcast.hibernate.CacheEnvironment.getCacheCleanup;
 import static java.lang.Class.forName;
 
 /**
@@ -46,8 +46,9 @@ import static java.lang.Class.forName;
  */
 public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryTemplate {
 
-    protected CleanupService cleanupService;
     protected HazelcastInstance instance;
+
+    protected final List<LocalRegionCache> localRegionCaches = new ArrayList<>();
 
     private final CacheKeysFactory cacheKeysFactory;
     private final ILogger log = Logger.getLogger(getClass());
@@ -100,7 +101,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         // Note: We don't want to use an ITopic for invalidation because the timestamps cache can take care of outdated
         // queries
         final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false);
-        cleanupService.registerCache(regionCache);
+        localRegionCaches.add(regionCache);
         return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
           .getFallback(sessionFactory.getProperties()));
     }
@@ -140,8 +141,6 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
             instanceLoader = resolveInstanceLoader(toProperties(configValues));
             instance = instanceLoader.loadInstance();
         }
-
-        cleanupService = new CleanupService(instance.getName(), getCacheCleanup(toProperties(configValues)));
     }
 
     private IHazelcastInstanceLoader resolveInstanceLoader(Properties properties) {
@@ -162,7 +161,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     @SuppressWarnings("Duplicates")
     @Override
     protected void releaseFromUse() {
-        cleanupService.stop();
+        localRegionCaches.forEach(LocalRegionCache::destroy);
+
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();
