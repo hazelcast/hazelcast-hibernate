@@ -28,7 +28,7 @@
     <properties>
         <hibernate.core.version>5.3.7.Final</hibernate.core.version>
         <bytebuddy.version>1.8.17</bytebuddy.version>
-        <javassist.version>3.24.0-GA</javassist.version>
+        <javassist.version>3.27.0-GA</javassist.version>
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
     </properties>
