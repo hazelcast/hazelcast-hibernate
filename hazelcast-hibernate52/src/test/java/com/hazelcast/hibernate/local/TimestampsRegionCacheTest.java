@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.hazelcast.config.EvictionConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ public class TimestampsRegionCacheTest {
 
     @Mock private Config config;
     @Mock private MapConfig mapConfig;
+    @Mock private EvictionConfig evictionConfig;
     @Mock private ITopic<Object> topic;
     @Mock private HazelcastInstance instance;
     @Mock private Cluster cluster;
@@ -47,6 +49,10 @@ public class TimestampsRegionCacheTest {
         when(instance.getCluster()).thenReturn(cluster);
         when(instance.getConfig()).thenReturn(config);
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
+
+        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
+        when(mapConfig.getTimeToLiveSeconds()).thenReturn(5);
+        when(evictionConfig.getSize()).thenReturn(42);
 
         // make the message appear that it is coming from a different member of the cluster
         when(member.localMember()).thenReturn(false);

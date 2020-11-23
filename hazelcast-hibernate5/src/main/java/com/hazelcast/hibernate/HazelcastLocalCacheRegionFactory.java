@@ -55,7 +55,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                                                   final CacheDataDescription metadata) throws CacheException {
         final HazelcastCollectionRegion<LocalRegionCache> region = new HazelcastCollectionRegion<>(instance,
           regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
-        cleanupService.registerCache(region.getCache());
+        localRegionCaches.add(region.getCache());
         return region;
     }
 
@@ -64,7 +64,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                                           final CacheDataDescription metadata) throws CacheException {
         final HazelcastEntityRegion<LocalRegionCache> region = new HazelcastEntityRegion<>(instance,
           regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
-        cleanupService.registerCache(region.getCache());
+        localRegionCaches.add(region.getCache());
         return region;
     }
 
@@ -73,7 +73,7 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                                                 final CacheDataDescription metadata) throws CacheException {
         final HazelcastNaturalIdRegion<LocalRegionCache> region = new HazelcastNaturalIdRegion<>(
           instance, regionName, properties, metadata, new LocalRegionCache(regionName, instance, metadata));
-        cleanupService.registerCache(region.getCache());
+        localRegionCaches.add(region.getCache());
 
         return region;
     }

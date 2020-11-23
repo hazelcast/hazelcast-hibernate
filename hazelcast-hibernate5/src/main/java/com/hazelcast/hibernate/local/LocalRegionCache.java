@@ -15,6 +15,7 @@
 
 package com.hazelcast.hibernate.local;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
@@ -32,16 +33,9 @@ import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.access.SoftLock;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -52,7 +46,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LocalRegionCache implements RegionCache {
 
     private static final int MAX_SIZE = 100000;
-    private static final float BASE_EVICTION_RATE = 0.2F;
 
     protected final HazelcastInstance hazelcastInstance;
     protected final ITopic<Object> topic;
@@ -116,7 +109,6 @@ public class LocalRegionCache implements RegionCache {
             EmptyStatement.ignore(ignored);
         }
         versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
-        cache = new ConcurrentHashMap<>();
         markerIdCounter = new AtomicLong();
 
         messageListener = createMessageListener();
@@ -128,6 +120,10 @@ public class LocalRegionCache implements RegionCache {
             listenerRegistrationId = null;
         }
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
+        this.cache = Caffeine.newBuilder()
+          .maximumSize(this.evictionConfig.getMaxSize())
+          .expireAfterWrite(resolveTTL())
+          .<Object, Expirable>build().asMap();
     }
 
     @Override
@@ -318,21 +314,6 @@ public class LocalRegionCache implements RegionCache {
         return cache;
     }
 
-    void cleanup() {
-        final int maxSize = evictionConfig.getMaxSize();
-        final long timeToLive = evictionConfig.getTimeToLive().toMillis();
-
-        boolean limitSize = maxSize > 0 && maxSize != Integer.MAX_VALUE;
-        if (limitSize || timeToLive > 0) {
-            List<EvictionEntry> entries = searchEvictableEntries(timeToLive, limitSize);
-            final int diff = cache.size() - maxSize;
-            final int evictionRate = calculateEvictionRate(diff, maxSize);
-            if (evictionRate > 0 && entries != null) {
-                evictEntries(entries, evictionRate);
-            }
-        }
-    }
-
     protected void maybeInvalidate(final Object messageObject) {
         Invalidation invalidation = (Invalidation) messageObject;
         Object key = invalidation.getKey();
@@ -375,93 +356,15 @@ public class LocalRegionCache implements RegionCache {
           : HazelcastTimestamper.nextTimestamp(hazelcastInstance);
     }
 
-    private List<EvictionEntry> searchEvictableEntries(final long timeToLive, final boolean limitSize) {
-        List<EvictionEntry> entries = null;
-        Iterator<Entry<Object, Expirable>> iter = cache.entrySet().iterator();
-        long now = nextTimestamp();
-        while (iter.hasNext()) {
-            final Entry<Object, Expirable> e = iter.next();
-            final Object k = e.getKey();
-            final Expirable expirable = e.getValue();
-            if (expirable instanceof ExpiryMarker) {
-                continue;
-            }
-            final Value v = (Value) expirable;
-            if (timeToLive > 0 && v.getTimestamp() + timeToLive < now) {
-                iter.remove();
-            } else if (limitSize) {
-                if (entries == null) {
-                    // Use a List rather than a Set for correctness. Using a Set, especially a TreeSet
-                    // based on EvictionEntry.compareTo, causes evictions to be processed incorrectly
-                    // when two or more entries in the map have the same timestamp. In such a case, the
-                    // _first_ entry at a given timestamp is the only one that can be evicted because
-                    // TreeSet does not add "equivalent" entries. A second benefit of using a List is
-                    // that the cost of sorting the entries is not incurred if eviction isn't performed
-                    entries = new ArrayList<>(cache.size());
-                }
-                entries.add(new EvictionEntry(k, v));
-            }
-        }
-        return entries;
-    }
-
-    private int calculateEvictionRate(final int diff, final int maxSize) {
-        return diff >= 0 ? (diff + (int) (maxSize * BASE_EVICTION_RATE)) : 0;
-    }
-
-    private void evictEntries(final List<EvictionEntry> entries, final int evictionRate) {
-        // Only sort the entries if we're going to evict some
-        Collections.sort(entries);
-        int removed = 0;
-        for (EvictionEntry entry : entries) {
-            if (cache.remove(entry.key, entry.value) && ++removed == evictionRate) {
-                break;
-            }
-        }
+    private Duration resolveTTL() {
+        // zero is interpreted differently by Hazelcast and Caffeine
+        return Math.max(evictionConfig.getTimeToLive().toMillis(), 0) == 0
+          ? Duration.ofMillis(Integer.MAX_VALUE)
+          : evictionConfig.getTimeToLive();
     }
 
     /**
-     * Inner class that instances represent an entry marked for eviction
-     */
-    private static final class EvictionEntry implements Comparable<EvictionEntry> {
-        final Object key;
-        final Value value;
-
-        private EvictionEntry(final Object key, final Value value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public int compareTo(final EvictionEntry o) {
-            final long thisVal = this.value.getTimestamp();
-            final long anotherVal = o.value.getTimestamp();
-            return (Long.compare(thisVal, anotherVal));
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            EvictionEntry that = (EvictionEntry) o;
-
-            return (Objects.equals(key, that.key))
-              && (Objects.equals(value, that.value));
-        }
-
-        @Override
-        public int hashCode() {
-            return key == null ? 0 : key.hashCode();
-        }
-    }
-
-    /**
-     * Defines the parameters used when evicting entries from the cache.
+     * Generic representation of eviction-related configuration.
      */
     public interface EvictionConfig {
         /**
