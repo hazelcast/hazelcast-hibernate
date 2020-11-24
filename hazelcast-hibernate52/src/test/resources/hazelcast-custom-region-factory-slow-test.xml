@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+           http://www.hazelcast.com/schema/config/hazelcast-config-4.0.xsd">
+    <network>
+        <port>5701</port>
+    </network>
+
+    <map name="org.hibernate.cache.*">
+        <time-to-live-seconds>30</time-to-live-seconds>
+        <eviction size="150" />
+    </map>
+</hazelcast>
