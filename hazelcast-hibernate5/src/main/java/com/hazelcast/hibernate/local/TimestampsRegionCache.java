@@ -92,8 +92,4 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
         cache.clear();
         maybeNotifyTopic(null, -1L, null);
     }
-
-    @Override
-    final void cleanup() {
-    }
 }
