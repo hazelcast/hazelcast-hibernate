@@ -24,14 +24,13 @@ import java.util.Properties;
  * A factory that returns a {@link com.hazelcast.core.HazelcastInstance} depending on configuration either backed by Hazelcast
  * client or node implementation.
  */
-public final class DefaultHazelcastInstanceFactory implements IHazelcastInstanceFactory
-{
+public final class DefaultHazelcastInstanceFactory implements IHazelcastInstanceFactory {
     private static final String HZ_CLIENT_LOADER_CLASSNAME = "com.hazelcast.hibernate.instance.HazelcastClientLoader";
     private static final String HZ_INSTANCE_LOADER_CLASSNAME = "com.hazelcast.hibernate.instance.HazelcastInstanceLoader";
 
     public IHazelcastInstanceLoader createInstanceLoader(final Properties props) throws CacheException {
         try {
-            Class loaderClass = getInstanceLoaderClass(props);
+            Class<?> loaderClass = getInstanceLoaderClass(props);
             IHazelcastInstanceLoader instanceLoader = (IHazelcastInstanceLoader) loaderClass.newInstance();
             instanceLoader.configure(props);
             return instanceLoader;
@@ -40,7 +39,7 @@ public final class DefaultHazelcastInstanceFactory implements IHazelcastInstance
         }
     }
 
-    private static Class getInstanceLoaderClass(final Properties props) throws ClassNotFoundException {
+    private static Class<?> getInstanceLoaderClass(final Properties props) throws ClassNotFoundException {
         ClassLoader cl = DefaultHazelcastInstanceFactory.class.getClassLoader();
         if (props != null && CacheEnvironment.isNativeClient(props)) {
             return cl.loadClass(HZ_CLIENT_LOADER_CLASSNAME);

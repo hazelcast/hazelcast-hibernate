@@ -45,8 +45,7 @@ public abstract class Expirable implements IdentifiedDataSerializable {
      * @param versionComparator the comparator to use for the version
      * @return {@code true} if the value can be replaced, {@code false} otherwise
      */
-    public abstract boolean isReplaceableBy(final long txTimestamp, final Object newVersion,
-                                            final Comparator versionComparator);
+    public abstract boolean isReplaceableBy(long txTimestamp, Object newVersion, Comparator versionComparator);
 
     /**
      * @return the value contained, or {@code null} if none exists
@@ -57,7 +56,7 @@ public abstract class Expirable implements IdentifiedDataSerializable {
      * @param txTimestamp the timestamp of the transaction
      * @return the value contained if it was created before the transaction timestamp or {@code null}
      */
-    public abstract Object getValue(final long txTimestamp);
+    public abstract Object getValue(long txTimestamp);
 
     /**
      * @return the version representing the value of {@code null} if the entry is not versioned
@@ -70,7 +69,7 @@ public abstract class Expirable implements IdentifiedDataSerializable {
      * @return {@code true} if the {@link Expirable} matches using the specified lock, {@code false} otherwise
      * @see ExpiryMarker#expire(long)
      */
-    public abstract boolean matches(final ExpiryMarker lock);
+    public abstract boolean matches(ExpiryMarker lock);
 
     /**
      * Mark the entry for expiration with the given timeout and marker id.
@@ -83,7 +82,7 @@ public abstract class Expirable implements IdentifiedDataSerializable {
      * @return the newly created marker, or the current marker with a higher multiplicity
      * @see ExpiryMarker#expire(long)
      */
-    public abstract ExpiryMarker markForExpiration(final long timeout, final String nextMarkerId);
+    public abstract ExpiryMarker markForExpiration(long timeout, String nextMarkerId);
 
     @Override
     public void writeData(final ObjectDataOutput out) throws IOException {

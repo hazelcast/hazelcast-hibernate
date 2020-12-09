@@ -24,14 +24,14 @@ import org.hibernate.cache.spi.access.SoftLock;
  */
 public interface RegionCache extends Region, ExtendedStatisticsSupport {
 
-    void afterUpdate(final Object key, final Object newValue, final Object newVersion);
+    void afterUpdate(Object key, Object newValue, Object newVersion);
 
     @Override
     default void clear() {
         evictData();
     }
 
-    boolean contains(final Object key);
+    boolean contains(Object key);
 
     @Override
     default void destroy() {
@@ -39,9 +39,9 @@ public interface RegionCache extends Region, ExtendedStatisticsSupport {
 
     void evictData();
 
-    void evictData(final Object key);
+    void evictData(Object key);
 
-    Object get(final Object key, final long txTimestamp);
+    Object get(Object key, long txTimestamp);
 
     /**
      * Hazelcast does not support pushing elements to disk.
@@ -57,7 +57,7 @@ public interface RegionCache extends Region, ExtendedStatisticsSupport {
         return getRegionFactory().nextTimestamp();
     }
 
-    boolean put(final Object key, final Object value, final long txTimestamp, final Object version);
+    boolean put(Object key, Object value, long txTimestamp, Object version);
 
-    void unlockItem(final Object key, final SoftLock lock);
+    void unlockItem(Object key, SoftLock lock);
 }
