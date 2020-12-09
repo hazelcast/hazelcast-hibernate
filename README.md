@@ -123,8 +123,6 @@ Local region cache eviction can be configured using two parameters:
  - _time-to-live_ - defining the lifespan of cache entries (defaults to 1 hour)
  - -eviction-size_ - defining the maximum cache size (defaults to 100000)
 
-When maximum size is hit, 20% of the entries will be evicted automatically.
-
 Above can be configured in your Hazelcast configuration file:
 
 ```xml
