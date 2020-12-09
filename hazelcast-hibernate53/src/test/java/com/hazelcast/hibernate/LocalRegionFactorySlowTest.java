@@ -2,7 +2,6 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.DummyEntity;
-import com.hazelcast.hibernate.instance.HazelcastAccessor;
 import com.hazelcast.instance.impl.TestUtil;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;

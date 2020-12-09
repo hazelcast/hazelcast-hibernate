@@ -13,13 +13,11 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.hazelcast.hibernate.instance;
+package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.hibernate.AbstractHazelcastCacheRegionFactory;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -37,16 +35,6 @@ public final class HazelcastAccessor {
     static final ILogger LOGGER = Logger.getLogger(HazelcastAccessor.class);
 
     private HazelcastAccessor() {
-    }
-
-    /**
-     * Tries to extract <code>HazelcastInstance</code> from <code>Session</code>.
-     *
-     * @param session the {@code Session} to retrieve the Hazelcast instance for
-     * @return Currently used <code>HazelcastInstance</code> or null if an error occurs.
-     */
-    public static HazelcastInstance getHazelcastInstance(final Session session) {
-        return getHazelcastInstance(session.getSessionFactory());
     }
 
     /**

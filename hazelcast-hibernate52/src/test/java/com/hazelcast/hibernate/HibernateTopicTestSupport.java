@@ -33,7 +33,7 @@ public abstract class HibernateTopicTestSupport extends HibernateTestSupport {
         loader.setInstanceFactory(factory);
         sf = createSessionFactory(getCacheProperties(),  loader);
 
-        instance = getHazelcastInstance(sf);
+        instance = HazelcastAccessor.getHazelcastInstance(sf);
 
         configureTopic(instance);
     }
