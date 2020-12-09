@@ -31,6 +31,8 @@ import java.util.Properties;
  */
 public final class CacheEnvironment {
 
+    public static final String PREFIX = "hibernate.cache.hazelcast.";
+
     /**
      * Legacy property to configure the path of the hazelcast.xml or hazelcast-client.xml configuration files
      */
@@ -40,62 +42,62 @@ public final class CacheEnvironment {
     /**
      * Property to configure the path of the hazelcast.xml or hazelcast-client.xml configuration files
      */
-    public static final String CONFIG_FILE_PATH = "hibernate.cache.hazelcast.configuration_file_path";
+    public static final String CONFIG_FILE_PATH = PREFIX + "configuration_file_path";
 
     /**
      * Property to configure whether a Hazelcast client or node will be used for connection to the cluster
      */
-    public static final String USE_NATIVE_CLIENT = "hibernate.cache.hazelcast.use_native_client";
+    public static final String USE_NATIVE_CLIENT = PREFIX + "use_native_client";
 
     /**
      * Property to configure the address for the Hazelcast client to connect to
      */
-    public static final String NATIVE_CLIENT_ADDRESS = "hibernate.cache.hazelcast.native_client_address";
+    public static final String NATIVE_CLIENT_ADDRESS = PREFIX + "native_client_address";
 
     /**
      * Property to configure Hazelcast client cluster name
      */
-    public static final String NATIVE_CLIENT_CLUSTER_NAME = "hibernate.cache.hazelcast.native_client_cluster_name";
+    public static final String NATIVE_CLIENT_CLUSTER_NAME = PREFIX + "native_client_cluster_name";
 
     /**
      * Property to configure Hazelcast client instance name
      */
-    public static final String NATIVE_CLIENT_INSTANCE_NAME = "hibernate.cache.hazelcast.native_client_instance_name";
+    public static final String NATIVE_CLIENT_INSTANCE_NAME = PREFIX + "native_client_instance_name";
 
     /**
      * Property to configure if the HazelcastInstance should going to shutdown when the RegionFactory is being stopped
      */
-    public static final String SHUTDOWN_ON_STOP = "hibernate.cache.hazelcast.shutdown_on_session_factory_close";
+    public static final String SHUTDOWN_ON_STOP = PREFIX + "shutdown_on_session_factory_close";
 
     /**
      * Property to configure the IMDG cluster connection timeout
      */
-    public static final String CLUSTER_TIMEOUT = "hibernate.cache.hazelcast.cluster_timeout";
+    public static final String CLUSTER_TIMEOUT = PREFIX + "cluster_timeout";
 
     /**
      * Property to configure the IMDG cluster connection initial backoff
      */
-    public static final String INITIAL_BACKOFF_MS = "hibernate.cache.hazelcast.initial_backoff";
+    public static final String INITIAL_BACKOFF_MS = PREFIX + "initial_backoff";
 
     /**
      * Property to configure the IMDG cluster connection max backoff
      */
-    public static final String MAX_BACKOFF_MS = "hibernate.cache.hazelcast.max_backoff";
+    public static final String MAX_BACKOFF_MS = PREFIX + "max_backoff";
 
     /**
      * Property to configure the IMDG cluster connection backoff multiplier
      */
-    public static final String BACKOFF_MULTIPLIER = "hibernate.cache.hazelcast.backoff_multiplier";
+    public static final String BACKOFF_MULTIPLIER = PREFIX + "backoff_multiplier";
 
     /**
      * Property to configure the timeout delay before a lock eventually times out
      */
-    public static final String LOCK_TIMEOUT = "hibernate.cache.hazelcast.lock_timeout";
+    public static final String LOCK_TIMEOUT = PREFIX + "lock_timeout";
 
     /**
      * Property to configure the Hazelcast instance internal name
      */
-    public static final String HAZELCAST_INSTANCE_NAME = "hibernate.cache.hazelcast.instance_name";
+    public static final String HAZELCAST_INSTANCE_NAME = PREFIX + "instance_name";
 
     /**
      * Property to configure the Hazelcast operation timeout
@@ -112,7 +114,7 @@ public final class CacheEnvironment {
      * that shall be used for creating
      * {@link com.hazelcast.hibernate.instance.IHazelcastInstanceLoader hazelcast instance loaders}.
      */
-    public static final String HAZELCAST_FACTORY = "hibernate.cache.hazelcast.factory";
+    public static final String HAZELCAST_FACTORY = PREFIX + "factory";
 
     private static final Duration MAXIMUM_LOCK_TIMEOUT = Duration.ofMillis(10000);
 
