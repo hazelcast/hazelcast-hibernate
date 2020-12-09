@@ -68,11 +68,8 @@ public class QueryCacheEvictionTest extends HibernateSlowTestSupport {
 
     protected Properties getCacheProperties() {
         Properties props = new Properties();
-
-        // Use a specific hazelcast xml config file for these tests
-        props.setProperty(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, configFile);
+        props.setProperty(CacheEnvironment.CONFIG_FILE_PATH, configFile);
         props.setProperty(Environment.CACHE_REGION_FACTORY, regionFactory);
-
         return props;
     }
 
