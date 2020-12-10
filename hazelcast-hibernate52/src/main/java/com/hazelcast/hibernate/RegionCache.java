@@ -25,21 +25,21 @@ import java.util.Map;
  */
 public interface RegionCache {
 
-    Object get(final Object key, final long txTimestamp);
+    Object get(Object key, long txTimestamp);
 
-    boolean insert(final Object key, final Object value, final Object currentVersion);
+    boolean insert(Object key, Object value, Object currentVersion);
 
-    boolean put(final Object key, final Object value, final long txTimestamp, final Object version);
+    boolean put(Object key, Object value, long txTimestamp, Object version);
 
-    boolean update(final Object key, final Object newValue, final Object newVersion, final SoftLock lock);
+    boolean update(Object key, Object newValue, Object newVersion, SoftLock lock);
 
-    boolean remove(final Object key);
+    boolean remove(Object key);
 
-    SoftLock tryLock(final Object key, final Object version);
+    SoftLock tryLock(Object key, Object version);
 
-    void unlock(final Object key, final SoftLock lock);
+    void unlock(Object key, SoftLock lock);
 
-    boolean contains(final Object key);
+    boolean contains(Object key);
 
     void clear();
 
@@ -51,5 +51,4 @@ public interface RegionCache {
     long getSizeInMemory();
 
     Map asMap();
-
 }
