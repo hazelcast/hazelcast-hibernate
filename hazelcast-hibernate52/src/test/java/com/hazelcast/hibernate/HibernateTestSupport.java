@@ -70,14 +70,6 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
         return AccessType.READ_WRITE;
     }
 
-    protected void sleep(int seconds) {
-        try {
-            Thread.sleep(1000 * seconds);
-        } catch (InterruptedException e) {
-            logger.warning("", e);
-        }
-    }
-
     protected void addHbmMappings(final Configuration conf) {
         conf.addFile(createHbmXml("DummyEntity"));
         conf.addFile(createHbmXml("DummyProperty"));

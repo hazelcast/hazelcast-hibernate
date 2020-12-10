@@ -22,43 +22,49 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
 
-
 /**
  * Cache key factory.
  */
 public class HazelcastCacheKeysFactory implements CacheKeysFactory {
 
-  @Override
-  public Object createCollectionKey(Object id, CollectionPersister persister, SessionFactoryImplementor factory,
+    @Override
+    public Object createCollectionKey(
+      Object id, CollectionPersister persister,
+      SessionFactoryImplementor factory,
       String tenantIdentifier) {
-    return new CacheKeyImpl(id, persister.getKeyType(), persister.getRole(), tenantIdentifier, factory);
-  }
+        return new CacheKeyImpl(id, persister.getKeyType(), persister.getRole(), tenantIdentifier, factory);
+    }
 
-  @Override
-  public Object createEntityKey(Object id, EntityPersister persister, SessionFactoryImplementor factory,
+    @Override
+    public Object createEntityKey(
+      Object id, EntityPersister persister,
+      SessionFactoryImplementor factory,
       String tenantIdentifier) {
-    return new CacheKeyImpl(id, persister.getIdentifierType(), persister.getRootEntityName(), tenantIdentifier, factory);
-  }
+        return new CacheKeyImpl(id, persister.getIdentifierType(), persister
+          .getRootEntityName(), tenantIdentifier, factory);
+    }
 
-  @Override
-  public Object createNaturalIdKey(Object[] naturalIdValues, EntityPersister persister,
+    @Override
+    public Object createNaturalIdKey(
+      Object[] naturalIdValues, EntityPersister persister,
       SharedSessionContractImplementor session) {
-    return new NaturalIdCacheKey(naturalIdValues,  persister.getPropertyTypes(), persister.getNaturalIdentifierProperties(),
-        persister.getRootEntityName(), (SessionImplementor) session);
-  }
+        return new NaturalIdCacheKey(naturalIdValues, persister.getPropertyTypes(), persister
+          .getNaturalIdentifierProperties(),
+          persister.getRootEntityName(), (SessionImplementor) session);
+    }
 
-  @Override
-  public Object getEntityId(Object cacheKey) {
-    return ((CacheKeyImpl) cacheKey).getId();
-  }
+    @Override
+    public Object getEntityId(Object cacheKey) {
+        return ((CacheKeyImpl) cacheKey).getId();
+    }
 
-  @Override
-  public Object getCollectionId(Object cacheKey) {
-    return ((CacheKeyImpl) cacheKey).getId();
-  }
+    @Override
+    public Object getCollectionId(Object cacheKey) {
+        return ((CacheKeyImpl) cacheKey).getId();
+    }
 
-  @Override
-  public Object[] getNaturalIdValues(Object cacheKey) {
-    return ((NaturalIdCacheKey) cacheKey).getNaturalIdValues();
-  }
+    @Override
+    public Object[] getNaturalIdValues(Object cacheKey) {
+        return ((NaturalIdCacheKey) cacheKey).getNaturalIdValues();
+    }
 }

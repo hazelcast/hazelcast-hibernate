@@ -75,7 +75,7 @@ class HazelcastInstanceLoader implements IHazelcastInstanceLoader {
             if (instance == null) {
                 throw new CacheException("No instance with name [" + existingInstanceName + "] could be found.");
             }
-        } else  {
+        } else {
             instance = Hazelcast.newHazelcastInstance(config);
         }
         return instance;
