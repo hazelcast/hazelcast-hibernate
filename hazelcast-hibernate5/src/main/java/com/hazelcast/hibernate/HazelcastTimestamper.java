@@ -20,13 +20,13 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.logging.Logger;
 
+import java.time.Duration;
+
 /**
  * Helper class to create timestamps and calculate timeouts based on either Hazelcast
  * configuration of by requesting values on the cluster.
  */
 public final class HazelcastTimestamper {
-
-    private static final int SEC_TO_MS = 1000;
 
     private HazelcastTimestamper() {
     }
@@ -46,8 +46,7 @@ public final class HazelcastTimestamper {
         try {
             final MapConfig cfg = instance.getConfig().findMapConfig(regionName);
             if (cfg.getTimeToLiveSeconds() > 0) {
-                // TTL in ms
-                return cfg.getTimeToLiveSeconds() * SEC_TO_MS;
+                return (int) Duration.ofSeconds(cfg.getTimeToLiveSeconds()).toMillis();
             }
         } catch (UnsupportedOperationException e) {
             // HazelcastInstance is instance of HazelcastClient.

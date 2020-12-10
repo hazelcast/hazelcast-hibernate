@@ -21,6 +21,7 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A container class which represents an entry in a region cache which can be marked for expiration
@@ -95,4 +96,20 @@ public abstract class Expirable implements IdentifiedDataSerializable {
         version = in.readObject();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Expirable expirable = (Expirable) o;
+        return Objects.equals(version, expirable.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(version);
+    }
 }

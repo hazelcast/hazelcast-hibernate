@@ -29,7 +29,7 @@ import java.util.UUID;
 public class TimestampsRegionCache extends LocalRegionCache implements RegionCache {
 
     // Identifier to prevent handling messages sent by this.
-    private UUID regionId;
+    private final UUID regionId;
 
     public TimestampsRegionCache(final String name, final HazelcastInstance hazelcastInstance) {
         super(name, hazelcastInstance, null);
@@ -62,7 +62,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
             return;
         }
 
-        for (; ; ) {
+        while (true) {
             final Expirable value = cache.get(key);
             final Long current = value != null ? (Long) value.getValue() : null;
             if (current != null) {

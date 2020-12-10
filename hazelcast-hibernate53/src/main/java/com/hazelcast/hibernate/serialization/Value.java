@@ -20,6 +20,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A value within a region cache
@@ -95,4 +96,23 @@ public class Value extends Expirable {
         return HibernateDataSerializerHook.VALUE;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        Value value1 = (Value) o;
+        return timestamp == value1.timestamp && Objects.equals(value, value1.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), timestamp, value);
+    }
 }

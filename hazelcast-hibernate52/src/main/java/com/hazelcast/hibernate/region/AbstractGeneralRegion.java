@@ -28,16 +28,16 @@ import java.util.Properties;
 /**
  * Basic implementation of a IMap based cache without any special security checks
  *
- * @param <Cache> implementation type of RegionCache
+ * @param <T> implementation type of RegionCache
  */
-abstract class AbstractGeneralRegion<Cache extends RegionCache>
-        extends AbstractHazelcastRegion<Cache>
+abstract class AbstractGeneralRegion<T extends RegionCache>
+        extends AbstractHazelcastRegion<T>
         implements GeneralDataRegion {
 
-    private final Cache cache;
+    private final T cache;
 
     protected AbstractGeneralRegion(final HazelcastInstance instance, final String name,
-                                    final Properties props, final Cache cache) {
+                                    final Properties props, final T cache) {
         super(instance, name, props);
         this.cache = cache;
     }
@@ -78,7 +78,7 @@ abstract class AbstractGeneralRegion<Cache extends RegionCache>
         }
     }
 
-    public Cache getCache() {
+    public T getCache() {
         return cache;
     }
 }
