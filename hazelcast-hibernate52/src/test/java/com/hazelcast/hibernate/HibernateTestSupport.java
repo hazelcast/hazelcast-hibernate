@@ -20,7 +20,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
-import com.hazelcast.hibernate.instance.HazelcastAccessor;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.internal.nio.IOUtil;
@@ -109,11 +108,7 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
         return sf;
     }
 
-    protected HazelcastInstance getHazelcastInstance(final SessionFactory sf) {
-        return HazelcastAccessor.getHazelcastInstance(sf);
-    }
-
-    protected void deleteDummyEntity(SessionFactory sf, long id) throws Exception {
+    protected void deleteDummyEntity(SessionFactory sf, long id) {
         Session session = null;
         Transaction txn = null;
         try {

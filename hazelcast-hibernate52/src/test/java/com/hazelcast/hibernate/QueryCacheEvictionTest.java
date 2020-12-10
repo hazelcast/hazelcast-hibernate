@@ -75,7 +75,7 @@ public class QueryCacheEvictionTest extends HibernateSlowTestSupport {
 
     @Test
     public void testQueryCacheCleanup() {
-        MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("org.hibernate.cache.*");
+        MapConfig mapConfig = HazelcastAccessor.getHazelcastInstance(sf).getConfig().getMapConfig("org.hibernate.cache.*");
         final int numberOfEntities = 100;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
         int initialEntries = Math.min(maxSize, numberOfEntities);
