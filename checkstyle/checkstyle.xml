@@ -85,8 +85,8 @@
     </module>
 
     <module name="TreeWalker">
-        <!-- Needed for SuppressWarningsFilter to work -->
         <module name="SuppressWarningsHolder"/>
+        <module name="SuppressionCommentFilter"/>
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
