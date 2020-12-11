@@ -114,6 +114,6 @@ public abstract class Expirable implements IdentifiedDataSerializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(version);
+        return Objects.hashCode(version);
     }
 }
