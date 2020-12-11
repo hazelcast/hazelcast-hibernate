@@ -107,12 +107,20 @@ public class Value extends Expirable {
         if (!super.equals(o)) {
             return false;
         }
+
         Value value1 = (Value) o;
-        return timestamp == value1.timestamp && Objects.equals(value, value1.value);
+
+        if (timestamp != value1.timestamp) {
+            return false;
+        }
+        return Objects.equals(value, value1.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), timestamp, value);
+        int result = super.hashCode();
+        result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 }
