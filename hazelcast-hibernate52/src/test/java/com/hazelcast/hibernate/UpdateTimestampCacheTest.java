@@ -130,8 +130,9 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
     private boolean isTimestampCacheUpToDate(SessionFactory sessionFactory) {
         try (Session session = sessionFactory.openSession()) {
             UpdateTimestampsCache timestampsCache = ((SessionFactoryImpl) sessionFactory).getUpdateTimestampsCache();
-            return timestampsCache.isUpToDate(new HashSet<>(Arrays.asList("dummy_entities")),
-                    timestampsCache.getRegion().nextTimestamp(), (SessionImpl) session);
+            return timestampsCache.getRegion().get((SessionImpl) session, "dummy_entities") != null &&
+                    timestampsCache.isUpToDate(new HashSet<>(Arrays.asList("dummy_entities")),
+                            timestampsCache.getRegion().nextTimestamp(), (SessionImpl) session);
         }
     }
 
