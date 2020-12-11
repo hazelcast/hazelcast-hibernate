@@ -1,13 +1,11 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.hibernate.entity.DummyEntity;
-import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,60 +57,69 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
     }
 
     @Test
-    public void testTimestampCacheUpdate() {
-        // given
+    public void testTimestampCacheUpdate() throws Exception {
         final int entityCount = 10;
         insertDummyEntities(entityCount);
 
-        // when
-        List<DummyEntity> list = executeCacheableQuery(sf);
-        // then - put query result to sf local query cache
-        assertEquals(entityCount, list.size());
-        verifyQueryCacheStats(sf, 0, 1, 1);
+        // Expect cache miss on sf since executing the query first time
+        executeQueryAndVerifyCacheStats(sf, entityCount, 0, 1, 1);
 
-        // when
-        list = executeCacheableQuery(sf2);
-        // then - expect miss since query caches are always local
-        assertEquals(entityCount, list.size());
-        verifyQueryCacheStats(sf2, 0, 1, 1);
+        // Expect cache miss on sf2 since query caches are always local
+        executeQueryAndVerifyCacheStats(sf2, entityCount, 0, 1, 1);
 
-        // when - invalidate cached queries on both regions
-        DummyEntity toDelete = list.get(0);
-        Session session = sf.openSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.delete(toDelete);
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
-        list = executeCacheableQuery(sf2);
-        // then - verify invalidated query on sf2
-        assertEquals(entityCount - 1, list.size());
-        verifyQueryCacheStats(sf2, 0, 2, 2);
+        // Invalidate cached queries on both regions
+        deleteDummyEntity(sf, 0);
+        deleteDummyEntity(sf2, 1);
 
-        // when
-        list = executeCacheableQuery(sf2);
-        // then - verify query cache is not blocked
-        assertEquals(entityCount - 1, list.size());
-        verifyQueryCacheStats(sf2, 1, 2, 2);
+        // Wait until invalidation messages are sent between sf and sf2
+        // TODO: Use awaits instead.
+        sleepSeconds(3);
+
+        // Expect the cached query on sf is invalidated and the new one is inserted
+        executeQueryAndVerifyCacheStats(sf, entityCount-2, 0, 2, 2);
+
+        // Expect the cached query on sf2 is invalidated and the new one is inserted
+        executeQueryAndVerifyCacheStats(sf2, entityCount-2,0, 2, 2);
+
+        // Verify sf query cache is not blocked
+        executeQueryAndVerifyCacheStats(sf, entityCount-2, 1, 2, 2);
+
+        // Verify sf2 query cache is not blocked
+        executeQueryAndVerifyCacheStats(sf2, entityCount-2, 1, 2, 2);
     }
 
+    /**
+     * Runs #executeCacheableQuery on the factory and verifies the query result
+     * as well as the query cache stats after the query is executed.
+     *
+     * @param factory  factory to run the query
+     * @param expectedEntryCount  expected number of entries returned by the query
+     * @param expectedCacheHits  expected number of QueryCacheHitCount
+     * @param expectedCacheMisses  expected number of QueryCacheMissCount
+     * @param expectedCachePuts  expected number of QueryCachePutCount
+     */
+    private void executeQueryAndVerifyCacheStats(SessionFactory factory, int expectedEntryCount,
+                                                 long expectedCacheHits, long expectedCacheMisses,
+                                                 long expectedCachePuts) {
+        List<DummyEntity> list = executeCacheableQuery(factory);
+        assertEquals(expectedEntryCount, list.size());
+        assertEquals(expectedCacheHits, factory.getStatistics().getQueryCacheHitCount());
+        assertEquals(expectedCacheMisses, factory.getStatistics().getQueryCacheMissCount());
+        assertEquals(expectedCachePuts, factory.getStatistics().getQueryCachePutCount());
+    }
+
+    /**
+     * Executes a query to select all DummyEntity entries and caches the result.
+     *
+     * @param sessionFactory  factory to run the query
+     * @return  query result
+     */
     private List<DummyEntity> executeCacheableQuery(SessionFactory sessionFactory) {
         try (Session session = sessionFactory.openSession()) {
             Query query = session.createQuery("from " + DummyEntity.class.getName());
             query.setCacheable(true);
             return query.list();
         }
-    }
-
-    private void verifyQueryCacheStats(SessionFactory factory, long expectHits, long expectMisses, long expectPuts) {
-        assertEquals(expectHits, factory.getStatistics().getQueryCacheHitCount());
-        assertEquals(expectMisses, factory.getStatistics().getQueryCacheMissCount());
-        assertEquals(expectPuts, factory.getStatistics().getQueryCachePutCount());
     }
 
 }
