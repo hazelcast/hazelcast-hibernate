@@ -16,7 +16,11 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
@@ -74,19 +78,19 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
         deleteDummyEntity(sf2, 1);
 
         // Wait until invalidation messages are sent between sf and sf2
-        await().atMost(10, SECONDS).until(() -> isTimestampCacheUpToDate(sf) && isTimestampCacheUpToDate(sf2));
+        await().atMost(5, SECONDS).until(() -> isTimestampCacheUpToDate(sf) && isTimestampCacheUpToDate(sf2));
 
         // Expect the cached query on sf is invalidated and the new one is inserted
-        executeQueryAndVerifyCacheStats(sf, entityCount-2, 0, 2, 2);
+        executeQueryAndVerifyCacheStats(sf, entityCount - 2, 0, 2, 2);
 
         // Expect the cached query on sf2 is invalidated and the new one is inserted
-        executeQueryAndVerifyCacheStats(sf2, entityCount-2, 0, 2, 2);
+        executeQueryAndVerifyCacheStats(sf2, entityCount - 2, 0, 2, 2);
 
         // Verify sf query cache is not blocked
-        executeQueryAndVerifyCacheStats(sf, entityCount-2, 1, 2, 2);
+        executeQueryAndVerifyCacheStats(sf, entityCount - 2, 1, 2, 2);
 
         // Verify sf2 query cache is not blocked
-        executeQueryAndVerifyCacheStats(sf2, entityCount-2, 1, 2, 2);
+        executeQueryAndVerifyCacheStats(sf2, entityCount - 2, 1, 2, 2);
     }
 
     /**

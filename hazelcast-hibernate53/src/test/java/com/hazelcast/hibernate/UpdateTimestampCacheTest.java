@@ -3,13 +3,15 @@ package com.hazelcast.hibernate;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cache.spi.UpdateTimestampsCache;
+import org.hibernate.cache.internal.EnabledCaching;
+import org.hibernate.cache.spi.CacheImplementor;
+import org.hibernate.cache.spi.RegionFactory;
+import org.hibernate.cache.spi.TimestampsCache;
 import org.hibernate.cfg.Environment;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.internal.SessionImpl;
+import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -129,9 +131,10 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
 
     private boolean isTimestampCacheUpToDate(SessionFactory sessionFactory) {
         try (Session session = sessionFactory.openSession()) {
-            UpdateTimestampsCache timestampsCache = ((SessionFactoryImpl) sessionFactory).getUpdateTimestampsCache();
+            TimestampsCache timestampsCache = ((EnabledCaching) sf.getCache()).getTimestampsCache();
+            RegionFactory regionFactory = ((CacheImplementor) sessionFactory.getCache()).getRegionFactory();
             return timestampsCache.isUpToDate(new HashSet<>(Arrays.asList("dummy_entities")),
-                    timestampsCache.getRegion().nextTimestamp(), (SessionImpl) session);
+                    regionFactory.nextTimestamp(), (SessionImpl) session);
         }
     }
 
