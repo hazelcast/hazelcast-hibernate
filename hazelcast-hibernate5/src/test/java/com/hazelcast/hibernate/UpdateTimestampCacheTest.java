@@ -6,7 +6,10 @@ import com.hazelcast.test.annotation.SlowTest;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cache.spi.UpdateTimestampsCache;
 import org.hibernate.cfg.Environment;
+import org.hibernate.internal.SessionFactoryImpl;
+import org.hibernate.internal.SessionImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -15,9 +18,12 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -35,9 +41,9 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
     public static Collection<Object[]> parameters() {
         return Arrays.asList(
                 new Object[]{"hazelcast-custom.xml", HazelcastCacheRegionFactory.class.getName()},
-                new Object[]{"hazelcast-custom.xml", HazelcastLocalCacheRegionFactory.class.getName()}, // fails
+                new Object[]{"hazelcast-custom.xml", HazelcastLocalCacheRegionFactory.class.getName()},
                 new Object[]{"hazelcast-custom-object-in-memory-format.xml", HazelcastCacheRegionFactory.class.getName()}, // fails
-                new Object[]{"hazelcast-custom-object-in-memory-format.xml", HazelcastLocalCacheRegionFactory.class.getName()} // fails
+                new Object[]{"hazelcast-custom-object-in-memory-format.xml", HazelcastLocalCacheRegionFactory.class.getName()}
         );
     }
 
@@ -57,7 +63,7 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
     }
 
     @Test
-    public void testTimestampCacheUpdate() throws Exception {
+    public void testTimestampCacheUpdate_issue219() throws Exception {
         final int entityCount = 10;
         insertDummyEntities(entityCount);
 
@@ -72,14 +78,13 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
         deleteDummyEntity(sf2, 1);
 
         // Wait until invalidation messages are sent between sf and sf2
-        // TODO: Use awaits instead.
-        sleepSeconds(3);
+        await().atMost(10, SECONDS).until(() -> isTimestampCacheUpToDate(sf) && isTimestampCacheUpToDate(sf2));
 
         // Expect the cached query on sf is invalidated and the new one is inserted
         executeQueryAndVerifyCacheStats(sf, entityCount-2, 0, 2, 2);
 
         // Expect the cached query on sf2 is invalidated and the new one is inserted
-        executeQueryAndVerifyCacheStats(sf2, entityCount-2,0, 2, 2);
+        executeQueryAndVerifyCacheStats(sf2, entityCount-2, 0, 2, 2);
 
         // Verify sf query cache is not blocked
         executeQueryAndVerifyCacheStats(sf, entityCount-2, 1, 2, 2);
@@ -119,6 +124,14 @@ public class UpdateTimestampCacheTest extends HibernateSlowTestSupport {
             Query query = session.createQuery("from " + DummyEntity.class.getName());
             query.setCacheable(true);
             return query.list();
+        }
+    }
+
+    private boolean isTimestampCacheUpToDate(SessionFactory sessionFactory) {
+        try (Session session = sessionFactory.openSession()) {
+            UpdateTimestampsCache timestampsCache = ((SessionFactoryImpl) sessionFactory).getUpdateTimestampsCache();
+            return timestampsCache.isUpToDate(new HashSet<>(Arrays.asList("dummy_entities")),
+                    timestampsCache.getRegion().nextTimestamp(), (SessionImpl) session);
         }
     }
 
