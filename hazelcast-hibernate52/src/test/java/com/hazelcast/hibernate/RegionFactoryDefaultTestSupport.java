@@ -42,7 +42,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
 
     @Test
     public void testEntity() {
-        final HazelcastInstance hz = getHazelcastInstance(sf);
+        final HazelcastInstance hz = HazelcastAccessor.getHazelcastInstance(sf);
         assertNotNull(hz);
         final int count = 100;
         final int childCount = 3;

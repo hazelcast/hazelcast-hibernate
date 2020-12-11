@@ -68,21 +68,17 @@ public class QueryCacheEvictionTest extends HibernateSlowTestSupport {
 
     protected Properties getCacheProperties() {
         Properties props = new Properties();
-
-        // Use a specific hazelcast xml config file for these tests
-        props.setProperty(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, configFile);
+        props.setProperty(CacheEnvironment.CONFIG_FILE_PATH, configFile);
         props.setProperty(Environment.CACHE_REGION_FACTORY, regionFactory);
-
         return props;
     }
 
     @Test
     public void testQueryCacheCleanup() {
-        MapConfig mapConfig = getHazelcastInstance(sf).getConfig().getMapConfig("default-query-results-region");
+        MapConfig mapConfig = HazelcastAccessor.getHazelcastInstance(sf).getConfig().getMapConfig("default-query-results-region");
         final int numberOfEntities = 100;
         final int maxSize = mapConfig.getEvictionConfig().getSize();
         int initialEntries = Math.min(maxSize, numberOfEntities);
-
 
         insertDummyEntities(numberOfEntities);
         for (int i = 0; i < numberOfEntities; i++) {

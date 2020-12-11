@@ -60,7 +60,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         this(DefaultCacheKeysFactory.INSTANCE);
     }
 
-    public AbstractHazelcastCacheRegionFactory(final CacheKeysFactory cacheKeysFactory) {
+    public AbstractHazelcastCacheRegionFactory(CacheKeysFactory cacheKeysFactory) {
         this.cacheKeysFactory = cacheKeysFactory;
         this.phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     }
@@ -106,9 +106,9 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
           .getFallback(sessionFactory.getProperties()));
     }
 
-    protected abstract RegionCache createRegionCache(final String unqualifiedRegionName,
-                                                     final SessionFactoryImplementor sessionFactory,
-                                                     final DomainDataRegionConfig regionConfig);
+    protected abstract RegionCache createRegionCache(String unqualifiedRegionName,
+                                                     SessionFactoryImplementor sessionFactory,
+                                                     DomainDataRegionConfig regionConfig);
 
     @Override
     protected StorageAccess createTimestampsRegionStorageAccess(final String regionName,
@@ -118,8 +118,8 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
           CacheEnvironment.getFallback(sessionFactory.getProperties()));
     }
 
-    protected abstract RegionCache createTimestampsRegionCache(final String regionName,
-                                                               final SessionFactoryImplementor sessionFactory);
+    protected abstract RegionCache createTimestampsRegionCache(String regionName,
+                                                               SessionFactoryImplementor sessionFactory);
 
     @Override
     protected CacheKeysFactory getImplicitCacheKeysFactory() {

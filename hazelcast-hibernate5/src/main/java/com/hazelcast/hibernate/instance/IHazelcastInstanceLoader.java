@@ -31,7 +31,7 @@ public interface IHazelcastInstanceLoader {
      *
      * @param props properties to apply
      */
-    void configure(final Properties props);
+    void configure(Properties props);
 
     /**
      * Create a new {@link com.hazelcast.core.HazelcastInstance} or loads an already

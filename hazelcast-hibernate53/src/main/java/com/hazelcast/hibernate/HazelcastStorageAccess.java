@@ -23,8 +23,7 @@ import org.hibernate.cache.spi.support.DomainDataStorageAccess;
  */
 public interface HazelcastStorageAccess extends DomainDataStorageAccess {
 
-    void afterUpdate(final Object key, final Object newValue, final Object newVersion);
+    void afterUpdate(Object key, Object newValue, Object newVersion);
 
-    void unlockItem(final Object key, final SoftLock lock);
-
+    void unlockItem(Object key, SoftLock lock);
 }

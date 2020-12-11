@@ -5,18 +5,9 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-
     <!-- Suppress strict duplicate code checking -->
     <suppress checks="StrictDuplicateCode" files="\.java" lines="1-15"/>
 
-    <!-- Hibernate -->
-    <suppress checks="IllegalImport" files="com/hazelcast/hibernate/serialization/Hibernate[0-9]+CacheEntrySerializer"/>
-    <suppress checks="IllegalImport" files="com/hazelcast/hibernate/serialization/Hibernate[0-9]+CacheKeySerializer"/>
-
     <!-- Exclude Clover instrumented sources -->
     <suppress checks="" files="/src-instrumented/"/>
-
-    <!-- TODO: Failing due to the lambda in static block. To be removed with checkstyle version upgrade to 3.x -->
-    <suppress checks="" files="com/hazelcast/hibernate/PhoneHomeService"/>
-
 </suppressions>
