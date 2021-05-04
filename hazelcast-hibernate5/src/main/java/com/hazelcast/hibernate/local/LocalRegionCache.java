@@ -111,7 +111,7 @@ public class LocalRegionCache implements RegionCache {
         versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
         markerIdCounter = new AtomicLong();
 
-        messageListener = createMessageListener();
+        messageListener = ignoreMessagesFromLocalMember(createMessageListener());
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
             listenerRegistrationId = topic.addMessageListener(messageListener);
@@ -221,7 +221,15 @@ public class LocalRegionCache implements RegionCache {
     }
 
     protected MessageListener<Object> createMessageListener() {
-        return message -> maybeInvalidate(message.getMessageObject());
+        return message -> {
+            // Updates made by current node should have been reflected in its local cache already.
+            // Invalidation is only needed if updates came from other node(s).
+            if (message.getPublishingMember() == null
+                    || hazelcastInstance == null
+                    || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
+                maybeInvalidate(message.getMessageObject());
+            }
+        };
     }
 
     @Override
@@ -361,6 +369,16 @@ public class LocalRegionCache implements RegionCache {
         return Math.max(evictionConfig.getTimeToLive().toMillis(), 0) == 0
           ? Duration.ofMillis(Integer.MAX_VALUE)
           : evictionConfig.getTimeToLive();
+    }
+
+    private MessageListener<Object> ignoreMessagesFromLocalMember(final MessageListener<Object> delegate) {
+        return message -> {
+            if (message.getPublishingMember() == null
+                    || hazelcastInstance == null
+                    || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
+                delegate.onMessage(message);
+            }
+        };
     }
 
     /**
