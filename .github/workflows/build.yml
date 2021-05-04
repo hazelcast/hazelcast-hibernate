@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 8
+          distribution: 'zulu'
           architecture: x64
 
       - uses: actions/cache@v2.1.4
@@ -45,6 +46,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java }}
+          distribution: 'zulu'
           architecture: ${{ matrix.architecture }}
 
       - uses: actions/cache@v2.1.4
