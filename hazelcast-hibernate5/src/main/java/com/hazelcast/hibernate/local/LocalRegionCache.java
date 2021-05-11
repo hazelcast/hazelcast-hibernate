@@ -221,15 +221,7 @@ public class LocalRegionCache implements RegionCache {
     }
 
     protected MessageListener<Object> createMessageListener() {
-        return message -> {
-            // Updates made by current node should have been reflected in its local cache already.
-            // Invalidation is only needed if updates came from other node(s).
-            if (message.getPublishingMember() == null
-                    || hazelcastInstance == null
-                    || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
-                maybeInvalidate(message.getMessageObject());
-            }
-        };
+        return message -> maybeInvalidate(message.getMessageObject());
     }
 
     @Override
