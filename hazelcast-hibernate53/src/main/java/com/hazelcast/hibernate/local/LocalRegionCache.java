@@ -244,7 +244,15 @@ public class LocalRegionCache implements RegionCache {
     }
 
     private MessageListener<Object> createMessageListener() {
-        return message -> maybeInvalidate(message.getMessageObject());
+        return message -> {
+            // Updates made by current node should have been reflected in its local cache already.
+            // Invalidation is only needed if updates came from other node(s).
+            if (message.getPublishingMember() == null
+                    || hazelcastInstance == null
+                    || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
+                maybeInvalidate(message.getMessageObject());
+            }
+        };
     }
 
     private Optional<Comparator<?>> findVersionComparator(final DomainDataRegionConfig regionConfig) {

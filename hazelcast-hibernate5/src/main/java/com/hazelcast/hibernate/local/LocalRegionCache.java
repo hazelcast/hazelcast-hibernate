@@ -111,7 +111,7 @@ public class LocalRegionCache implements RegionCache {
         versionComparator = metadata != null && metadata.isVersioned() ? metadata.getVersionComparator() : null;
         markerIdCounter = new AtomicLong();
 
-        messageListener = createMessageListener();
+        messageListener = ignoreMessagesFromLocalMember(createMessageListener());
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
             listenerRegistrationId = topic.addMessageListener(messageListener);
@@ -361,6 +361,16 @@ public class LocalRegionCache implements RegionCache {
         return Math.max(evictionConfig.getTimeToLive().toMillis(), 0) == 0
           ? Duration.ofMillis(Integer.MAX_VALUE)
           : evictionConfig.getTimeToLive();
+    }
+
+    private MessageListener<Object> ignoreMessagesFromLocalMember(final MessageListener<Object> delegate) {
+        return message -> {
+            if (message.getPublishingMember() == null
+                    || hazelcastInstance == null
+                    || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
+                delegate.onMessage(message);
+            }
+        };
     }
 
     /**
