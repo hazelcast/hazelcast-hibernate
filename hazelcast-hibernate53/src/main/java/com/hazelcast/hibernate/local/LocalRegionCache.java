@@ -260,7 +260,11 @@ public class LocalRegionCache implements RegionCache {
 
             @Override
             public void onMessage(final Message<Object> message) {
-                maybeInvalidate(message.getMessageObject());
+                if (message.getPublishingMember() == null
+                        || hazelcastInstance == null
+                        || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
+                    maybeInvalidate(message.getMessageObject());
+                }
             }
         };
     }
