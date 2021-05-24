@@ -2,8 +2,11 @@ package com.hazelcast.hibernate.local;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
+import com.hazelcast.core.Member;
+import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.QuickTest;
@@ -11,6 +14,7 @@ import org.hibernate.cache.spi.CacheDataDescription;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 
 import java.util.Comparator;
 
@@ -91,6 +95,45 @@ public class LocalRegionCacheTest {
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
         verify(topic).addMessageListener(isNotNull(MessageListener.class));
+    }
+
+    @Test
+    public void testMessagesFromLocalNodeAreIgnored() {
+        MapConfig mapConfig = mock(MapConfig.class);
+
+        LocalRegionCache.EvictionConfig evictionConfig = mock(LocalRegionCache.EvictionConfig.class);
+        when(evictionConfig.getTimeToLiveMillis()).thenReturn(60*60*1000L);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        ITopic<Object> topic = mock(ITopic.class);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+        when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
+
+        // Create a new local cache
+        new LocalRegionCache(CACHE_NAME, instance, null, true, evictionConfig);
+
+        // Obtain the message listener of the local cache
+        ArgumentCaptor<MessageListener> messageListenerArgumentCaptor = ArgumentCaptor.forClass(MessageListener.class);
+        verify(topic).addMessageListener(messageListenerArgumentCaptor.capture());
+        MessageListener messageListener = messageListenerArgumentCaptor.getValue();
+
+        Message message = mock(Message.class);
+        Member local = mock(Member.class);
+        Cluster cluster = mock(Cluster.class);
+        when(cluster.getLocalMember()).thenReturn(local);
+        when(message.getMessageObject()).thenReturn(new Invalidation());
+        when(message.getPublishingMember()).thenReturn(local);
+        when(instance.getCluster()).thenReturn(cluster);
+
+        // Publish a message from local node
+        messageListener.onMessage(message);
+
+        // Verify that our message listener ignores messages from local node
+        verify(message, never()).getMessageObject();
     }
 
     public static void runCleanup(LocalRegionCache cache) {

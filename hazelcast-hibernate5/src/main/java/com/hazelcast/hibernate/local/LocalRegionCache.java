@@ -118,7 +118,7 @@ public class LocalRegionCache implements RegionCache {
         cache = new ConcurrentHashMap<Object, Expirable>();
         markerIdCounter = new AtomicLong();
 
-        messageListener = createMessageListener();
+        messageListener = ignoreMessagesFromLocalMember(createMessageListener());
         if (withTopic && hazelcastInstance != null) {
             topic = hazelcastInstance.getTopic(name);
             topic.addMessageListener(messageListener);
@@ -361,6 +361,19 @@ public class LocalRegionCache implements RegionCache {
                 cache.remove(key, value);
             }
         }
+    }
+
+    private MessageListener<Object> ignoreMessagesFromLocalMember(final MessageListener<Object> delegate) {
+        return new MessageListener<Object>() {
+            @Override
+            public void onMessage(Message<Object> message) {
+                if (message.getPublishingMember() == null
+                        || hazelcastInstance == null
+                        || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
+                    delegate.onMessage(message);
+                }
+            }
+        };
     }
 
     private String nextMarkerId() {
