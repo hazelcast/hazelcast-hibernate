@@ -31,6 +31,20 @@ public class Hibernate5CacheEntrySerializerHook implements SerializerHook {
 
     private static Class<?> tryLoadCacheEntryImpl() {
         try {
+            // First check if Hibernate is present at all.
+            // We have to do it, because when Hibernate CacheEntry
+            // is not available then loading Hazelcast CacheEntryImpl
+            // throws NoClassDefFoundError. This makes some application
+            // containers (Wildfly) to freak out and log scary warnings.
+
+            // When Hibernate is NOT available then it will throw just ClassNotFoundException
+            // which we catch anyway. The important difference is that
+            // ClassNotFoundException is seen as less severe than NoClassDefFoundError
+            // and JBoss/Wildfly won't bother logging it on its own.
+            Class.forName("org.hibernate.cache.spi.entry.CacheEntry");
+
+            // If we are here then Hibernate is available and we can safely
+            // load CacheEntryImpl
             return CacheEntryImpl.class;
         } catch (Throwable e) {
             Logger.getLogger(Hibernate5CacheEntrySerializerHook.class).finest(SKIP_INIT_MSG);
