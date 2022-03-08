@@ -13,7 +13,7 @@ jobs:
         hazelcast: [ '5.1-SNAPSHOT' ]
     name: Build against IMDG ${{ matrix.hazelcast }} with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Setup JDK
         uses: actions/setup-java@v2
         with:
