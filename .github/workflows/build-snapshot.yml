@@ -1,4 +1,4 @@
-name: build
+name: Build snapshot
 on:
   schedule:
     - cron: '0 3 * * *'
@@ -9,23 +9,16 @@ jobs:
     strategy:
       matrix:
         java: [ '8' ]
-        architecture: [ 'x64' ]
         hazelcast: [ '5.1-SNAPSHOT' ]
-    name: Build against IMDG ${{ matrix.hazelcast }} with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
+    name: Build against Hazelcast ${{ matrix.hazelcast }} with JDK ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup JDK
         uses: actions/setup-java@v3.4.1
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'zulu'
-          architecture: ${{ matrix.architecture }}
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build with Maven
         run: mvn -Dhazelcast.version=${{ matrix.hazelcast }} verify
