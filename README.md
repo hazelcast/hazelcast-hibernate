@@ -10,7 +10,6 @@ You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or 
 ## Supported Versions
 
 The newest version of:
-- `hazelcast-hibernate52` supports Hibernate 5.2.x, and Hazelcast 4+
 - `hazelcast-hibernate53` supports Hibernate 5.3.x/5.4.x, and Hazelcast 4+
 
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
