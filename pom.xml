@@ -23,7 +23,6 @@
     <url>http://www.hazelcast.com/</url>
 
     <modules>
-        <module>hazelcast-hibernate5</module>
         <module>hazelcast-hibernate52</module>
         <module>hazelcast-hibernate53</module>
     </modules>
