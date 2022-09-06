@@ -6,11 +6,11 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.test.HazelcastSerialClassRunner;
+import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.topic.ITopic;
 import com.hazelcast.topic.Message;
 import com.hazelcast.topic.MessageListener;
-import com.hazelcast.test.HazelcastSerialClassRunner;
-import com.hazelcast.test.annotation.QuickTest;
 import org.hibernate.cache.cfg.spi.CollectionDataCachingConfig;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.cfg.spi.EntityDataCachingConfig;
@@ -27,7 +27,17 @@ import java.util.Comparator;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(QuickTest.class)
@@ -153,7 +163,7 @@ public class LocalRegionCacheTest {
 
         verify(evictionConfig, atLeastOnce()).getMaxSize();
         verify(evictionConfig, atLeastOnce()).getTimeToLive();
-        verifyZeroInteractions(mapConfig);
+        verifyNoInteractions(mapConfig);
     }
 
     // Verifies that the three-argument constructor still registers a listener with a topic if the HazelcastInstance
@@ -169,7 +179,7 @@ public class LocalRegionCacheTest {
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
 
         ITopic<Object> topic = mock(ITopic.class);
-        when(topic.addMessageListener(isNotNull(MessageListener.class))).thenReturn(UUID.randomUUID());
+        when(topic.addMessageListener(isNotNull())).thenReturn(UUID.randomUUID());
 
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
@@ -179,7 +189,7 @@ public class LocalRegionCacheTest {
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
-        verify(topic).addMessageListener(isNotNull(MessageListener.class));
+        verify(topic).addMessageListener(isNotNull());
     }
 
     @Test

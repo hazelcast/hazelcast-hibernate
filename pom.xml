@@ -35,6 +35,9 @@
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
+        <hazelcast-hibernate.module.name>ALL-UNNAMED</hazelcast-hibernate.module.name>
+        <javaModuleArgs/>
+
         <hazelcast.version>5.1.3</hazelcast.version>
 
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
@@ -66,7 +69,7 @@
 
         <junit.version>4.13.2</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <mockito.version>1.10.19</mockito.version>
+        <mockito.version>4.7.0</mockito.version>
         <powermock.version>2.0.9</powermock.version>
         <wiremock.version>2.27.2</wiremock.version>
 
@@ -237,6 +240,7 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>failedfirst</runOrder>
                     <argLine>
+                        ${javaModuleArgs}
                         -Xms128m -Xmx1G
                         -Dhazelcast.phone.home.enabled=false
                         -Dhazelcast.mancenter.enabled=false
@@ -294,7 +298,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
@@ -385,6 +389,19 @@
     </dependencies>
     <profiles>
         <profile>
+            <id>jdk-9</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <!-- required only by Hibernate <5.3 -->
+                <javaModuleArgs>
+                    --add-opens java.base/java.lang=${hazelcast-hibernate.module.name}
+                    --illegal-access=deny
+                </javaModuleArgs>
+            </properties>
+        </profile>
+        <profile>
             <id>checkstyle</id>
             <build>
                 <plugins>
@@ -445,6 +462,7 @@
             <id>test-coverage</id>
             <properties>
                 <argLine>
+                    ${javaModuleArgs}
                     -Xms128m -Xmx1G
                     -Dhazelcast.version.check.enabled=false
                     -Dhazelcast.mancenter.enabled=false
@@ -591,7 +609,9 @@
                         <configuration combine.self="override">
                             <parallel>none</parallel>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <argLine>-Xms128m -Xmx1G
+                            <argLine>
+                                ${javaModuleArgs}
+                                -Xms128m -Xmx1G
                                 -Dhazelcast.phone.home.enabled=false
                                 -Dhazelcast.mancenter.enabled=false
                                 -Dhazelcast.logging.type=none
