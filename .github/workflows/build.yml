@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         java: [ '8' ]
-        module: ['hazelcast-hibernate5', 'hazelcast-hibernate52', 'hazelcast-hibernate53']
+        module: [ 'hazelcast-hibernate53' ]
     name: Build ${{ matrix.module }} with JDK ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
