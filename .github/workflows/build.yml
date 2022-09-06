@@ -18,7 +18,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3.5.0
         with:
-          java-version: 8
+          java-version: 17
           distribution: 'temurin'
           cache: 'maven'
 
@@ -30,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '8' ]
         module: [ 'hazelcast-hibernate53' ]
     name: Build ${{ matrix.module }} with JDK ${{ matrix.java }}
     steps:
@@ -38,7 +37,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3.5.0
         with:
-          java-version: ${{ matrix.java }}
+          java-version:  17
           distribution: 'temurin'
           cache: 'maven'
 
