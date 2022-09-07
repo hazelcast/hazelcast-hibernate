@@ -35,7 +35,6 @@
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
-        <hazelcast-hibernate.module.name>ALL-UNNAMED</hazelcast-hibernate.module.name>
         <javaModuleArgs/>
 
         <hazelcast.version>5.1.3</hazelcast.version>
@@ -229,6 +228,9 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestEntries>
+                            <Automatic-Module-Name>${jpms.module.name}</Automatic-Module-Name>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -394,9 +396,9 @@
                 <jdk>[9,)</jdk>
             </activation>
             <properties>
-                <!-- required only by Hibernate <5.3 -->
+                <!-- required only for tests with Hibernate <5.3 -->
                 <javaModuleArgs>
-                    --add-opens java.base/java.lang=${hazelcast-hibernate.module.name}
+                    --add-opens java.base/java.lang=ALL-UNNAMED
                     --illegal-access=deny
                 </javaModuleArgs>
             </properties>
