@@ -44,7 +44,6 @@ class PhoneHomeService {
 
     private static final Duration TIMEOUT = Duration.ofMillis(3000);
     private static final int RETRY_COUNT = 5;
-    private static final boolean PHONE_HOME_ENABLED = isPhoneHomeEnabled();
     private static ScheduledThreadPoolExecutor executor;
 
     private final ILogger logger = Logger.getLogger(PhoneHomeService.class);
@@ -55,7 +54,6 @@ class PhoneHomeService {
     private ScheduledFuture<?> sendFuture;
 
     static {
-        if (PHONE_HOME_ENABLED) {
             executor = new ScheduledThreadPoolExecutor(0, r -> {
                 Thread t = new Thread(r, "Hazelcast-Hibernate.PhoneHomeService");
                 t.setDaemon(true);
@@ -63,7 +61,6 @@ class PhoneHomeService {
             });
             executor.setRemoveOnCancelPolicy(true);
         }
-    }
 
     PhoneHomeService(PhoneHomeInfo phoneHomeInfo) {
         this("http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate52", phoneHomeInfo);
@@ -85,7 +82,7 @@ class PhoneHomeService {
     }
 
     void start() {
-       if (PHONE_HOME_ENABLED && started.compareAndSet(false, true)) {
+        if (isPhoneHomeEnabled() && started.compareAndSet(false, true)) {
             sendFuture = executor.scheduleAtFixedRate(this::send, 0, 1, TimeUnit.DAYS);
         }
     }
