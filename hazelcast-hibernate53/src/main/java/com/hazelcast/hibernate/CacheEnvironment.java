@@ -119,7 +119,7 @@ public final class CacheEnvironment {
     }
 
     public static String getInstanceName(final Properties props) {
-        return getString(HAZELCAST_INSTANCE_NAME, props, null);
+        return getString(HAZELCAST_INSTANCE_NAME, props, (String) null);
     }
 
     public static boolean isNativeClient(final Properties props) {
