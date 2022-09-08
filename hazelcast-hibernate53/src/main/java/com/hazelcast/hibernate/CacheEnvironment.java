@@ -15,8 +15,6 @@
 
 package com.hazelcast.hibernate;
 
-import org.hibernate.cfg.Environment;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.internal.util.config.ConfigurationException;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 
@@ -31,12 +29,6 @@ import static org.hibernate.internal.util.config.ConfigurationHelper.getString;
  * and contains all property names for hibernate based configuration properties.
  */
 public final class CacheEnvironment {
-
-    /**
-     * Legacy property to configure the path of the hazelcast.xml or hazelcast-client.xml configuration files
-     */
-    @Deprecated
-    public static final String CONFIG_FILE_PATH_LEGACY = Environment.CACHE_PROVIDER_CONFIG;
 
     /**
      * Property to configure the path of the hazelcast.xml or hazelcast-client.xml configuration files
@@ -123,11 +115,7 @@ public final class CacheEnvironment {
     }
 
     public static String getConfigFilePath(final Properties props) {
-        String configResourcePath = getString(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, props, null);
-        if (StringHelper.isEmpty(configResourcePath)) {
-            configResourcePath = getString(CacheEnvironment.CONFIG_FILE_PATH, props, null);
-        }
-        return configResourcePath;
+            return getString(CacheEnvironment.CONFIG_FILE_PATH, props, (String) null);
     }
 
     public static String getInstanceName(final Properties props) {

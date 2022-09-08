@@ -62,7 +62,6 @@ public class CustomPropertiesTest extends HibernateTestSupport {
         Config config = new ClasspathXmlConfig("hazelcast-custom.xml");
         HazelcastInstance main = factory.newHazelcastInstance(config);
         Properties props = getDefaultProperties();
-        props.remove(CacheEnvironment.CONFIG_FILE_PATH_LEGACY);
         props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
         props.setProperty(CacheEnvironment.USE_NATIVE_CLIENT, "true");
         props.setProperty(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, "dev-custom");
@@ -214,7 +213,7 @@ public class CustomPropertiesTest extends HibernateTestSupport {
     private Properties getDefaultProperties() {
         Properties props = new Properties();
         props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
-        props.setProperty(CacheEnvironment.CONFIG_FILE_PATH_LEGACY, "hazelcast-custom.xml");
+        props.setProperty(CacheEnvironment.CONFIG_FILE_PATH, "hazelcast-custom.xml");
         return props;
     }
 }
