@@ -20,15 +20,18 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceLoader;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.stat.SecondLevelCacheStatistics;
+import org.hibernate.query.Query;
+import org.hibernate.stat.CacheRegionStatistics;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -122,7 +125,7 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
 
         getDummyEntities(sf, 10);
 
-        SecondLevelCacheStatistics dummyEntityCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY);
+        CacheRegionStatistics dummyEntityCacheStats = sf.getStatistics().getCacheRegionStatistics(CACHE_ENTITY);
         assertEquals(10, dummyEntityCacheStats.getMissCount());
         assertEquals(0, dummyEntityCacheStats.getHitCount());
     }
@@ -138,7 +141,7 @@ public abstract class HibernateStatisticsTestSupport extends HibernateTestSuppor
         //property reference missed in cache.
         getPropertiesOfEntity(0);
 
-        SecondLevelCacheStatistics dummyPropertyCacheStats = sf.getStatistics().getSecondLevelCacheStatistics(CACHE_ENTITY + ".properties");
+        CacheRegionStatistics dummyPropertyCacheStats = sf.getStatistics().getCacheRegionStatistics(CACHE_ENTITY + ".properties");
         assertEquals(0, dummyPropertyCacheStats.getHitCount());
         assertEquals(1, dummyPropertyCacheStats.getMissCount());
     }

@@ -8,8 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.assertEquals;
@@ -29,7 +29,7 @@ public class PhoneHomeTest {
     @Test
     public void localRegionRegistryTest() {
         HazelcastLocalCacheRegionFactory regionFactory = new HazelcastLocalCacheRegionFactory(phoneHomeService);
-        regionFactory.start(sessionFactoryOptions, new Properties());
+        regionFactory.start(sessionFactoryOptions, new HashMap<>());
         verify(phoneHomeService, times(1)).start();
         regionFactory.stop();
         verify(phoneHomeService, times(1)).shutdown();
@@ -38,7 +38,7 @@ public class PhoneHomeTest {
     @Test
     public void distributedRegionRegistryTest() {
         HazelcastCacheRegionFactory regionFactory = new HazelcastCacheRegionFactory(phoneHomeService);
-        regionFactory.start(sessionFactoryOptions, new Properties());
+        regionFactory.start(sessionFactoryOptions, new HashMap<>());
         verify(phoneHomeService, times(1)).start();
         regionFactory.stop();
         verify(phoneHomeService, times(1)).shutdown();

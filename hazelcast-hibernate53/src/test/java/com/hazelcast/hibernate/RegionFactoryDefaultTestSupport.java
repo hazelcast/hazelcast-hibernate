@@ -18,17 +18,25 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.Version;
 import org.hibernate.cfg.Environment;
+import org.hibernate.query.Query;
 import org.hibernate.stat.Statistics;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public abstract class RegionFactoryDefaultTestSupport extends HibernateStatisticsTestSupport {
 
@@ -88,8 +96,8 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         assertEquals(count, cache.size());
         assertEquals(count * childCount, propCache.size());
         assertEquals(count, propCollCache.size());
-        sf.getCache().evictEntityRegion(DummyEntity.class);
-        sf.getCache().evictEntityRegion(DummyProperty.class);
+        sf.getCache().evictEntityData(DummyEntity.class);
+        sf.getCache().evictEntityData(DummyProperty.class);
         assertEquals(0, cache.size());
         assertEquals(0, propCache.size());
         stats.logSummary();
@@ -136,11 +144,19 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         //      HazelcastRegionFactory puts into L2 cache 2 times; 1 on insert, 1 on query execution
         //      assertEquals(entityCount, stats.getSecondLevelCachePutCount());
         assertEquals(entityCount, stats.getEntityLoadCount());
-        assertEquals(entityCount * (queryCount - 1) * 2, stats.getSecondLevelCacheHitCount());
+
+        // see https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#query-result-cache
+        boolean entitiesInQueryCache = hibernateMajorVersion() >= 6;
+        assertEquals(entityCount * (queryCount - 1) * (entitiesInQueryCache ? 1 : 2), stats.getSecondLevelCacheHitCount());
         // collection cache miss
         assertEquals(entityCount, stats.getSecondLevelCacheMissCount());
         assertEquals(entityCount, stats.getEntityDeleteCount());
         stats.logSummary();
+    }
+
+    private int hibernateMajorVersion() {
+        String hibernateVersion = Version.getVersionString();
+        return Integer.parseInt(hibernateVersion.split("\\.")[0]);
     }
 
     @Test
@@ -236,14 +252,14 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
     @Test
     public void testEvictionEntity() {
         insertDummyEntities(1, 1);
-        sf.getCache().evictEntity("com.hazelcast.hibernate.entity.DummyEntity", 0L);
+        sf.getCache().evictEntityData("com.hazelcast.hibernate.entity.DummyEntity", 0L);
         assertFalse(sf.getCache().containsEntity("com.hazelcast.hibernate.entity.DummyEntity", 0L));
     }
 
     @Test
     public void testEvictionCollection() {
         insertDummyEntities(1, 1);
-        sf.getCache().evictCollection("com.hazelcast.hibernate.entity.DummyEntity.properties", 0L);
+        sf.getCache().evictCollectionData("com.hazelcast.hibernate.entity.DummyEntity.properties", 0L);
         assertFalse(sf.getCache().containsCollection("com.hazelcast.hibernate.entity.DummyEntity.properties", 0L));
     }
 
@@ -253,7 +269,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
         DummyEntity ent = session.get(DummyEntity.class, 0L);
-        sf.getCache().evictEntity("com.hazelcast.hibernate.entity.DummyEntity", 0L);
+        sf.getCache().evictEntityData("com.hazelcast.hibernate.entity.DummyEntity", 0L);
         ent.setName("updatedName");
         session.update(ent);
         tx.commit();
