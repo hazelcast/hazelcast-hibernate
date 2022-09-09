@@ -3,9 +3,11 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.instance.impl.TestUtil;
+import com.hazelcast.spi.impl.eventservice.EventService;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
 import com.hazelcast.topic.impl.TopicService;
+import org.assertj.core.api.SoftAssertions;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 
+import static org.hibernate.cache.spi.RegionFactory.DEFAULT_QUERY_RESULTS_REGION_UNQUALIFIED_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -30,19 +33,26 @@ public class LocalRegionFactorySlowTest extends HibernateSlowTestSupport {
     public void cleanUpRegisteredTopicOnRegionShutdown() {
         HazelcastInstance sf1Instance = HazelcastAccessor.getHazelcastInstance(sf);
         List<String> regions = new ArrayList<>(Arrays.asList(sf.getStatistics().getSecondLevelCacheRegionNames()));
-        // 'Query' cache is not subscribed to a topic in 5 and 52.
-        regions.removeIf(n -> n.contains("Query"));
 
-        Function<String, Integer> getRegistrationsCount = r -> TestUtil.getNode(sf1Instance).getNodeEngine()
-                .getEventService().getRegistrations(TopicService.SERVICE_NAME, r).size();
+        //default query results region is not subscribed to a topic
+        regions.remove(DEFAULT_QUERY_RESULTS_REGION_UNQUALIFIED_NAME);
 
-        regions.forEach(r ->
-                assertEquals(r,2L, getRegistrationsCount.apply(r).longValue()));
+        EventService eventService = TestUtil.getNode(sf1Instance).getNodeEngine().getEventService();
+        Function<String, Integer> getRegistrationsCount = r -> eventService.getRegistrations(TopicService.SERVICE_NAME, r).size();
 
+        SoftAssertions softly = new SoftAssertions();
+        regions.forEach(r -> {
+                    softly.assertThat(getRegistrationsCount.apply(r).longValue()).as(r).isEqualTo(2L);
+                }
+        );
+        softly.assertAll();
         sf2.close();
 
-        regions.forEach(r ->
-                assertEquals(r,1L, getRegistrationsCount.apply(r).longValue()));
+        SoftAssertions softly2 = new SoftAssertions();
+        regions.forEach(r -> {
+                    softly2.assertThat(getRegistrationsCount.apply(r).longValue()).as(r).isEqualTo(1L);
+                }
+        );
     }
 
     @Test
