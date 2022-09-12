@@ -19,14 +19,8 @@ jobs:
         uses: actions/setup-java@v3.5.0
         with:
           java-version: 8
-          distribution: 'zulu'
-          architecture: x64
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build with Maven
         run: mvn -B install -DskipTests -Pcheckstyle,findbugs
@@ -37,23 +31,16 @@ jobs:
     strategy:
       matrix:
         java: [ '8' ]
-        architecture: [ 'x64' ]
-        module: ['hazelcast-hibernate5', 'hazelcast-hibernate52', 'hazelcast-hibernate53']
-    name: Build ${{ matrix.module }} with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
+        module: [ 'hazelcast-hibernate53' ]
+    name: Build ${{ matrix.module }} with JDK ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup JDK
         uses: actions/setup-java@v3.5.0
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'zulu'
-          architecture: ${{ matrix.architecture }}
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build with Maven
         run: mvn -f ${{ matrix.module }}/pom.xml verify

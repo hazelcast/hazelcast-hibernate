@@ -1,7 +1,7 @@
 # Hibernate Second Level Cache
 
-<a href="https://github.com/hazelcast/hazelcast-hibernate5/actions?query=event%3Apush+branch%3Amaster"><img alt="GitHub Actions status" src="https://github.com/hazelcast/hazelcast-hibernate5/workflows/build/badge.svg"></a>
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.hazelcast/hazelcast-hibernate5/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.hazelcast/hazelcast-hibernate53) 
+<a href="https://github.com/hazelcast/hazelcast-hibernate/actions?query=event%3Apush+branch%3Amaster"><img alt="GitHub Actions status" src="https://github.com/hazelcast/hazelcast-hibernate5/workflows/build/badge.svg"></a>
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.hazelcast/hazelcast-hibernate/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.hazelcast/hazelcast-hibernate53) 
 
 Hazelcast provides a distributed second-level cache for your Hibernate entities, collections, and queries.
 
@@ -10,8 +10,6 @@ You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or 
 ## Supported Versions
 
 The newest version of:
-- `hazelcast-hibernate5` supports Hibernate 5.0.x, Hibernate 5.1.x, and Hazelcast 4+
-- `hazelcast-hibernate52` supports Hibernate 5.2.x, and Hazelcast 4+
 - `hazelcast-hibernate53` supports Hibernate 5.3.x/5.4.x, and Hazelcast 4+
 
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
@@ -298,9 +296,3 @@ public class Cat implements Serializable {
   ...
 }
 ```
-
-## Advanced Settings
-
-**Changing/setting lock timeout value of *read-write* strategy in hazelcast-hibernate5 and hazelcast-hibernate52**
-
-You can set a lock timeout value using the `hibernate.cache.hazelcast.lock_timeout` Hibernate property. The value should be in milliseconds.

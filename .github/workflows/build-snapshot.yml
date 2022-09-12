@@ -1,4 +1,4 @@
-name: build
+name: Build snapshot
 on:
   schedule:
     - cron: '0 3 * * *'
@@ -8,25 +8,37 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '8' ]
-        architecture: [ 'x64' ]
-        hazelcast: [ '5.1-SNAPSHOT' ]
-    name: Build against IMDG ${{ matrix.hazelcast }} with JDK ${{ matrix.java }} on ${{ matrix.architecture }}
+        java: [ '11' ]
+        hazelcast: [ '4.1.9','4.2.5' ,'5.0.3', '5.1.3', '5.2-SNAPSHOT' ]
+        hibernate: [ '5.3.28.Final', '5.4.33.Final','5.5.9.Final', '5.6.11.Final' ]
+    name: Build against Hazelcast ${{ matrix.hazelcast }} and Hibernate ${{ matrix.hibernate }} with JDK ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup JDK
         uses: actions/setup-java@v3.5.0
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'zulu'
-          architecture: ${{ matrix.architecture }}
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          distribution: 'temurin'
+          cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -Dhazelcast.version=${{ matrix.hazelcast }} verify
+        run: mvn -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }} verify
+
+  test-jdks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
+    name: Build with JDK ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v3.4.1
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn verify
 
