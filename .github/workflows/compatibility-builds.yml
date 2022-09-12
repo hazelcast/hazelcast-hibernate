@@ -1,4 +1,4 @@
-name: Build snapshot
+name: Compatiblity Builds
 on:
   schedule:
     - cron: '0 3 * * *'
