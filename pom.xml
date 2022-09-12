@@ -35,8 +35,6 @@
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
 
-        <javaModuleArgs/>
-
         <hazelcast.version>5.1.3</hazelcast.version>
 
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
@@ -242,7 +240,6 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>failedfirst</runOrder>
                     <argLine>
-                        ${javaModuleArgs}
                         -Xms128m -Xmx1G
                         -Dhazelcast.phone.home.enabled=false
                         -Dhazelcast.mancenter.enabled=false
@@ -391,19 +388,6 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>jdk-9</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <!-- required only for tests with Hibernate <5.3 -->
-                <javaModuleArgs>
-                    --add-opens java.base/java.lang=ALL-UNNAMED
-                    --illegal-access=deny
-                </javaModuleArgs>
-            </properties>
-        </profile>
-        <profile>
             <id>checkstyle</id>
             <build>
                 <plugins>
@@ -464,7 +448,6 @@
             <id>test-coverage</id>
             <properties>
                 <argLine>
-                    ${javaModuleArgs}
                     -Xms128m -Xmx1G
                     -Dhazelcast.version.check.enabled=false
                     -Dhazelcast.mancenter.enabled=false
@@ -612,7 +595,6 @@
                             <parallel>none</parallel>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <argLine>
-                                ${javaModuleArgs}
                                 -Xms128m -Xmx1G
                                 -Dhazelcast.phone.home.enabled=false
                                 -Dhazelcast.mancenter.enabled=false
