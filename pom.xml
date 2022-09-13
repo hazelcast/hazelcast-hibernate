@@ -326,6 +326,7 @@
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
+            <classifier>jdk8</classifier>
             <type>jar</type>
             <scope>test</scope>
         </dependency>
