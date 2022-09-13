@@ -78,7 +78,7 @@
         <sonar.language>java</sonar.language>
         <sonar.verbose>true</sonar.verbose>
 
-        <hsqldb.version>2.5.1</hsqldb.version>
+        <hsqldb.version>2.7.0</hsqldb.version>
         <javassist.version>3.27.0-GA</javassist.version>
         <hibernate.core.version>5.0.12.Final</hibernate.core.version>
         <bytebuddy.version>1.10.11</bytebuddy.version>
@@ -326,6 +326,7 @@
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
             <version>${hsqldb.version}</version>
+            <classifier>jdk8</classifier>
             <type>jar</type>
             <scope>test</scope>
         </dependency>
