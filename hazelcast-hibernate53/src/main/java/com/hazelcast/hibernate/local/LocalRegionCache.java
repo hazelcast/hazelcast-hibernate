@@ -17,6 +17,7 @@ package com.hazelcast.hibernate.local;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
 import com.hazelcast.hibernate.HazelcastTimestamper;
@@ -133,10 +134,21 @@ public class LocalRegionCache implements RegionCache {
         this.versionComparator = findVersionComparator(regionConfig).orElse(null);
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
 
-        this.cache = Caffeine.newBuilder()
-          .maximumSize(this.evictionConfig.getMaxSize())
-          .expireAfterWrite(resolveTTL())
-          .<Object, Expirable>build().asMap();
+        this.cache = createCache(this.evictionConfig);
+    }
+
+    private ConcurrentMap<Object, Expirable> createCache(EvictionConfig evictionConfig) {
+        Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
+                .expireAfterWrite(resolveTTL());
+        MaxSizePolicy maxSizePolicy = evictionConfig.getMaxSizePolicy();
+        switch (maxSizePolicy) {
+            case ENTRY_COUNT:
+                caffeine.maximumSize(this.evictionConfig.getMaxSize());
+                break;
+            default:
+                throw new IllegalArgumentException(maxSizePolicy + " policy not supported");
+        }
+        return caffeine.<Object, Expirable>build().asMap();
     }
 
     @Override
@@ -302,18 +314,30 @@ public class LocalRegionCache implements RegionCache {
 
     /**
      * Generic representation of eviction-related configuration
+     * <p>
+     * See {@link com.hazelcast.config.EvictionConfig}
      */
     public interface EvictionConfig {
 
         /**
-         * @return the duration for which an item should live in the cache
+         * @return the maximum number of seconds for each entry to stay in the map.
          */
         Duration getTimeToLive();
 
         /**
-         * @return the maximum number of entries that should live in the cache
+         * Returns the size which is used by the {@link MaxSizePolicy}.
+         * <p>
+         * The interpretation of the value depends
+         * on the configured {@link MaxSizePolicy}.
+         *
+         * @return the size which is used by the {@link MaxSizePolicy}
          */
         int getMaxSize();
+
+        /**
+         * @return the {@link MaxSizePolicy} of this eviction configuration
+         */
+        MaxSizePolicy getMaxSizePolicy();
 
         /**
          * Creates an {@link EvictionConfig} for a given Hazelcast {@link MapConfig}.
@@ -325,15 +349,22 @@ public class LocalRegionCache implements RegionCache {
                 @Override
                 public Duration getTimeToLive() {
                     return mapConfig == null
-                      ? Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis())
-                      : Duration.ofSeconds(mapConfig.getTimeToLiveSeconds());
+                            ? Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis())
+                            : Duration.ofSeconds(mapConfig.getTimeToLiveSeconds());
                 }
 
                 @Override
                 public int getMaxSize() {
                     return mapConfig == null
-                      ? MAX_SIZE
-                      : mapConfig.getEvictionConfig().getSize();
+                            ? MAX_SIZE
+                            : mapConfig.getEvictionConfig().getSize();
+                }
+
+                @Override
+                public MaxSizePolicy getMaxSizePolicy() {
+                    return mapConfig == null
+                            ? com.hazelcast.config.EvictionConfig.DEFAULT_MAX_SIZE_POLICY
+                            : mapConfig.getEvictionConfig().getMaxSizePolicy();
                 }
             };
         }
