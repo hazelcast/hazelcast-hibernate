@@ -156,7 +156,7 @@ public class LocalRegionCacheTest {
         LocalRegionCache.EvictionConfig evictionConfig = LocalRegionCache.EvictionConfig.create(mapConfig);
 
         assertThat(evictionConfig.getTimeToLive()).hasSeconds(123);
-        assertThat(evictionConfig.getMaxSize()).isEqualTo(234);
+        assertThat(evictionConfig.getSize()).isEqualTo(234);
         assertThat(evictionConfig.getMaxSizePolicy()).isEqualTo(MaxSizePolicy.ENTRY_COUNT);
     }
 
@@ -174,7 +174,7 @@ public class LocalRegionCacheTest {
         LocalRegionCache.EvictionConfig evictionConfig = LocalRegionCache.EvictionConfig.create(null);
 
         assertThat(evictionConfig.getTimeToLive()).hasMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis());
-        assertThat(evictionConfig.getMaxSize()).isEqualTo(100_000);
+        assertThat(evictionConfig.getSize()).isEqualTo(100_000);
         assertThat(evictionConfig.getMaxSizePolicy()).isEqualTo(DEFAULT_MAX_SIZE_POLICY);
     }
 
@@ -185,7 +185,7 @@ public class LocalRegionCacheTest {
 
         new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig);
 
-        verify(evictionConfig, atLeastOnce()).getMaxSize();
+        verify(evictionConfig, atLeastOnce()).getSize();
         verify(evictionConfig, atLeastOnce()).getTimeToLive();
         verify(evictionConfig, atLeastOnce()).getMaxSizePolicy();
     }

@@ -143,7 +143,7 @@ public class LocalRegionCache implements RegionCache {
         MaxSizePolicy maxSizePolicy = evictionConfig.getMaxSizePolicy();
         switch (maxSizePolicy) {
             case ENTRY_COUNT:
-                caffeine.maximumSize(this.evictionConfig.getMaxSize());
+                caffeine.maximumSize(this.evictionConfig.getSize());
                 break;
             default:
                 throw new IllegalArgumentException(maxSizePolicy + " policy not supported");
@@ -325,6 +325,14 @@ public class LocalRegionCache implements RegionCache {
         Duration getTimeToLive();
 
         /**
+         * Use {@link EvictionConfig#getSize()} instead
+         */
+        @Deprecated
+        default int getMaxSize() {
+            return getSize();
+        }
+
+        /**
          * Returns the size which is used by the {@link MaxSizePolicy}.
          * <p>
          * The interpretation of the value depends
@@ -332,7 +340,7 @@ public class LocalRegionCache implements RegionCache {
          *
          * @return the size which is used by the {@link MaxSizePolicy}
          */
-        int getMaxSize();
+        int getSize();
 
         /**
          * @return the {@link MaxSizePolicy} of this eviction configuration
@@ -354,7 +362,7 @@ public class LocalRegionCache implements RegionCache {
                 }
 
                 @Override
-                public int getMaxSize() {
+                public int getSize() {
                     return mapConfig == null
                             ? MAX_SIZE
                             : mapConfig.getEvictionConfig().getSize();
