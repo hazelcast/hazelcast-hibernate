@@ -243,7 +243,6 @@
                         -Xms128m -Xmx1G
                         -Dhazelcast.phone.home.enabled=false
                         -Dhazelcast.mancenter.enabled=false
-                        -Dhazelcast.logging.type=none
                         -Dhazelcast.test.use.network=false
                     </argLine>
                 </configuration>
@@ -458,7 +457,6 @@
                     -Xms128m -Xmx1G
                     -Dhazelcast.version.check.enabled=false
                     -Dhazelcast.mancenter.enabled=false
-                    -Dhazelcast.logging.type=none
                     -Dhazelcast.test.use.network=false
                 </argLine>
             </properties>
@@ -605,7 +603,6 @@
                                 -Xms128m -Xmx1G
                                 -Dhazelcast.phone.home.enabled=false
                                 -Dhazelcast.mancenter.enabled=false
-                                -Dhazelcast.logging.type=none
                                 -Dhazelcast.test.use.network=true
                             </argLine>
                         </configuration>
