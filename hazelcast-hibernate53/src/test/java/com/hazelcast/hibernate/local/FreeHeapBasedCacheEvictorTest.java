@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -18,6 +19,7 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,15 +30,29 @@ public class FreeHeapBasedCacheEvictorTest {
     @Test
     public void should_start_async_job() {
         ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        when(executorService.scheduleWithFixedDelay(any(), anyLong(), anyLong(), any())).thenReturn(mock(ScheduledFuture.class));
         FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
         Cache<?, ?> cache = Caffeine.newBuilder()
                 //enable eviction operations
                 .maximumSize(Long.MAX_VALUE)
                 .build();
 
-        sut.start(cache, 123);
+        sut.start("some-cache", cache, 123);
 
         verify(executorService).scheduleWithFixedDelay(any(), anyLong(), anyLong(), any());
+
+        sut.stop("some-cache");
+    }
+
+
+    @Test
+    public void should_fail_stopping_evicing_of_non_existing_cache() {
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
+
+        assertThatThrownBy(() -> sut.stop("some-cache"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Evicting task for cache 'some-cache' not found");
     }
 
     @Test
@@ -56,19 +72,26 @@ public class FreeHeapBasedCacheEvictorTest {
     }
 
     @Test
-    public void should_forbid_second_start() {
+    public void should_handle_many_caches() {
         ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        when(executorService.scheduleWithFixedDelay(any(), anyLong(), anyLong(), any())).thenReturn(mock(ScheduledFuture.class));
         FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
         Cache<?, ?> cache = Caffeine.newBuilder()
                 //enable eviction operations
                 .maximumSize(Long.MAX_VALUE)
                 .build();
 
-        sut.start(cache, 123);
+        sut.start("some-cache", cache, 123);
+        sut.start("some-other-cache", cache, 123);
+        sut.start("yet-another-cache", cache, 123);
 
-        assertThatThrownBy(() -> sut.start(cache, 123))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("FreeHeapBasedCacheEvictor already started");
+        sut.stop("some-cache");
+        sut.stop("some-other-cache");
+        sut.stop("yet-another-cache");
+
+        verify(executorService, times(3))
+                .scheduleWithFixedDelay(any(), anyLong(), anyLong(), any());
+
     }
 
     @Test
@@ -84,15 +107,17 @@ public class FreeHeapBasedCacheEvictorTest {
 
         assertThat(cache.estimatedSize()).isEqualTo(25);
 
-        sut.start(cache, 100);
+        sut.start("some-cache", cache, 100);
 
         await().atMost(5, TimeUnit.SECONDS)
                 .until(() -> cache.estimatedSize() == 0);
+
         assertThat(allThreads()).anyMatch(thread -> thread.getName().contains("-free-heap-evictor"));
 
         sut.close();
 
-        assertThat(allThreads()).noneMatch(thread -> thread.getName().contains("-free-heap-evictor"));
+        await().atMost(5, TimeUnit.SECONDS)
+                .untilAsserted(() -> assertThat(allThreads()).noneMatch(thread -> thread.getName().contains("-free-heap-evictor")));
     }
 
     private static Set<Thread> allThreads() {
@@ -112,7 +137,7 @@ public class FreeHeapBasedCacheEvictorTest {
 
         assertThat(cache.estimatedSize()).isEqualTo(50);
 
-        sut.start(cache, 0);
+        sut.start("some-cache", cache, 0);
 
         await().pollDelay(1, TimeUnit.SECONDS)
                 .atMost(5, TimeUnit.SECONDS)

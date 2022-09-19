@@ -64,39 +64,42 @@ public class LocalRegionCache implements RegionCache {
     private final UUID listenerRegistrationId;
     private final Comparator versionComparator;
     private final EvictionConfig evictionConfig;
-    private final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor;
+    private FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor;
 
     private MapConfig config;
 
     /**
-     * @param regionFactory     the region factory
-     * @param name              the name for this region cache, which is also used to retrieve configuration/topic
-     * @param hazelcastInstance the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
-     *                          configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
-     *                          with (optional)
-     * @param regionConfig      the region configuration
-     */
-    public LocalRegionCache(final RegionFactory regionFactory, final String name,
-                            final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig) {
-        this(regionFactory, name, hazelcastInstance, regionConfig, true);
-    }
-
-    /**
-     * @param regionFactory     the region factory
-     * @param name              the name for this region cache, which is also used to retrieve configuration/topic
-     * @param hazelcastInstance the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
-     *                          configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
-     *                          with if {@code withTopic} is {@code true} (optional)
-     * @param regionConfig      the region configuration
-     * @param withTopic         {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
-     *                          matches this region cache <i>if</i> a {@code HazelcastInstance} was provided to look
-     *                          up the topic; otherwise, {@code false} not to register a listener even if an instance
-     *                          was provided
+     * @param regionFactory             the region factory
+     * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
+     * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
+     *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
+     *                                  with (optional)
+     * @param regionConfig              the region configuration
+     * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
      */
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final boolean withTopic) {
-        this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null, new FreeHeapBasedCacheEvictor());
+                            FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+        this(regionFactory, name, hazelcastInstance, regionConfig, true, freeHeapBasedCacheEvictor);
+    }
+
+    /**
+     * @param regionFactory             the region factory
+     * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
+     * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
+     *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
+     *                                  with if {@code withTopic} is {@code true} (optional)
+     * @param regionConfig              the region configuration
+     * @param withTopic                 {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
+     *                                  matches this region cache <i>if</i> a {@code HazelcastInstance} was provided to look
+     *                                  up the topic; otherwise, {@code false} not to register a listener even if an instance
+     *                                  was provided
+     * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
+     */
+    public LocalRegionCache(final RegionFactory regionFactory, final String name,
+                            final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
+                            final boolean withTopic, FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+        this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null, freeHeapBasedCacheEvictor);
     }
 
     /**
@@ -139,12 +142,11 @@ public class LocalRegionCache implements RegionCache {
 
         this.versionComparator = findVersionComparator(regionConfig).orElse(null);
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
-        this.freeHeapBasedCacheEvictor = freeHeapBasedCacheEvictor;
 
-        this.cache = createCache();
+        this.cache = createCache(freeHeapBasedCacheEvictor, name);
     }
 
-    private ConcurrentMap<Object, Expirable> createCache() {
+    private ConcurrentMap<Object, Expirable> createCache(FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor, String name) {
         Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder()
                 .expireAfterWrite(resolveTTL());
         MaxSizePolicy maxSizePolicy = evictionConfig.getMaxSizePolicy();
@@ -157,11 +159,12 @@ public class LocalRegionCache implements RegionCache {
                 caffeineBuilder.maximumSize(evictionConfig.getSize());
                 break;
             case FREE_HEAP_SIZE:
+                this.freeHeapBasedCacheEvictor = freeHeapBasedCacheEvictor;
                 assertEvictorPresent(maxSizePolicy);
                 enableEviction(caffeineBuilder);
                 caffeineCache = caffeineBuilder.build();
                 long minimalHeapSizeInMB = MEGABYTES.toBytes(evictionConfig.getSize());
-                freeHeapBasedCacheEvictor.start(caffeineCache, minimalHeapSizeInMB);
+                this.freeHeapBasedCacheEvictor.start(name, caffeineCache, minimalHeapSizeInMB);
                 break;
             default:
                 throw new IllegalArgumentException(maxSizePolicy + " policy not supported");
@@ -278,7 +281,7 @@ public class LocalRegionCache implements RegionCache {
     @Override
     public void destroy() {
         if (freeHeapBasedCacheEvictor != null) {
-            freeHeapBasedCacheEvictor.close();
+            freeHeapBasedCacheEvictor.stop(name);
         }
         if (topic != null && listenerRegistrationId != null) {
             topic.removeMessageListener(listenerRegistrationId);

@@ -53,7 +53,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                 sessionFactory.getSessionFactoryOptions()
         );
 
-        final LocalRegionCache regionCache = new LocalRegionCache(this, qualifiedRegionName, instance, regionConfig);
+        final LocalRegionCache regionCache = new LocalRegionCache(this, qualifiedRegionName, instance, regionConfig,
+                freeHeapBasedCacheEvictor);
         localRegionCaches.add(regionCache);
         return regionCache;
     }
@@ -69,7 +70,8 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                 sessionFactory.getSessionFactoryOptions()
         );
 
-        TimestampsRegionCache timestampsRegionCache = new TimestampsRegionCache(this, qualifiedRegionName, instance);
+        TimestampsRegionCache timestampsRegionCache = new TimestampsRegionCache(this, qualifiedRegionName, instance,
+                freeHeapBasedCacheEvictor);
         localRegionCaches.add(timestampsRegionCache);
         return timestampsRegionCache;
     }

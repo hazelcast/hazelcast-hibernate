@@ -19,6 +19,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
+import com.hazelcast.hibernate.local.FreeHeapBasedCacheEvictor;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
@@ -42,7 +43,7 @@ public class TopicTransactionalTest53 extends HibernateTopicTestSupport {
     @Override
     protected void configureTopic(HazelcastInstance instance) {
         // Construct a LocalRegionCache instance, which configures the topic
-        new LocalRegionCache(mock(RegionFactory.class), "cache", instance, null, true);
+        new LocalRegionCache(mock(RegionFactory.class), "cache", instance, null, true, new FreeHeapBasedCacheEvictor());
     }
 
     @Override
