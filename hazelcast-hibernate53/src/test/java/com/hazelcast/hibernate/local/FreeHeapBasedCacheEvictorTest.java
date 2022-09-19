@@ -7,11 +7,11 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
@@ -73,7 +73,7 @@ public class FreeHeapBasedCacheEvictorTest {
 
     @Test
     public void should_evict_entries() {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(FreeHeapBasedCacheEvictor.defaultThreadFactory());
+        ScheduledExecutorService executorService = newSingleThreadScheduledExecutor(FreeHeapBasedCacheEvictor.defaultThreadFactory());
 
         FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
         Cache<Integer, Integer> cache = Caffeine.newBuilder()
@@ -101,7 +101,7 @@ public class FreeHeapBasedCacheEvictorTest {
 
     @Test
     public void should_not_evict_entries() {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        ScheduledExecutorService executorService = newSingleThreadScheduledExecutor();
 
         FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
         Cache<Integer, Integer> cache = Caffeine.newBuilder()

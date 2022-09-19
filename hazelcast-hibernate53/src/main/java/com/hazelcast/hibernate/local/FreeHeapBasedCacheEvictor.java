@@ -23,11 +23,12 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 
 import java.time.Duration;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 class FreeHeapBasedCacheEvictor implements AutoCloseable {
     private static final int TERMINATE_TIMEOUT_SECONDS = 5;
@@ -41,7 +42,7 @@ class FreeHeapBasedCacheEvictor implements AutoCloseable {
     private final AtomicBoolean started = new AtomicBoolean();
 
     FreeHeapBasedCacheEvictor() {
-        this(Executors.newSingleThreadScheduledExecutor(defaultThreadFactory()), new RuntimeMemoryInfoAccessor(),
+        this(newSingleThreadScheduledExecutor(defaultThreadFactory()), new RuntimeMemoryInfoAccessor(),
                 DEFAULT_EVICTION_DELAY);
     }
 
