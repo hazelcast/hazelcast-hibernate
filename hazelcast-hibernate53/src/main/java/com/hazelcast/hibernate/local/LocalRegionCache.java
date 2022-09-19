@@ -79,7 +79,7 @@ public class LocalRegionCache implements RegionCache {
      */
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+                            final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
         this(regionFactory, name, hazelcastInstance, regionConfig, true, freeHeapBasedCacheEvictor);
     }
 
@@ -98,7 +98,7 @@ public class LocalRegionCache implements RegionCache {
      */
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final boolean withTopic, FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+                            final boolean withTopic, final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
         this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null, freeHeapBasedCacheEvictor);
     }
 
@@ -121,7 +121,7 @@ public class LocalRegionCache implements RegionCache {
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
                             final boolean withTopic, final EvictionConfig evictionConfig,
-                            FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+                            final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
         this.hazelcastInstance = hazelcastInstance;
         this.name = name;
         this.regionFactory = regionFactory;
