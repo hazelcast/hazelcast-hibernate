@@ -277,11 +277,11 @@ public class LocalRegionCache implements RegionCache {
 
     @Override
     public void destroy() {
-        if (topic != null && listenerRegistrationId != null) {
-            topic.removeMessageListener(listenerRegistrationId);
-        }
         if (freeHeapBasedCacheEvictor != null) {
             freeHeapBasedCacheEvictor.close();
+        }
+        if (topic != null && listenerRegistrationId != null) {
+            topic.removeMessageListener(listenerRegistrationId);
         }
     }
 
