@@ -33,7 +33,7 @@ class FreeHeapBasedCacheEvictor implements AutoCloseable {
     private static final int TERMINATE_TIMEOUT_SECONDS = 5;
     private static final Duration DEFAULT_EVICTION_DELAY = Duration.ofSeconds(1);
     private static final int EVICTION_BATCH_SIZE = 15;
-    private final ILogger log = Logger.getLogger(getClass());
+    private static final ILogger log = Logger.getLogger(FreeHeapBasedCacheEvictor.class);
 
     private final ScheduledExecutorService executorService;
     private final MemoryInfoAccessor memoryInfoAccessor;
