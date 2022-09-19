@@ -117,7 +117,8 @@ public class LocalRegionCache implements RegionCache {
      */
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final boolean withTopic, final EvictionConfig evictionConfig, FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+                            final boolean withTopic, final EvictionConfig evictionConfig,
+                            FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
         this.hazelcastInstance = hazelcastInstance;
         this.name = name;
         this.regionFactory = regionFactory;
@@ -178,7 +179,8 @@ public class LocalRegionCache implements RegionCache {
 
     private void assertEvictorPresent(MaxSizePolicy maxSizePolicy) {
         if (freeHeapBasedCacheEvictor == null) {
-            throw new IllegalStateException(FreeHeapBasedCacheEvictor.class.getSimpleName() + " is required for " + maxSizePolicy + " policy");
+            throw new IllegalStateException(FreeHeapBasedCacheEvictor.class.getSimpleName() + " is required for "
+                    + maxSizePolicy + " policy");
         }
     }
 
