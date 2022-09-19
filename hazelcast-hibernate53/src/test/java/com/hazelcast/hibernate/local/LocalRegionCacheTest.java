@@ -8,6 +8,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
+import com.hazelcast.map.impl.eviction.ZeroMemoryInfoAccessor;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.topic.ITopic;
@@ -23,13 +24,17 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
-import static com.hazelcast.config.EvictionConfig.DEFAULT_MAX_SIZE_POLICY;
+import static com.hazelcast.config.MapConfig.DEFAULT_MAX_SIZE_POLICY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
@@ -39,6 +44,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -151,21 +157,96 @@ public class LocalRegionCacheTest {
 
     @Test
     public void test_EvictionConfig_creation_from_MapConfig() {
-        MapConfig mapConfig = someMapConfigWithEvictionConfig();
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.PER_NODE);
 
         LocalRegionCache.EvictionConfig evictionConfig = LocalRegionCache.EvictionConfig.create(mapConfig);
 
         assertThat(evictionConfig.getTimeToLive()).hasSeconds(123);
         assertThat(evictionConfig.getSize()).isEqualTo(234);
-        assertThat(evictionConfig.getMaxSizePolicy()).isEqualTo(MaxSizePolicy.ENTRY_COUNT);
+        assertThat(evictionConfig.getMaxSizePolicy()).isEqualTo(MaxSizePolicy.PER_NODE);
     }
 
+    @Test
+    public void test_freeHeapCacheEvictor_started_when_FREE_HEAP_SIZE_policy() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.FREE_HEAP_SIZE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor(mock(ScheduledExecutorService.class),
+                new ZeroMemoryInfoAccessor(), Duration.ofMillis(50)));
+
+        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, null, freeHeapBasedCacheEvictor);
+
+        verify(freeHeapBasedCacheEvictor).start(any(), eq(234L * 1024 * 1024));
+    }
+
+    @Test
+    public void test_freeHeapCacheEvictor_is_required_for_FREE_HEAP_SIZE_policy() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.FREE_HEAP_SIZE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        assertThatThrownBy(() -> new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, null, null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("FreeHeapBasedCacheEvictor is required for FREE_HEAP_SIZE policy");
+    }
+
+    @Test
+    public void test_freeHeapCacheEvictor_NOT_started_when_PER_NODE_policy() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.PER_NODE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor(mock(ScheduledExecutorService.class),
+                new ZeroMemoryInfoAccessor(), Duration.ofMillis(50)));
+
+        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, null, freeHeapBasedCacheEvictor);
+        verifyNoInteractions(freeHeapBasedCacheEvictor);
+    }
+
+
+    @Test
+    public void test_free_heap_evictor_should_be_closed() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.FREE_HEAP_SIZE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor());
+        LocalRegionCache localRegionCache = new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false,
+                null, freeHeapBasedCacheEvictor);
+
+        localRegionCache.destroy();
+
+        verify(freeHeapBasedCacheEvictor).close();
+    }
+
+
     private MapConfig someMapConfigWithEvictionConfig() {
+        return someMapConfigWithEvictionConfig(234, MaxSizePolicy.PER_NODE);
+    }
+
+    private MapConfig someMapConfigWithEvictionConfig(int sizeInMB, MaxSizePolicy maxSizePolicy) {
         return spy(new MapConfig()
                 .setTimeToLiveSeconds(123)
                 .setEvictionConfig(spy(new EvictionConfig()
-                        .setSize(234)
-                        .setMaxSizePolicy(MaxSizePolicy.ENTRY_COUNT))
+                        .setSize(sizeInMB)
+                        .setMaxSizePolicy(maxSizePolicy))
                 ));
     }
 
@@ -183,7 +264,7 @@ public class LocalRegionCacheTest {
     public void test_passing_evictionConfig_when_no_instance() {
         LocalRegionCache.EvictionConfig evictionConfig = spy(LocalRegionCache.EvictionConfig.create(someMapConfigWithEvictionConfig()));
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig);
+        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig, null);
 
         verify(evictionConfig, atLeastOnce()).getSize();
         verify(evictionConfig, atLeastOnce()).getTimeToLive();
@@ -229,7 +310,7 @@ public class LocalRegionCacheTest {
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
 
         // Create a new local cache
-        new LocalRegionCache(null, CACHE_NAME, instance, null, true, evictionConfig);
+        new LocalRegionCache(null, CACHE_NAME, instance, null, true, evictionConfig, null);
 
         // Obtain the message listener of the local cache
         ArgumentCaptor<MessageListener> messageListenerArgumentCaptor = ArgumentCaptor.forClass(MessageListener.class);

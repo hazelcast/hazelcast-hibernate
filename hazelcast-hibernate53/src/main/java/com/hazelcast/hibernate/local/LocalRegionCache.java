@@ -15,6 +15,7 @@
 
 package com.hazelcast.hibernate.local;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizePolicy;
@@ -44,6 +45,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.hazelcast.memory.MemoryUnit.MEGABYTES;
+
 /**
  * Local only {@link RegionCache} implementation based on a topic to distribute cache updates.
  */
@@ -61,6 +64,7 @@ public class LocalRegionCache implements RegionCache {
     private final UUID listenerRegistrationId;
     private final Comparator versionComparator;
     private final EvictionConfig evictionConfig;
+    private final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor;
 
     private MapConfig config;
 
@@ -92,27 +96,28 @@ public class LocalRegionCache implements RegionCache {
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
                             final boolean withTopic) {
-        this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null);
+        this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null, new FreeHeapBasedCacheEvictor());
     }
 
     /**
-     * @param regionFactory     the region factory
-     * @param name              the name for this region cache, which is also used to retrieve configuration/topic
-     * @param hazelcastInstance the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
-     *                          configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
-     *                          with if {@code withTopic} is {@code true} (optional)
-     * @param regionConfig      the region configuration
-     * @param withTopic         {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
-     *                          matches this region cache <i>if</i> a {@code HazelcastInstance} was provided to look
-     *                          up the topic; otherwise, {@code false} not to register a listener even if an instance
-     *                          was provided
-     * @param evictionConfig    provides the parameters which should be used when evicting entries from the cache;
-     *                          if null, this will be derived from the Hazelcast {@link MapConfig}; if the MapConfig
-     *                          cannot be resolved, this will use defaults.
+     * @param regionFactory             the region factory
+     * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
+     * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
+     *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
+     *                                  with if {@code withTopic} is {@code true} (optional)
+     * @param regionConfig              the region configuration
+     * @param withTopic                 {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
+     *                                  matches this region cache <i>if</i> a {@code HazelcastInstance} was provided to look
+     *                                  up the topic; otherwise, {@code false} not to register a listener even if an instance
+     *                                  was provided
+     * @param evictionConfig            provides the parameters which should be used when evicting entries from the cache;
+     *                                  if null, this will be derived from the Hazelcast {@link MapConfig}; if the MapConfig
+     *                                  cannot be resolved, this will use defaults.
+     * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
      */
     public LocalRegionCache(final RegionFactory regionFactory, final String name,
                             final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final boolean withTopic, final EvictionConfig evictionConfig) {
+                            final boolean withTopic, final EvictionConfig evictionConfig, FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
         this.hazelcastInstance = hazelcastInstance;
         this.name = name;
         this.regionFactory = regionFactory;
@@ -133,22 +138,48 @@ public class LocalRegionCache implements RegionCache {
 
         this.versionComparator = findVersionComparator(regionConfig).orElse(null);
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
+        this.freeHeapBasedCacheEvictor = freeHeapBasedCacheEvictor;
 
-        this.cache = createCache(this.evictionConfig);
+        this.cache = createCache();
     }
 
-    private ConcurrentMap<Object, Expirable> createCache(EvictionConfig evictionConfig) {
-        Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
+    private ConcurrentMap<Object, Expirable> createCache() {
+        Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder()
                 .expireAfterWrite(resolveTTL());
         MaxSizePolicy maxSizePolicy = evictionConfig.getMaxSizePolicy();
+        Cache<Object, Expirable> caffeineCache = null;
+        if (maxSizePolicy == null) {
+            maxSizePolicy = MaxSizePolicy.PER_NODE;
+        }
         switch (maxSizePolicy) {
-            case ENTRY_COUNT:
-                caffeine.maximumSize(this.evictionConfig.getSize());
+            case PER_NODE:
+                caffeineBuilder.maximumSize(evictionConfig.getSize());
+                break;
+            case FREE_HEAP_SIZE:
+                assertEvictorPresent(maxSizePolicy);
+                enableEviction(caffeineBuilder);
+                caffeineCache = caffeineBuilder.build();
+                long minimalHeapSizeInMB = MEGABYTES.toBytes(evictionConfig.getSize());
+                freeHeapBasedCacheEvictor.start(caffeineCache, minimalHeapSizeInMB);
                 break;
             default:
                 throw new IllegalArgumentException(maxSizePolicy + " policy not supported");
         }
-        return caffeine.<Object, Expirable>build().asMap();
+        if (caffeineCache == null) {
+            caffeineCache = caffeineBuilder.build();
+        }
+        return caffeineCache.asMap();
+    }
+
+    private void enableEviction(Caffeine<Object, Object> caffeineBuilder) {
+        //cache has to be size-bound to enable eviction, see caffeineCache.policy().eviction()
+        caffeineBuilder.maximumSize(Long.MAX_VALUE);
+    }
+
+    private void assertEvictorPresent(MaxSizePolicy maxSizePolicy) {
+        if (freeHeapBasedCacheEvictor == null) {
+            throw new IllegalStateException(FreeHeapBasedCacheEvictor.class.getSimpleName() + " is required for " + maxSizePolicy + " policy");
+        }
     }
 
     @Override
@@ -246,6 +277,9 @@ public class LocalRegionCache implements RegionCache {
     public void destroy() {
         if (topic != null && listenerRegistrationId != null) {
             topic.removeMessageListener(listenerRegistrationId);
+        }
+        if (freeHeapBasedCacheEvictor != null) {
+            freeHeapBasedCacheEvictor.close();
         }
     }
 
@@ -371,7 +405,7 @@ public class LocalRegionCache implements RegionCache {
                 @Override
                 public MaxSizePolicy getMaxSizePolicy() {
                     return mapConfig == null
-                            ? com.hazelcast.config.EvictionConfig.DEFAULT_MAX_SIZE_POLICY
+                            ? com.hazelcast.config.MapConfig.DEFAULT_MAX_SIZE_POLICY
                             : mapConfig.getEvictionConfig().getMaxSizePolicy();
                 }
             };
