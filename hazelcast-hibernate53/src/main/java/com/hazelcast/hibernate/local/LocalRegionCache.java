@@ -73,40 +73,6 @@ public class LocalRegionCache implements RegionCache {
      * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
      * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
      *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
-     *                                  with (optional)
-     * @param regionConfig              the region configuration
-     * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
-     */
-    public LocalRegionCache(final RegionFactory regionFactory, final String name,
-                            final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
-        this(regionFactory, name, hazelcastInstance, regionConfig, true, freeHeapBasedCacheEvictor);
-    }
-
-    /**
-     * @param regionFactory             the region factory
-     * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
-     * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
-     *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
-     *                                  with if {@code withTopic} is {@code true} (optional)
-     * @param regionConfig              the region configuration
-     * @param withTopic                 {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
-     *                                  matches this region cache <i>if</i> a {@code HazelcastInstance} was provided to look
-     *                                  up the topic; otherwise, {@code false} not to register a listener even if an instance
-     *                                  was provided
-     * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
-     */
-    public LocalRegionCache(final RegionFactory regionFactory, final String name,
-                            final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final boolean withTopic, final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
-        this(regionFactory, name, hazelcastInstance, regionConfig, withTopic, null, freeHeapBasedCacheEvictor);
-    }
-
-    /**
-     * @param regionFactory             the region factory
-     * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
-     * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
-     *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
      *                                  with if {@code withTopic} is {@code true} (optional)
      * @param regionConfig              the region configuration
      * @param withTopic                 {@code true} to register a {@link MessageListener} with the {@link ITopic} whose name
@@ -118,10 +84,10 @@ public class LocalRegionCache implements RegionCache {
      *                                  cannot be resolved, this will use defaults.
      * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
      */
-    public LocalRegionCache(final RegionFactory regionFactory, final String name,
-                            final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
-                            final boolean withTopic, final EvictionConfig evictionConfig,
-                            final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+    protected LocalRegionCache(final RegionFactory regionFactory, final String name,
+                               final HazelcastInstance hazelcastInstance, final DomainDataRegionConfig regionConfig,
+                               final boolean withTopic, final EvictionConfig evictionConfig,
+                               final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
         this.hazelcastInstance = hazelcastInstance;
         this.name = name;
         this.regionFactory = regionFactory;
@@ -144,6 +110,62 @@ public class LocalRegionCache implements RegionCache {
         this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
 
         this.cache = createCache(freeHeapBasedCacheEvictor, name);
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private RegionFactory regionFactory;
+        private String name;
+        private HazelcastInstance hazelcastInstance;
+        private DomainDataRegionConfig regionConfig;
+        private boolean withTopic;
+        private EvictionConfig evictionConfig;
+        private FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor;
+
+        public LocalRegionCache build() {
+            return new LocalRegionCache(regionFactory, name,
+                    hazelcastInstance, regionConfig,
+                    withTopic, evictionConfig,
+                    freeHeapBasedCacheEvictor);
+        }
+
+        public Builder withRegionFactory(RegionFactory regionFactory) {
+            this.regionFactory = regionFactory;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder withHazelcastInstance(HazelcastInstance hazelcastInstance) {
+            this.hazelcastInstance = hazelcastInstance;
+            return this;
+        }
+
+        public Builder withRegionConfig(DomainDataRegionConfig regionConfig) {
+            this.regionConfig = regionConfig;
+            return this;
+        }
+
+        public Builder withTopic(boolean withTopic) {
+            this.withTopic = withTopic;
+            return this;
+        }
+
+        public Builder withEvictionConfig(EvictionConfig evictionConfig) {
+            this.evictionConfig = evictionConfig;
+            return this;
+        }
+
+        public Builder withFreeHeapBasedCacheEvictor(FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+            this.freeHeapBasedCacheEvictor = freeHeapBasedCacheEvictor;
+            return this;
+        }
     }
 
     private ConcurrentMap<Object, Expirable> createCache(FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor, String name) {

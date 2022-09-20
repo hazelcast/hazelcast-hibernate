@@ -16,7 +16,6 @@
 package com.hazelcast.hibernate;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.hibernate.local.FreeHeapBasedCacheEvictor;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
@@ -34,7 +33,11 @@ public class TopicNonStrictReadWriteTest53 extends TopicNonStrictReadWriteTestSu
     @Override
     protected void configureTopic(HazelcastInstance instance) {
         // Construct a LocalRegionCache instance, which configures the topic
-        new LocalRegionCache(mock(RegionFactory.class), "cache", instance, null, true, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(mock(RegionFactory.class))
+                .withName("cache")
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .build();
     }
 
     @Override

@@ -44,7 +44,7 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
      */
     public TimestampsRegionCache(final RegionFactory regionFactory, final String name,
                                  final HazelcastInstance hazelcastInstance, FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
-        super(regionFactory, name, hazelcastInstance, null, freeHeapBasedCacheEvictor);
+        super(regionFactory, name, hazelcastInstance, null, true, null, freeHeapBasedCacheEvictor);
         regionId = UuidUtil.newSecureUUID();
     }
 

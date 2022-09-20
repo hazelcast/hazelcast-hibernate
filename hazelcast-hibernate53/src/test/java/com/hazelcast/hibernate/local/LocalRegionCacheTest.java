@@ -64,7 +64,11 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         doThrow(UnsupportedOperationException.class).when(instance).getConfig();
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build();
     }
 
     @Test
@@ -74,7 +78,11 @@ public class LocalRegionCacheTest {
         when(domainDataRegionConfig.getEntityCaching()).thenReturn(Collections.singletonList(entityDataCachingConfig));
         doThrow(AssertionError.class).when(entityDataCachingConfig).getVersionComparatorAccess(); // Will fail the test if called
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
         verify(entityDataCachingConfig).isVersioned(); // Verify that the versioned flag was checked
         verifyNoMoreInteractions(entityDataCachingConfig);
     }
@@ -89,7 +97,11 @@ public class LocalRegionCacheTest {
         when(entityDataCachingConfig.isVersioned()).thenReturn(true);
         when(entityDataCachingConfig.getVersionComparatorAccess()).thenReturn((Supplier) () -> comparator);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
         verify(entityDataCachingConfig).isVersioned();
         verify(entityDataCachingConfig).getVersionComparatorAccess();
     }
@@ -101,7 +113,11 @@ public class LocalRegionCacheTest {
         when(domainDataRegionConfig.getCollectionCaching()).thenReturn(Collections.singletonList(collectionDataCachingConfig));
         doThrow(AssertionError.class).when(collectionDataCachingConfig).getOwnerVersionComparator(); // Will fail the test if called
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
         verify(collectionDataCachingConfig).isVersioned(); // Verify that the versioned flag was checked
         verifyNoMoreInteractions(collectionDataCachingConfig);
     }
@@ -116,7 +132,11 @@ public class LocalRegionCacheTest {
         when(collectionDataCachingConfig.isVersioned()).thenReturn(true);
         when(collectionDataCachingConfig.getOwnerVersionComparator()).thenReturn(comparator);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
         verify(collectionDataCachingConfig).getOwnerVersionComparator();
         verify(collectionDataCachingConfig).isVersioned();
     }
@@ -131,7 +151,11 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build();
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance, never()).getTopic(anyString());
@@ -149,8 +173,11 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, new FreeHeapBasedCacheEvictor());
-
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build();
         verify(maxSizeConfig, atLeastOnce()).getSize();
         verify(maxSizeConfig, atLeastOnce()).getMaxSizePolicy();
         verify(mapConfig, atLeastOnce()).getTimeToLiveSeconds();
@@ -180,7 +207,12 @@ public class LocalRegionCacheTest {
         FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor(newSingleThreadScheduledExecutor(),
                 new ZeroMemoryInfoAccessor(), Duration.ofMillis(50)));
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, null, freeHeapBasedCacheEvictor);
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
 
         verify(freeHeapBasedCacheEvictor).start(eq(CACHE_NAME), any(), eq(234L * 1024 * 1024));
     }
@@ -195,7 +227,13 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        assertThatThrownBy(() -> new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, null, null))
+        assertThatThrownBy(() -> {
+            LocalRegionCache regionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                    .withName(CACHE_NAME)
+                    .withHazelcastInstance(instance)
+                    .withTopic(false)
+                    .build();
+        })
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("FreeHeapBasedCacheEvictor is required for FREE_HEAP_SIZE policy");
     }
@@ -213,7 +251,12 @@ public class LocalRegionCacheTest {
         FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor(mock(ScheduledExecutorService.class),
                 new ZeroMemoryInfoAccessor(), Duration.ofMillis(50)));
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false, null, freeHeapBasedCacheEvictor);
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
         verifyNoInteractions(freeHeapBasedCacheEvictor);
     }
 
@@ -228,9 +271,12 @@ public class LocalRegionCacheTest {
         when(instance.getConfig()).thenReturn(config);
 
         FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor());
-        LocalRegionCache localRegionCache = new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false,
-                null, freeHeapBasedCacheEvictor);
-
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
         localRegionCache.destroy();
 
         verify(freeHeapBasedCacheEvictor).stop(CACHE_NAME);
@@ -264,7 +310,11 @@ public class LocalRegionCacheTest {
     public void test_passing_evictionConfig_when_no_instance() {
         LocalRegionCache.EvictionConfig evictionConfig = spy(LocalRegionCache.EvictionConfig.create(someMapConfigWithEvictionConfig()));
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig, null);
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withTopic(false)
+                .withEvictionConfig(evictionConfig)
+                .build();
 
         verify(evictionConfig, atLeastOnce()).getSize();
         verify(evictionConfig, atLeastOnce()).getTimeToLive();
@@ -287,7 +337,11 @@ public class LocalRegionCacheTest {
         when(instance.getConfig()).thenReturn(config);
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, true, new FreeHeapBasedCacheEvictor());
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .build();
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
@@ -310,7 +364,12 @@ public class LocalRegionCacheTest {
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
 
         // Create a new local cache
-        new LocalRegionCache(null, CACHE_NAME, instance, null, true, evictionConfig, null);
+        LocalRegionCache.builder()
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .withEvictionConfig(evictionConfig)
+                .build();
 
         // Obtain the message listener of the local cache
         ArgumentCaptor<MessageListener> messageListenerArgumentCaptor = ArgumentCaptor.forClass(MessageListener.class);

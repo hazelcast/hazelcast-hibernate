@@ -52,9 +52,13 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
                 unqualifiedRegionName,
                 sessionFactory.getSessionFactoryOptions()
         );
-
-        final LocalRegionCache regionCache = new LocalRegionCache(this, qualifiedRegionName, instance, regionConfig,
-                freeHeapBasedCacheEvictor);
+        final LocalRegionCache regionCache = LocalRegionCache.builder().withRegionFactory(this)
+                .withName(qualifiedRegionName)
+                .withHazelcastInstance(instance)
+                .withRegionConfig(regionConfig)
+                .withTopic(true)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
         localRegionCaches.add(regionCache);
         return regionCache;
     }

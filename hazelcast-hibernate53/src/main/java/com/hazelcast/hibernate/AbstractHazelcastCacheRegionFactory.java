@@ -102,8 +102,12 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
                                                                   final SessionFactoryImplementor sessionFactory) {
         // Note: We don't want to use an ITopic for invalidation because the timestamps cache can take care of outdated
         // queries
-        final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false,
-                freeHeapBasedCacheEvictor);
+        final LocalRegionCache regionCache = LocalRegionCache.builder().withRegionFactory(this)
+                .withName(regionName)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
         localRegionCaches.add(regionCache);
         return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
                 .getFallback(sessionFactory.getProperties()));
