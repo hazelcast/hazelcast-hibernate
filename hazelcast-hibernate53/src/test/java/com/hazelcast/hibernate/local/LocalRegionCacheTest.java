@@ -60,29 +60,33 @@ public class LocalRegionCacheTest {
     private RegionFactory regionFactory;
 
     @Test
-    public void testConstructorIgnoresUnsupportedOperationExceptionsFromConfig() {
+    public void testConstructionIgnoresUnsupportedOperationExceptionsFromConfig() {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         doThrow(UnsupportedOperationException.class).when(instance).getConfig();
 
-        LocalRegionCache.builder().withRegionFactory(regionFactory)
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
                 .withName(CACHE_NAME)
                 .withHazelcastInstance(instance)
                 .withTopic(false)
                 .build();
+
+        assertThat(localRegionCache).isNotNull();
     }
 
     @Test
-    public void testConstructorIgnoresVersionComparatorForUnversionedEntityData() {
+    public void testConstructionIgnoresVersionComparatorForUnversionedEntityData() {
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
         EntityDataCachingConfig entityDataCachingConfig = mock(EntityDataCachingConfig.class);
         when(domainDataRegionConfig.getEntityCaching()).thenReturn(Collections.singletonList(entityDataCachingConfig));
         doThrow(AssertionError.class).when(entityDataCachingConfig).getVersionComparatorAccess(); // Will fail the test if called
 
-        LocalRegionCache.builder().withRegionFactory(regionFactory)
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
                 .withName(CACHE_NAME)
                 .withRegionConfig(domainDataRegionConfig)
                 .withTopic(false)
                 .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(entityDataCachingConfig).isVersioned(); // Verify that the versioned flag was checked
         verifyNoMoreInteractions(entityDataCachingConfig);
     }
@@ -97,17 +101,19 @@ public class LocalRegionCacheTest {
         when(entityDataCachingConfig.isVersioned()).thenReturn(true);
         when(entityDataCachingConfig.getVersionComparatorAccess()).thenReturn((Supplier) () -> comparator);
 
-        LocalRegionCache.builder().withRegionFactory(regionFactory)
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
                 .withName(CACHE_NAME)
                 .withRegionConfig(domainDataRegionConfig)
                 .withTopic(false)
                 .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(entityDataCachingConfig).isVersioned();
         verify(entityDataCachingConfig).getVersionComparatorAccess();
     }
 
     @Test
-    public void testConstructorIgnoresVersionComparatorForUnversionedCollectionData() {
+    public void testConstructionIgnoresVersionComparatorForUnversionedCollectionData() {
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
         CollectionDataCachingConfig collectionDataCachingConfig = mock(CollectionDataCachingConfig.class);
         when(domainDataRegionConfig.getCollectionCaching()).thenReturn(Collections.singletonList(collectionDataCachingConfig));
@@ -123,7 +129,7 @@ public class LocalRegionCacheTest {
     }
 
     @Test
-    public void testConstructorSetsVersionComparatorForVersionedCollectionData() {
+    public void testConstructionSetsVersionComparatorForVersionedCollectionData() {
         Comparator<?> comparator = mock(Comparator.class);
 
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
@@ -132,17 +138,19 @@ public class LocalRegionCacheTest {
         when(collectionDataCachingConfig.isVersioned()).thenReturn(true);
         when(collectionDataCachingConfig.getOwnerVersionComparator()).thenReturn(comparator);
 
-        LocalRegionCache.builder().withRegionFactory(regionFactory)
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
                 .withName(CACHE_NAME)
                 .withRegionConfig(domainDataRegionConfig)
                 .withTopic(false)
                 .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(collectionDataCachingConfig).getOwnerVersionComparator();
         verify(collectionDataCachingConfig).isVersioned();
     }
 
     @Test
-    public void testFourArgConstructorDoesNotRegisterTopicListenerIfNotRequested() {
+    public void testConstructionDoesNotRegisterTopicListenerIfNotRequested() {
         MapConfig mapConfig = someMapConfigWithEvictionConfig();
 
         Config config = mock(Config.class);
@@ -151,11 +159,13 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        LocalRegionCache.builder().withRegionFactory(regionFactory)
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
                 .withName(CACHE_NAME)
                 .withHazelcastInstance(instance)
                 .withTopic(false)
                 .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance, never()).getTopic(anyString());
@@ -227,14 +237,12 @@ public class LocalRegionCacheTest {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        assertThatThrownBy(() -> {
-            LocalRegionCache regionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
-                    .withName(CACHE_NAME)
-                    .withHazelcastInstance(instance)
-                    .withTopic(false)
-                    .build();
-        })
-                .isInstanceOf(IllegalStateException.class)
+        assertThatThrownBy(() -> LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build()
+        ).isInstanceOf(IllegalStateException.class)
                 .hasMessage("FreeHeapBasedCacheEvictor is required for FREE_HEAP_SIZE policy");
     }
 
@@ -321,10 +329,8 @@ public class LocalRegionCacheTest {
         verify(evictionConfig, atLeastOnce()).getMaxSizePolicy();
     }
 
-    // Verifies that the three-argument constructor still registers a listener with a topic if the HazelcastInstance
-    // is provided. This ensures the old behavior has not been regressed by adding the new four argument constructor
     @Test
-    public void testThreeArgConstructorRegistersTopicListener() {
+    public void testRegistrationTopicListener() {
         MapConfig mapConfig = someMapConfigWithEvictionConfig();
 
         Config config = mock(Config.class);
