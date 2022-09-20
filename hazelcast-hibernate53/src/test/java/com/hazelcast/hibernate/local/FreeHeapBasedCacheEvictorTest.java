@@ -129,7 +129,7 @@ public class FreeHeapBasedCacheEvictorTest {
 
         sut.close();
 
-        await().atMost(5, TimeUnit.SECONDS)
+        await().atMost(10, TimeUnit.SECONDS)
                 .untilAsserted(() -> assertThat(allThreads()).noneMatch(thread -> thread.getName().contains("-free-heap-evictor")));
     }
 

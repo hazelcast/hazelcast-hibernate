@@ -106,5 +106,6 @@ public class FreeHeapBasedCacheEvictor implements AutoCloseable {
             LOG.warning("ExecutorService awaitTermination is interrupted. Terminating forcefully.", e);
             executorService.shutdownNow();
         }
+        LOG.info("Shutdown of " + FreeHeapBasedCacheEvictor.class.getSimpleName() + " completed");
     }
 }
