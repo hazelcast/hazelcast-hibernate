@@ -44,11 +44,28 @@ public class FreeHeapBasedCacheEvictorTest {
         sut.stop("some-cache");
     }
 
-
     @Test
     public void should_fail_stopping_evicing_of_non_existing_cache() {
         ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
         FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
+
+        assertThatThrownBy(() -> sut.stop("some-cache"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Evicting task for cache 'some-cache' not found");
+    }
+
+    @Test
+    public void should_remove_task_after_stopping() {
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        when(executorService.scheduleWithFixedDelay(any(), anyLong(), anyLong(), any())).thenReturn(mock(ScheduledFuture.class));
+        FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
+        Cache<?, ?> cache = Caffeine.newBuilder()
+                //enable eviction operations
+                .maximumSize(Long.MAX_VALUE)
+                .build();
+
+        sut.start("some-cache", cache, 123);
+        sut.stop("some-cache");
 
         assertThatThrownBy(() -> sut.stop("some-cache"))
                 .isInstanceOf(IllegalStateException.class)

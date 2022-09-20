@@ -71,7 +71,7 @@ public class FreeHeapBasedCacheEvictor implements AutoCloseable {
     }
 
     public void stop(String cacheName) {
-        ScheduledFuture<?> task = tasks.get(cacheName);
+        ScheduledFuture<?> task = tasks.remove(cacheName);
         if (task == null) {
             throw new IllegalStateException("Evicting task for cache '" + cacheName + "' not found");
         }
