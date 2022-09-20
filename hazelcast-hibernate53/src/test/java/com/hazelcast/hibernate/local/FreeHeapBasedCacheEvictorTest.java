@@ -77,10 +77,6 @@ public class FreeHeapBasedCacheEvictorTest {
         ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
         when(executorService.awaitTermination(anyLong(), any())).thenReturn(true);
         FreeHeapBasedCacheEvictor sut = new FreeHeapBasedCacheEvictor(executorService, new ZeroMemoryInfoAccessor(), TEST_EVICTION_DELAY);
-        Cache<?, ?> cache = Caffeine.newBuilder()
-                //enable eviction operations
-                .maximumSize(Long.MAX_VALUE)
-                .build();
 
         sut.close();
 
