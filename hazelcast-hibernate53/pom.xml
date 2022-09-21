@@ -28,7 +28,7 @@
     <properties>
         <hibernate.core.version>5.3.7.Final</hibernate.core.version>
         <!-- 3.23.1-GA from Hibernate 5.3.7 has incompatibilities with PowerMock -->
-        <javassist.version>3.29.1-GA</javassist.version>
+        <javassist.version>3.29.2-GA</javassist.version>
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
         <jpms.module.name>com.hazelcast.hibernate53</jpms.module.name>
