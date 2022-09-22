@@ -1,4 +1,4 @@
-name: Compatiblity Builds
+name: Compatibility Tests
 on:
   schedule:
     - cron: '0 3 * * *'
