@@ -44,4 +44,11 @@ jobs:
       - name: Build with Maven
         run: mvn -f ${{ matrix.module }}/pom.xml verify
 
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.0.0
+        if: ${{ !cancelled() }}
+        with:
+          check_name: Test results
+          files: '**/*-reports/TEST-*.xml'
+
 
