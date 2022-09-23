@@ -3,12 +3,10 @@ package com.hazelcast.hibernate;
 import com.hazelcast.hibernate.entity.AnnotatedEntity;
 import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.SlowTest;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cfg.Environment;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -66,9 +64,10 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
 
         //dummy:0 should be evicted and this leads to a cache miss
         session = sf.openSession();
-        Criteria criteria = session.createCriteria(AnnotatedEntity.class).add(Restrictions.naturalId().set("title","dummy:0"))
-                                   .setCacheable(true);
-        criteria.uniqueResult();
+
+        session.byNaturalId(AnnotatedEntity.class)
+                .using("title", "dummy:0")
+                .load();
 
         assertEquals(1, sf.getStatistics().getNaturalIdCacheMissCount());
     }
@@ -93,9 +92,10 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
 
         //only dummy:1 should be evicted from cache on contrary to behavior of hibernate query cache without natural ids
         session = sf.openSession();
-        Criteria criteria = session.createCriteria(AnnotatedEntity.class).add(Restrictions.naturalId().set("title","dummy:0"))
-                                   .setCacheable(true);
-        criteria.uniqueResult();
+
+        session.byNaturalId(AnnotatedEntity.class)
+                .using("title", "dummy:0")
+                .load();
 
         //cache hit dummy:0 + previous hit
         assertEquals(2, sf.getStatistics().getNaturalIdCacheHitCount());
@@ -115,7 +115,7 @@ public class NaturalIdTest extends HibernateStatisticsTestSupport {
     @Test
     public void testEvictionNaturalId() {
         insertAnnotatedEntities(1);
-        sf.getCache().evictNaturalIdRegion(AnnotatedEntity.class);
+        sf.getCache().evictNaturalIdData(AnnotatedEntity.class);
         assertFalse(sf.getCache().containsEntity(AnnotatedEntity.class, 0L));
     }
 

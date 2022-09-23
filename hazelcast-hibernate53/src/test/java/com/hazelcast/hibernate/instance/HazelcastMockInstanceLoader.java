@@ -6,11 +6,11 @@ import com.hazelcast.client.config.ConnectionRetryConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
-import com.hazelcast.internal.config.ConfigLoader;
 import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.CacheEnvironment;
+import com.hazelcast.internal.config.ConfigLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import org.hibernate.cache.CacheException;
@@ -42,8 +42,8 @@ public class HazelcastMockInstanceLoader implements IHazelcastInstanceLoader {
                 LOGGER.warning("Current HazelcastClient is already active! Shutting it down...");
                 unloadInstance();
             }
-            String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, null);
-            String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, null);
+            String address = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_ADDRESS, props, (String) null);
+            String clientClusterName = ConfigurationHelper.getString(CacheEnvironment.NATIVE_CLIENT_CLUSTER_NAME, props, (String) null);
             String configResourcePath = CacheEnvironment.getConfigFilePath(props);
 
             ClientConfig clientConfig = buildClientConfig(configResourcePath);

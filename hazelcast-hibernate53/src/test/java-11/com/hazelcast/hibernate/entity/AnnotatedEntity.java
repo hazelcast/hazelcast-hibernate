@@ -4,14 +4,11 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 @NaturalIdCache
-@Entity
-@Table( name = "ANNOTATED_ENTITIES" )
+@jakarta.persistence.Entity
+@javax.persistence.Entity
+@javax.persistence.Table(name = "ANNOTATED_ENTITIES")
+@jakarta.persistence.Table(name = "ANNOTATED_ENTITIES")
 public class AnnotatedEntity {
     private Long id;
 
@@ -33,9 +30,11 @@ public class AnnotatedEntity {
         this.title = title;
     }
 
-    @Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
+    @javax.persistence.Id
+    @jakarta.persistence.Id
+    @javax.persistence.GeneratedValue(generator = "increment")
+    @jakarta.persistence.GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
     public Long getId() {
         return id;
     }

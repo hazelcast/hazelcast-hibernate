@@ -18,10 +18,10 @@ package com.hazelcast.hibernate;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.entity.DummyProperty;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.junit.After;
 import org.junit.Before;
 

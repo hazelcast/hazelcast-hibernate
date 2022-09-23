@@ -414,28 +414,36 @@ public class LocalRegionCache implements RegionCache {
          * @param mapConfig the MapConfig to use. If null, defaults will be used.
          */
         static EvictionConfig create(final MapConfig mapConfig) {
-            return new EvictionConfig() {
-                @Override
-                public Duration getTimeToLive() {
-                    return mapConfig == null
-                            ? Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis())
-                            : Duration.ofSeconds(mapConfig.getTimeToLiveSeconds());
-                }
+            return new DefaultEvictionConfig(mapConfig);
+        }
 
-                @Override
-                public int getSize() {
-                    return mapConfig == null
-                            ? MAX_SIZE
-                            : mapConfig.getEvictionConfig().getSize();
-                }
+        class DefaultEvictionConfig implements EvictionConfig {
+            private final MapConfig mapConfig;
 
-                @Override
-                public MaxSizePolicy getMaxSizePolicy() {
-                    return mapConfig == null
-                            ? com.hazelcast.config.MapConfig.DEFAULT_MAX_SIZE_POLICY
-                            : mapConfig.getEvictionConfig().getMaxSizePolicy();
-                }
-            };
+            DefaultEvictionConfig(MapConfig mapConfig) {
+                this.mapConfig = mapConfig;
+            }
+
+            @Override
+            public Duration getTimeToLive() {
+                return mapConfig == null
+                        ? Duration.ofMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis())
+                        : Duration.ofSeconds(mapConfig.getTimeToLiveSeconds());
+            }
+
+            @Override
+            public int getSize() {
+                return mapConfig == null
+                        ? MAX_SIZE
+                        : mapConfig.getEvictionConfig().getSize();
+            }
+
+            @Override
+            public MaxSizePolicy getMaxSizePolicy() {
+                return mapConfig == null
+                        ? com.hazelcast.config.MapConfig.DEFAULT_MAX_SIZE_POLICY
+                        : mapConfig.getEvictionConfig().getMaxSizePolicy();
+            }
         }
     }
 }

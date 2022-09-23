@@ -52,13 +52,13 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
 
     @Override
     public void configure(final Properties props) {
-        instanceName = ConfigurationHelper.getString(NATIVE_CLIENT_INSTANCE_NAME, props, null);
+        instanceName = ConfigurationHelper.getString(NATIVE_CLIENT_INSTANCE_NAME, props, (String) null);
         if (instanceName != null) {
             return;
         }
 
-        String address = ConfigurationHelper.getString(NATIVE_CLIENT_ADDRESS, props, null);
-        String clientClusterName = ConfigurationHelper.getString(NATIVE_CLIENT_CLUSTER_NAME, props, null);
+        String address = ConfigurationHelper.getString(NATIVE_CLIENT_ADDRESS, props, (String) null);
+        String clientClusterName = ConfigurationHelper.getString(NATIVE_CLIENT_CLUSTER_NAME, props, (String) null);
         String configResourcePath = getConfigFilePath(props);
 
         if (configResourcePath != null) {

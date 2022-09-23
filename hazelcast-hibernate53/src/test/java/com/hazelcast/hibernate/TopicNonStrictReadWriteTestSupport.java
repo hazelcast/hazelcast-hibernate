@@ -21,7 +21,7 @@ import com.hazelcast.hibernate.entity.DummyProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cache.spi.access.AccessType;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.junit.Test;
 
 import java.util.HashSet;
