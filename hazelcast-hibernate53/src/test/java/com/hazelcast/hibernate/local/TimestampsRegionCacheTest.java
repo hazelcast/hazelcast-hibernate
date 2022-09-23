@@ -57,7 +57,7 @@ public class TimestampsRegionCacheTest {
 
         ArgumentCaptor<MessageListener> listener = ArgumentCaptor.forClass(MessageListener.class);
         when(topic.addMessageListener(listener.capture())).thenReturn(UUID.randomUUID());
-        target = new TimestampsRegionCache(regionFactory, CACHE_NAME, instance);
+        target = new TimestampsRegionCache(regionFactory, CACHE_NAME, instance, new FreeHeapBasedCacheEvictor());
         this.listener = listener.getValue();
     }
 

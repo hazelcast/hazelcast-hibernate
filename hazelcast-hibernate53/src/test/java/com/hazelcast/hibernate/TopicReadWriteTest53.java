@@ -36,7 +36,11 @@ public class TopicReadWriteTest53 extends TopicReadWriteTestSupport {
     @Override
     protected void configureTopic(HazelcastInstance instance) {
         // Construct a LocalRegionCache instance, which configures the topic
-        new LocalRegionCache(mock(RegionFactory.class), "cache", instance, null, true);
+        LocalRegionCache.builder().withRegionFactory(mock(RegionFactory.class))
+                .withName("cache")
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .build();
     }
 
     @Override

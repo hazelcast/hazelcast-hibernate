@@ -19,6 +19,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.instance.DefaultHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
+import com.hazelcast.hibernate.local.FreeHeapBasedCacheEvictor;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -48,6 +49,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
 
     protected HazelcastInstance instance;
     protected final List<LocalRegionCache> localRegionCaches = new ArrayList<>();
+    protected final FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = new FreeHeapBasedCacheEvictor();
 
     private final PhoneHomeService phoneHomeService;
     private final CacheKeysFactory cacheKeysFactory;
@@ -100,10 +102,15 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
                                                                   final SessionFactoryImplementor sessionFactory) {
         // Note: We don't want to use an ITopic for invalidation because the timestamps cache can take care of outdated
         // queries
-        final LocalRegionCache regionCache = new LocalRegionCache(this, regionName, instance, null, false);
+        final LocalRegionCache regionCache = LocalRegionCache.builder().withRegionFactory(this)
+                .withName(regionName)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
         localRegionCaches.add(regionCache);
         return new HazelcastStorageAccessImpl(regionCache, CacheEnvironment
-          .getFallback(sessionFactory.getProperties()));
+                .getFallback(sessionFactory.getProperties()));
     }
 
     protected abstract RegionCache createRegionCache(String unqualifiedRegionName,
@@ -169,6 +176,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     protected void releaseFromUse() {
         phoneHomeService.shutdown();
         localRegionCaches.forEach(LocalRegionCache::destroy);
+        freeHeapBasedCacheEvictor.close();
         if (instanceLoader != null) {
             log.info("Shutting down " + getClass().getSimpleName());
             instanceLoader.unloadInstance();

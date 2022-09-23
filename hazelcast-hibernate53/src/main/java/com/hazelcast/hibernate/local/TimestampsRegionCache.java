@@ -16,12 +16,12 @@
 package com.hazelcast.hibernate.local;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.topic.ITopic;
-import com.hazelcast.topic.MessageListener;
 import com.hazelcast.hibernate.RegionCache;
 import com.hazelcast.hibernate.serialization.Expirable;
 import com.hazelcast.hibernate.serialization.Value;
 import com.hazelcast.internal.util.UuidUtil;
+import com.hazelcast.topic.ITopic;
+import com.hazelcast.topic.MessageListener;
 import org.hibernate.cache.spi.RegionFactory;
 
 import java.util.UUID;
@@ -35,15 +35,16 @@ public class TimestampsRegionCache extends LocalRegionCache implements RegionCac
     private UUID regionId;
 
     /**
-     * @param regionFactory     the region factory
-     * @param name              the name for this region cache, which is also used to retrieve configuration/topic
-     * @param hazelcastInstance the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
-     *                          configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
-     *                          with (optional)
+     * @param regionFactory             the region factory
+     * @param name                      the name for this region cache, which is also used to retrieve configuration/topic
+     * @param hazelcastInstance         the {@code HazelcastInstance} to which this region cache belongs, used to retrieve
+     *                                  configuration and to lookup an {@link ITopic} to register a {@link MessageListener}
+     *                                  with (optional)
+     * @param freeHeapBasedCacheEvictor performs the free-heap-based eviction
      */
     public TimestampsRegionCache(final RegionFactory regionFactory, final String name,
-                                 final HazelcastInstance hazelcastInstance) {
-        super(regionFactory, name, hazelcastInstance, null);
+                                 final HazelcastInstance hazelcastInstance, FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor) {
+        super(regionFactory, name, hazelcastInstance, null, true, null, freeHeapBasedCacheEvictor);
         regionId = UuidUtil.newSecureUUID();
     }
 
