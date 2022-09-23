@@ -43,6 +43,27 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>add-jdk-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${entity.source.root}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -60,5 +81,37 @@
             </resource>
         </resources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jdk-8</id>
+            <activation>
+                <jdk>[1.8,11)</jdk>
+            </activation>
+            <properties>
+                <entity.source.root>src/test/java-8</entity.source.root>
+                <!-- Hibernate 6.x requires JDK 11 -->
+                <hibernate.core.version>5.6.11.Final</hibernate.core.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>jdk-11</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <properties>
+                <entity.source.root>src/test/java-11</entity.source.root>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <!-- Part of Hibernate 6.x, required to run tests against Hibernate 5.x -->
+                    <groupId>jakarta.persistence</groupId>
+                    <artifactId>jakarta.persistence-api</artifactId>
+                    <version>3.1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>
