@@ -6,8 +6,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.awaitility.Awaitility.await;
 
 public class PhoneHomeIntegrationTest {
 
@@ -26,8 +29,10 @@ public class PhoneHomeIntegrationTest {
                 "/hazelcast-hibernate53", info);
         service.start();
 
-        // verify 5 retries
-        WireMock.verify(5, getRequestedFor(urlEqualTo("/hazelcast-hibernate53" + info.getQueryString())));
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+                // verify 5 retries
+                WireMock.verify(5, getRequestedFor(urlEqualTo("/hazelcast-hibernate53" + info.getQueryString())))
+        );
 
         service.shutdown();
     }
