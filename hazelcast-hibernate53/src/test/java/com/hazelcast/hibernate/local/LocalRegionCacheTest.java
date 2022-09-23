@@ -5,7 +5,10 @@ import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.hibernate.CacheEnvironment;
+import com.hazelcast.map.impl.eviction.ZeroMemoryInfoAccessor;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.topic.ITopic;
@@ -25,8 +28,14 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
+import static com.hazelcast.config.MapConfig.DEFAULT_MAX_SIZE_POLICY;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
@@ -34,6 +43,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -50,21 +60,33 @@ public class LocalRegionCacheTest {
     private RegionFactory regionFactory;
 
     @Test
-    public void testConstructorIgnoresUnsupportedOperationExceptionsFromConfig() {
+    public void testConstructionIgnoresUnsupportedOperationExceptionsFromConfig() {
         HazelcastInstance instance = mock(HazelcastInstance.class);
         doThrow(UnsupportedOperationException.class).when(instance).getConfig();
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false);
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build();
+
+        assertThat(localRegionCache).isNotNull();
     }
 
     @Test
-    public void testConstructorIgnoresVersionComparatorForUnversionedEntityData() {
+    public void testConstructionIgnoresVersionComparatorForUnversionedEntityData() {
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
         EntityDataCachingConfig entityDataCachingConfig = mock(EntityDataCachingConfig.class);
         when(domainDataRegionConfig.getEntityCaching()).thenReturn(Collections.singletonList(entityDataCachingConfig));
         doThrow(AssertionError.class).when(entityDataCachingConfig).getVersionComparatorAccess(); // Will fail the test if called
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false);
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(entityDataCachingConfig).isVersioned(); // Verify that the versioned flag was checked
         verifyNoMoreInteractions(entityDataCachingConfig);
     }
@@ -79,25 +101,35 @@ public class LocalRegionCacheTest {
         when(entityDataCachingConfig.isVersioned()).thenReturn(true);
         when(entityDataCachingConfig.getVersionComparatorAccess()).thenReturn((Supplier) () -> comparator);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false);
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(entityDataCachingConfig).isVersioned();
         verify(entityDataCachingConfig).getVersionComparatorAccess();
     }
 
     @Test
-    public void testConstructorIgnoresVersionComparatorForUnversionedCollectionData() {
+    public void testConstructionIgnoresVersionComparatorForUnversionedCollectionData() {
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
         CollectionDataCachingConfig collectionDataCachingConfig = mock(CollectionDataCachingConfig.class);
         when(domainDataRegionConfig.getCollectionCaching()).thenReturn(Collections.singletonList(collectionDataCachingConfig));
         doThrow(AssertionError.class).when(collectionDataCachingConfig).getOwnerVersionComparator(); // Will fail the test if called
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false);
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
         verify(collectionDataCachingConfig).isVersioned(); // Verify that the versioned flag was checked
         verifyNoMoreInteractions(collectionDataCachingConfig);
     }
 
     @Test
-    public void testConstructorSetsVersionComparatorForVersionedCollectionData() {
+    public void testConstructionSetsVersionComparatorForVersionedCollectionData() {
         Comparator<?> comparator = mock(Comparator.class);
 
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
@@ -106,74 +138,200 @@ public class LocalRegionCacheTest {
         when(collectionDataCachingConfig.isVersioned()).thenReturn(true);
         when(collectionDataCachingConfig.getOwnerVersionComparator()).thenReturn(comparator);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, domainDataRegionConfig, false);
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withRegionConfig(domainDataRegionConfig)
+                .withTopic(false)
+                .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(collectionDataCachingConfig).getOwnerVersionComparator();
         verify(collectionDataCachingConfig).isVersioned();
     }
 
     @Test
-    public void testFourArgConstructorDoesNotRegisterTopicListenerIfNotRequested() {
-        MapConfig mapConfig = mock(MapConfig.class);
-        EvictionConfig evictionConfig = mock(EvictionConfig.class);
-        when(evictionConfig.getSize()).thenReturn(42);
+    public void testConstructionDoesNotRegisterTopicListenerIfNotRequested() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig();
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
-        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
 
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false);
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build();
+
+        assertThat(localRegionCache).isNotNull();
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance, never()).getTopic(anyString());
     }
 
     @Test
-    public void testEvictionConfigIsDerivedFromMapConfig() {
-        MapConfig mapConfig = mock(MapConfig.class);
+    public void test_EvictionConfig_from_HazelcastInstance() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig();
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
 
-        EvictionConfig maxSizeConfig = mock(EvictionConfig.class);
-        when(mapConfig.getEvictionConfig()).thenReturn(maxSizeConfig);
+        EvictionConfig maxSizeConfig = mapConfig.getEvictionConfig();
 
         HazelcastInstance instance = mock(HazelcastInstance.class);
         when(instance.getConfig()).thenReturn(config);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, false);
-
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build();
         verify(maxSizeConfig, atLeastOnce()).getSize();
+        verify(maxSizeConfig, atLeastOnce()).getMaxSizePolicy();
         verify(mapConfig, atLeastOnce()).getTimeToLiveSeconds();
     }
 
     @Test
-    public void testEvictionConfigIsNotDerivedFromMapConfig() {
-        MapConfig mapConfig = mock(MapConfig.class);
+    public void test_EvictionConfig_creation_from_MapConfig() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.PER_NODE);
+
+        LocalRegionCache.EvictionConfig evictionConfig = LocalRegionCache.EvictionConfig.create(mapConfig);
+
+        assertThat(evictionConfig.getTimeToLive()).hasSeconds(123);
+        assertThat(evictionConfig.getSize()).isEqualTo(234);
+        assertThat(evictionConfig.getMaxSizePolicy()).isEqualTo(MaxSizePolicy.PER_NODE);
+    }
+
+    @Test
+    public void test_freeHeapCacheEvictor_started_when_FREE_HEAP_SIZE_policy() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.FREE_HEAP_SIZE);
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
 
-        LocalRegionCache.EvictionConfig evictionConfig = mock(LocalRegionCache.EvictionConfig.class);
-        when(evictionConfig.getTimeToLive()).thenReturn(Duration.ofSeconds(1));
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, null, null, false, evictionConfig);
+        FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor(newSingleThreadScheduledExecutor(),
+                new ZeroMemoryInfoAccessor(), Duration.ofMillis(50)));
 
-        verify(evictionConfig, atLeastOnce()).getMaxSize();
-        verify(evictionConfig, atLeastOnce()).getTimeToLive();
-        verifyNoInteractions(mapConfig);
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
+
+        verify(freeHeapBasedCacheEvictor).start(eq(CACHE_NAME), any(), eq(234L * 1024 * 1024));
     }
 
-    // Verifies that the three-argument constructor still registers a listener with a topic if the HazelcastInstance
-    // is provided. This ensures the old behavior has not been regressed by adding the new four argument constructor
     @Test
-    public void testThreeArgConstructorRegistersTopicListener() {
-        MapConfig mapConfig = mock(MapConfig.class);
-        EvictionConfig evictionConfig = mock(EvictionConfig.class);
-        when(mapConfig.getEvictionConfig()).thenReturn(evictionConfig);
-        when(evictionConfig.getSize()).thenReturn(42);
+    public void test_freeHeapCacheEvictor_is_required_for_FREE_HEAP_SIZE_policy() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.FREE_HEAP_SIZE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        assertThatThrownBy(() -> LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .build()
+        ).isInstanceOf(IllegalStateException.class)
+                .hasMessage("FreeHeapBasedCacheEvictor is required for FREE_HEAP_SIZE policy");
+    }
+
+    @Test
+    public void test_freeHeapCacheEvictor_NOT_started_when_PER_NODE_policy() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.PER_NODE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor(mock(ScheduledExecutorService.class),
+                new ZeroMemoryInfoAccessor(), Duration.ofMillis(50)));
+
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
+        verifyNoInteractions(freeHeapBasedCacheEvictor);
+    }
+
+    @Test
+    public void test_free_heap_evictor_should_remove_task_when_cache_destroyed() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig(234, MaxSizePolicy.FREE_HEAP_SIZE);
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+
+        FreeHeapBasedCacheEvictor freeHeapBasedCacheEvictor = spy(new FreeHeapBasedCacheEvictor());
+        LocalRegionCache localRegionCache = LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(false)
+                .withFreeHeapBasedCacheEvictor(freeHeapBasedCacheEvictor)
+                .build();
+        localRegionCache.destroy();
+
+        verify(freeHeapBasedCacheEvictor).stop(CACHE_NAME);
+    }
+
+
+    private MapConfig someMapConfigWithEvictionConfig() {
+        return someMapConfigWithEvictionConfig(234, MaxSizePolicy.PER_NODE);
+    }
+
+    private MapConfig someMapConfigWithEvictionConfig(int sizeInMB, MaxSizePolicy maxSizePolicy) {
+        return spy(new MapConfig()
+                .setTimeToLiveSeconds(123)
+                .setEvictionConfig(spy(new EvictionConfig()
+                        .setSize(sizeInMB)
+                        .setMaxSizePolicy(maxSizePolicy))
+                ));
+    }
+
+    @Test
+    public void test_EvictionConfig_creation_withoutMapConfig() {
+        LocalRegionCache.EvictionConfig evictionConfig = LocalRegionCache.EvictionConfig.create(null);
+
+        assertThat(evictionConfig.getTimeToLive()).hasMillis(CacheEnvironment.getDefaultCacheTimeoutInMillis());
+        assertThat(evictionConfig.getSize()).isEqualTo(100_000);
+        assertThat(evictionConfig.getMaxSizePolicy()).isEqualTo(DEFAULT_MAX_SIZE_POLICY);
+    }
+
+
+    @Test
+    public void test_passing_evictionConfig_when_no_instance() {
+        LocalRegionCache.EvictionConfig evictionConfig = spy(LocalRegionCache.EvictionConfig.create(someMapConfigWithEvictionConfig()));
+
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withTopic(false)
+                .withEvictionConfig(evictionConfig)
+                .build();
+
+        verify(evictionConfig, atLeastOnce()).getSize();
+        verify(evictionConfig, atLeastOnce()).getTimeToLive();
+        verify(evictionConfig, atLeastOnce()).getMaxSizePolicy();
+    }
+
+    @Test
+    public void testRegistrationTopicListener() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig();
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
@@ -185,7 +343,11 @@ public class LocalRegionCacheTest {
         when(instance.getConfig()).thenReturn(config);
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
 
-        new LocalRegionCache(regionFactory, CACHE_NAME, instance, null, true);
+        LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .build();
         verify(config).findMapConfig(eq(CACHE_NAME));
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
@@ -196,8 +358,7 @@ public class LocalRegionCacheTest {
     public void testMessagesFromLocalNodeAreIgnored() {
         MapConfig mapConfig = mock(MapConfig.class);
 
-        LocalRegionCache.EvictionConfig evictionConfig = mock(LocalRegionCache.EvictionConfig.class);
-        when(evictionConfig.getTimeToLive()).thenReturn(Duration.ofHours(1));
+        LocalRegionCache.EvictionConfig evictionConfig = spy(LocalRegionCache.EvictionConfig.create(someMapConfigWithEvictionConfig()));
 
         Config config = mock(Config.class);
         when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
@@ -209,7 +370,12 @@ public class LocalRegionCacheTest {
         when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
 
         // Create a new local cache
-        new LocalRegionCache(null, CACHE_NAME, instance, null, true, evictionConfig);
+        LocalRegionCache.builder()
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .withEvictionConfig(evictionConfig)
+                .build();
 
         // Obtain the message listener of the local cache
         ArgumentCaptor<MessageListener> messageListenerArgumentCaptor = ArgumentCaptor.forClass(MessageListener.class);

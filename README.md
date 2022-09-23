@@ -109,24 +109,31 @@ With `HazelcastLocalCacheRegionFactory`, all of the following caches are not dis
 - Collection Cache
 - Timestamp Cache
 
-_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to all other members in order to remove the entity from their local cache. 
+_Entity_ and _Collection_ caches are invalidated on update. When they are updated on a member, an invalidation message is sent to
+all other members in order to remove the entity from their local cache.
 
-When needed, each member reads that data from the underlying datasource. 
+When needed, each member reads that data from the underlying datasource.
 
-On every _Timestamp_ cache update, `hazelcast-hibernate` publishes an invalidation message to a topic (see #hazelcastlocalcacheregionfactory for details).
+On every _Timestamp_ cache update, `hazelcast-hibernate` publishes an invalidation message to a topic (see
+#hazelcastlocalcacheregionfactory for details).
 
 #### Configuration
 
-Local region cache eviction can be configured using two parameters:
- - _time-to-live_ - defining the lifespan of cache entries (defaults to 1 hour)
- - _eviction-size_ - defining the maximum cache size (defaults to 100000)
+Local region cache eviction can be configured using the following parameters:
+
+- _time-to-live_ - defining the lifespan of cache entries (defaults to 1 hour)
+- _size_ - defining the maximum cache size, meaning depends on the `max-size-policy`,
+- _max-size-policy_ - defining the max size policy used for eviction. Available values are as follows:
+  - `PER_NODE` - Maximum number of map entries in the local cache. This is the default policy.
+  - `FREE_HEAP_SIZE` - Minimum free heap size in megabytes for the JVM.
 
 Above can be configured in your Hazelcast configuration file:
 
 ```xml
+
 <map name="your-cache-name">
-    <time-to-live-seconds>60</time-to-live-seconds>
-    <eviction size="150" />
+  <time-to-live-seconds>60</time-to-live-seconds>
+  <eviction size="150" max-size-policy="PER_NODE"/>
 </map>
 ```
 

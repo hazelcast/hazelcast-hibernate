@@ -243,7 +243,6 @@
                         -Xms128m -Xmx1G
                         -Dhazelcast.phone.home.enabled=false
                         -Dhazelcast.mancenter.enabled=false
-                        -Dhazelcast.logging.type=none
                         -Dhazelcast.test.use.network=false
                     </argLine>
                 </configuration>
@@ -405,6 +404,11 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.23.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
@@ -471,7 +475,6 @@
                     -Xms128m -Xmx1G
                     -Dhazelcast.version.check.enabled=false
                     -Dhazelcast.mancenter.enabled=false
-                    -Dhazelcast.logging.type=none
                     -Dhazelcast.test.use.network=false
                 </argLine>
             </properties>
@@ -618,7 +621,6 @@
                                 -Xms128m -Xmx1G
                                 -Dhazelcast.phone.home.enabled=false
                                 -Dhazelcast.mancenter.enabled=false
-                                -Dhazelcast.logging.type=none
                                 -Dhazelcast.test.use.network=true
                             </argLine>
                         </configuration>
