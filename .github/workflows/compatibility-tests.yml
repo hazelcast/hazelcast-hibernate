@@ -31,7 +31,7 @@ jobs:
         run: mvn compile
 
       - name: Run tests against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
-        run: mvn resources:testResources compiler:testCompile surefire:test failsafe:integration-test failsafe:verify -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
+        run: mvn verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
 
   test-jdks:
     if: ${{ github.event_name != 'labeled' || github.event.label.name == 'compatibility-sensitive' }}
