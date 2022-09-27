@@ -29,6 +29,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
@@ -79,7 +80,8 @@ public class FreeHeapBasedCacheEvictor implements AutoCloseable {
     }
 
     static ThreadFactory defaultThreadFactory() {
-        return r -> new Thread(r, FreeHeapBasedCacheEvictor.class.getSimpleName() + "-free-heap-evictor");
+        AtomicInteger counter = new AtomicInteger();
+        return r -> new Thread(r, FreeHeapBasedCacheEvictor.class.getSimpleName() + "-free-heap-evictor-" + counter.getAndIncrement());
     }
 
     private boolean freeHeapTooSmall(long minimalHeapSizeInMB) {
