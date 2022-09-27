@@ -81,7 +81,8 @@ public class FreeHeapBasedCacheEvictor implements AutoCloseable {
 
     static ThreadFactory defaultThreadFactory() {
         AtomicInteger counter = new AtomicInteger();
-        return r -> new Thread(r, FreeHeapBasedCacheEvictor.class.getSimpleName() + "-free-heap-evictor-" + counter.getAndIncrement());
+        return r -> new Thread(r, FreeHeapBasedCacheEvictor.class.getSimpleName() + "-free-heap-evictor-"
+                + counter.getAndIncrement());
     }
 
     private boolean freeHeapTooSmall(long minimalHeapSizeInMB) {
