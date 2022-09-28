@@ -549,6 +549,17 @@
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.0.0-M6</version>
+                        <configuration>
+                            <tagNameFormat>v@{project.version}</tagNameFormat>
+                            <scmCommentPrefix>Release -</scmCommentPrefix>
+                            <pushChanges>false</pushChanges>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
