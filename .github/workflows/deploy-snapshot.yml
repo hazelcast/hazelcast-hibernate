@@ -1,4 +1,4 @@
-name: Release Snapshot
+name: Deploy Snapshot
 
 on:
   push:
@@ -11,10 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: [ 'hazelcast-hibernate53' ]
-    name: Release ${{ matrix.module }} snapshot
+    name: Deploy snapshot
     steps:
       - uses: actions/checkout@v3
       - name: Setup JDK
@@ -27,7 +24,7 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
-      - name: Deploy ${{ matrix.module }} snapshot
+      - name: Deploy snapshot
         run: mvn deploy -Prelease-snapshot --batch-mode --update-snapshots -DskipTests -DretryFailedDeploymentCount=3
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_OSS_USERNAME }}
