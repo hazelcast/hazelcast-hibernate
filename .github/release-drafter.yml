@@ -27,3 +27,8 @@ categories:
     
 exclude-labels:
   - 'internal'
+
+exclude-contributors:
+  - 'dependabot[bot]'
+  - 'dependabot'
+  - 'devOpsHazelcast'
