@@ -1,0 +1,37 @@
+name: Deploy Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Deploy release
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v3.5.1
+        with:
+          java-version:  17
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: release-repository
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Deploy release
+        run: mvn deploy -Prelease --batch-mode -DskipTests -DretryFailedDeploymentCount=3
+        env:
+          MAVEN_USERNAME: ${{ secrets.SONATYPE_OSS_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.SONATYPE_OSS_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          append_body: true
+          files: '**target/hazelcast-hibernate*.jar'
