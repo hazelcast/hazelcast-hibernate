@@ -28,10 +28,7 @@ jobs:
   build:
     needs: checkstyle
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: [ 'hazelcast-hibernate53' ]
-    name: Build ${{ matrix.module }}
+    name: Build
     steps:
       - uses: actions/checkout@v3
       - name: Setup JDK
@@ -42,13 +39,21 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -f ${{ matrix.module }}/pom.xml verify
+        run: mvn verify
 
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2.0.0
-        if: ${{ !cancelled() }}
+      - name: Upload Test Results
+        if:  ${{ always() }}
+        uses: actions/upload-artifact@v3
         with:
-          check_name: Test results
-          files: '**/*-reports/TEST-*.xml'
+          name: Test Results
+          path: '**/*-reports/TEST-*.xml'
 
-
+  event_file:
+    name: Upload event file
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: Event File
+        path: ${{ github.event_path }}
