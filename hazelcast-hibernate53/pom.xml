@@ -92,6 +92,8 @@
                 <entity.source.root>src/test/java-8</entity.source.root>
                 <!-- Hibernate 6.x requires JDK 11 -->
                 <hibernate.core.version>5.6.11.Final</hibernate.core.version>
+                <jaxb-impl.version>2.3.1</jaxb-impl.version>
+                <jaxb-core.version>2.3.0.1</jaxb-core.version>
             </properties>
         </profile>
         <profile>
