@@ -26,21 +26,10 @@
     <url>http://www.hazelcast.com/</url>
 
     <properties>
-        <!-- 3.23.1-GA from Hibernate 5.3.7 has incompatibilities with PowerMock -->
-        <javassist.version>3.29.2-GA</javassist.version>
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
         <jpms.module.name>com.hazelcast.hibernate53</jpms.module.name>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>${javassist.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
