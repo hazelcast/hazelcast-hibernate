@@ -94,24 +94,8 @@
         <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate.git</connection>
         <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate.git</developerConnection>
         <url>https://github.com/hazelcast/hazelcast-hibernate/</url>
-    </scm>
-    <developers>
-        <developer>
-            <id>oztalip</id>
-            <name>talip ozturk</name>
-            <email>talip@hazelcast.com</email>
-        </developer>
-        <developer>
-            <id>fuad</id>
-            <name>fuad malikov</name>
-            <email>fuad@hazelcast.com</email>
-        </developer>
-        <developer>
-            <id>bturner</id>
-            <name>bryan turner</name>
-            <email>bturner@atlassian.com</email>
-        </developer>
-    </developers>
+      <tag>HEAD</tag>
+  </scm>
     <build>
         <plugins>
             <plugin>
