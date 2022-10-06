@@ -22,7 +22,7 @@
 
     <artifactId>hazelcast-hibernate53</artifactId>
     <packaging>jar</packaging>
-    <description>Hazelcast In-Memory DataGrid Hibernate Plugin</description>
+    <description>Hazelcast Platform Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
 
     <properties>

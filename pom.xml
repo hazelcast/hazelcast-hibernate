@@ -19,7 +19,7 @@
     <artifactId>hazelcast-hibernate</artifactId>
     <version>2.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>Hazelcast IMDG Hibernate Plugin</description>
+    <description>Hazelcast Platform Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
 
     <modules>
