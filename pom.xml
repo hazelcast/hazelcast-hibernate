@@ -198,7 +198,6 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>failedfirst</runOrder>
                     <argLine>
-                        -Xms128m -Xmx1G
                         -Dhazelcast.phone.home.enabled=false
                         -Dhazelcast.mancenter.enabled=false
                         -Dhazelcast.test.use.network=false
@@ -412,7 +411,6 @@
             <id>test-coverage</id>
             <properties>
                 <argLine>
-                    -Xms128m -Xmx1G
                     -Dhazelcast.version.check.enabled=false
                     -Dhazelcast.mancenter.enabled=false
                     -Dhazelcast.test.use.network=false
@@ -569,7 +567,6 @@
                             <parallel>none</parallel>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <argLine>
-                                -Xms128m -Xmx1G
                                 -Dhazelcast.phone.home.enabled=false
                                 -Dhazelcast.mancenter.enabled=false
                                 -Dhazelcast.test.use.network=true
