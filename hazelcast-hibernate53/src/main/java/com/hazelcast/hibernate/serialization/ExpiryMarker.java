@@ -63,7 +63,7 @@ public class ExpiryMarker extends Expirable implements Serializable {
     @Override
     public boolean isReplaceableBy(final long txTimestamp, final Object newVersion,
                                    final Comparator versionComparator) {
-        // If the marker has timed out it should be fine to write to write to it
+        // If the marker has timed out it should be fine to write to it
         if (txTimestamp > timeout) {
             return true;
         }
