@@ -112,6 +112,7 @@
                                     <artifact>com.github.ben-manes.caffeine:caffeine</artifact>
                                     <excludes>
                                         <exclude>META-INF/*.idx</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -167,7 +168,6 @@
                                     *
                                 </Import-Package>
                                 <Fragment-Host>com.hazelcast</Fragment-Host>
-                                <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
                             </instructions>
                         </configuration>
                     </execution>
