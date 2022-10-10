@@ -9,8 +9,7 @@ You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or 
 
 ## Supported Versions
 
-The newest version of:
-- `hazelcast-hibernate53` supports Hibernate 5.3.x/5.4.x, and Hazelcast 4+
+- `hazelcast-hibernate53` supports Hibernate 5.3+, and Hazelcast 4+
 
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
 
@@ -261,8 +260,6 @@ You can use an existing client instead of creating a new one by adding the follo
 ```
 ___
 ***NOTE***: *To configure a Hazelcast Native Client for Hibernate, put the configuration file named `hazelcast-client.xml` into the root of your classpath.*
-___
-***NOTE***: *To be able to use native client mode, add `hazelcast-hibernate(5,52,53)` and `hibernate-core` to your remote cluster's classpath.*
 ___
 ***NOTE***: *If your persisted classes only contain Java primitive type fields, you do not need to add your classes into your remote cluster's classpath. However, if your classes have non-primitive type fields, you need to add only these fields' classes (not your domain class) to your cluster's classpath.*
 
