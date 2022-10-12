@@ -22,8 +22,6 @@ import com.hazelcast.hibernate.entity.DummyProperty;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceFactory;
 import com.hazelcast.hibernate.instance.IHazelcastInstanceLoader;
 import com.hazelcast.internal.nio.IOUtil;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
 import com.hazelcast.test.HazelcastTestSupport;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -47,8 +45,6 @@ import java.util.Date;
 import java.util.Properties;
 
 public abstract class HibernateTestSupport extends HazelcastTestSupport {
-
-    private final ILogger logger = Logger.getLogger(getClass());
 
     protected final String CACHE_ENTITY = DummyEntity.class.getName();
     protected final String CACHE_PROPERTY = DummyProperty.class.getName();

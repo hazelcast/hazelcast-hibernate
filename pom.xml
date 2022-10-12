@@ -19,7 +19,7 @@
     <artifactId>hazelcast-hibernate</artifactId>
     <version>2.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>Hazelcast IMDG Hibernate Plugin</description>
+    <description>Hazelcast Platform Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
 
     <modules>
@@ -31,59 +31,42 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jdk.version>1.8</jdk.version>
-        <target.dir>target</target.dir>
-        <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
-        <timestamp>${maven.build.timestamp}</timestamp>
-
         <hazelcast.version>5.1.4</hazelcast.version>
 
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
-        <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-        <build.helper.maven.plugin.version>1.9.1</build.helper.maven.plugin.version>
         <maven.javadoc.plugin.version>3.4.1</maven.javadoc.plugin.version>
-        <maven.antrun.plugin.version>1.7</maven.antrun.plugin.version>
         <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
-        <maven.assembly.plugin.version>2.4</maven.assembly.plugin.version>
-        <maven.rar.plugin.version>2.2</maven.rar.plugin.version>
-        <maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
-        <maven.shade.plugin.version>2.2</maven.shade.plugin.version>
-        <maven.dependency.plugin.version>2.6</maven.dependency.plugin.version>
-        <maven.animal.sniffer.plugin.version>1.18</maven.animal.sniffer.plugin.version>
-        <maven.git.commit.id.plugin.version>2.1.10</maven.git.commit.id.plugin.version>
-        <maven.gpg.plugin.version>1.4</maven.gpg.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
-        <maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
         <maven.findbugs.plugin.version>3.0.5</maven.findbugs.plugin.version>
         <maven.checkstyle.plugin.version>3.2.0</maven.checkstyle.plugin.version>
         <maven.sonar.plugin.version>3.3.0.603</maven.sonar.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
-        <maven.cobertura.plugin.version>2.0</maven.cobertura.plugin.version>
 
         <reload4j.version>1.2.22</reload4j.version>
         <slf4j.api.version>2.0.3</slf4j.api.version>
 
         <junit.version>4.13.2</junit.version>
-        <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>4.8.0</mockito.version>
-        <powermock.version>2.0.9</powermock.version>
         <wiremock.version>2.27.2</wiremock.version>
 
-        <findbugs.version>1.3.2</findbugs.version>
-
         <sonar.jacoco.jar>${basedir}/lib/jacocoagent.jar</sonar.jacoco.jar>
-        <!--<sonar.phase>post-integration-test</sonar.phase>-->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.language>java</sonar.language>
         <sonar.verbose>true</sonar.verbose>
 
         <hsqldb.version>2.7.0</hsqldb.version>
-        <javassist.version>3.27.0-GA</javassist.version>
         <hibernate.core.version>6.1.3.Final</hibernate.core.version>
-        <bytebuddy.version>1.10.11</bytebuddy.version>
         <jaxb-impl.version>4.0.1</jaxb-impl.version>
         <jaxb-core.version>4.0.1</jaxb-core.version>
+
+        <surefire.argLine>
+            -Xmx1G
+            -Dhazelcast.phone.home.enabled=false
+            -Dhazelcast.mancenter.enabled=false
+            -Dhazelcast.test.use.network=false
+        </surefire.argLine>
     </properties>
 
     <licenses>
@@ -97,24 +80,8 @@
         <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate.git</connection>
         <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate.git</developerConnection>
         <url>https://github.com/hazelcast/hazelcast-hibernate/</url>
-    </scm>
-    <developers>
-        <developer>
-            <id>oztalip</id>
-            <name>talip ozturk</name>
-            <email>talip@hazelcast.com</email>
-        </developer>
-        <developer>
-            <id>fuad</id>
-            <name>fuad malikov</name>
-            <email>fuad@hazelcast.com</email>
-        </developer>
-        <developer>
-            <id>bturner</id>
-            <name>bryan turner</name>
-            <email>bturner@atlassian.com</email>
-        </developer>
-    </developers>
+      <tag>HEAD</tag>
+  </scm>
     <build>
         <plugins>
             <plugin>
@@ -152,6 +119,7 @@
                                     <artifact>com.github.ben-manes.caffeine:caffeine</artifact>
                                     <excludes>
                                         <exclude>META-INF/*.idx</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -199,15 +167,10 @@
                                 <Import-Package>
                                     !org.junit,
                                     !com.hazelcast.*,
-                                    org.apache.log4j;resolution:=optional,
-                                    org.apache.log4j.*;resolution:=optional,
-                                    org.apache.logging.log4j;resolution:=optional,
-                                    org.apache.logging.log4j.*;resolution:=optional,
                                     org.slf4j;resolution:=optional,
                                     *
                                 </Import-Package>
                                 <Fragment-Host>com.hazelcast</Fragment-Host>
-                                <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
                             </instructions>
                         </configuration>
                     </execution>
@@ -242,10 +205,7 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>failedfirst</runOrder>
                     <argLine>
-                        -Xms128m -Xmx1G
-                        -Dhazelcast.phone.home.enabled=false
-                        -Dhazelcast.mancenter.enabled=false
-                        -Dhazelcast.test.use.network=false
+                        ${surefire.argLine}
                     </argLine>
                 </configuration>
             </plugin>
@@ -364,12 +324,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.23.1</version>
@@ -460,14 +414,6 @@
         </profile>
         <profile>
             <id>test-coverage</id>
-            <properties>
-                <argLine>
-                    -Xms128m -Xmx1G
-                    -Dhazelcast.version.check.enabled=false
-                    -Dhazelcast.mancenter.enabled=false
-                    -Dhazelcast.test.use.network=false
-                </argLine>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -483,6 +429,9 @@
                         <configuration combine.self="override">
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <testFailureIgnore>true</testFailureIgnore>
+                            <argLine>
+                                ${surefire.argLine}
+                            </argLine>
                         </configuration>
                     </plugin>
 
@@ -600,31 +549,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>master</id>
-            <properties>
-                <hazelcast.version>5.0-SNAPSHOT</hazelcast.version>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire.plugin.version}</version>
-                        <configuration combine.self="override">
-                            <parallel>none</parallel>
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <argLine>
-                                -Xms128m -Xmx1G
-                                -Dhazelcast.phone.home.enabled=false
-                                -Dhazelcast.mancenter.enabled=false
-                                -Dhazelcast.test.use.network=true
-                            </argLine>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

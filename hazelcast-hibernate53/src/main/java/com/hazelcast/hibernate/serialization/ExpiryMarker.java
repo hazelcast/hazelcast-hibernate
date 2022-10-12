@@ -63,7 +63,7 @@ public class ExpiryMarker extends Expirable implements Serializable {
     @Override
     public boolean isReplaceableBy(final long txTimestamp, final Object newVersion,
                                    final Comparator versionComparator) {
-        // If the marker has timed out it should be fine to write to write to it
+        // If the marker has timed out it should be fine to write to it
         if (txTimestamp > timeout) {
             return true;
         }
@@ -128,7 +128,7 @@ public class ExpiryMarker extends Expirable implements Serializable {
     public void writeData(final ObjectDataOutput out) throws IOException {
         super.writeData(out);
         out.writeBoolean(concurrent);
-        out.writeUTF(markerId);
+        out.writeString(markerId);
         out.writeInt(multiplicity);
         out.writeLong(timeout);
         out.writeLong(expiredTimestamp);
@@ -138,7 +138,7 @@ public class ExpiryMarker extends Expirable implements Serializable {
     public void readData(final ObjectDataInput in) throws IOException {
         super.readData(in);
         concurrent = in.readBoolean();
-        markerId = in.readUTF();
+        markerId = in.readString();
         multiplicity = in.readInt();
         timeout = in.readLong();
         expiredTimestamp = in.readLong();
