@@ -26,6 +26,8 @@ jobs:
           if [ -n "${{ github.event.inputs.next-version }}" ]; then
               EXTRA_ARGS=-DdevelopmentVersion=${{ github.event.inputs.next-version }}
           fi
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
           mvn --batch-mode release:prepare -Prelease -Darguments="-DskipTests" $EXTRA_ARGS
           mvn --batch-mode release:clean
         env:
