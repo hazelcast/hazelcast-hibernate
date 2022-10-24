@@ -28,6 +28,8 @@ jobs:
           fi
           mvn --batch-mode release:prepare -Prelease -Darguments="-DskipTests" $EXTRA_ARGS
           mvn --batch-mode release:clean
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 
       - name: Push changes
         run: |
