@@ -4,17 +4,31 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to be released, e.g. v1.2.3, v2.2.2, v3.0.0'
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Deploy release
     steps:
+      - name: Determine tag to be released
+        run: |
+          TAG=${GITHUB_REF:10}
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}" 
+          fi
+          echo "TAG=${TAG}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
+        with:
+          ref: "${{ env.TAG }}"
       - name: Setup JDK
         uses: actions/setup-java@v3.6.0
         with:
-          java-version:  17
+          java-version: 17
           distribution: 'temurin'
           cache: 'maven'
           server-id: release-repository
