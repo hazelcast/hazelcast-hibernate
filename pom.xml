@@ -80,8 +80,16 @@
         <connection>scm:git:git://github.com/hazelcast/hazelcast-hibernate.git</connection>
         <developerConnection>scm:git:git@github.com:hazelcast/hazelcast-hibernate.git</developerConnection>
         <url>https://github.com/hazelcast/hazelcast-hibernate/</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
+    <developers>
+        <developer>
+            <id>ldziedziul</id>
+            <name>Łukasz Dziedziul</name>
+            <organization>Hazelcast</organization>
+            <organizationUrl>https://hazelcast.com</organizationUrl>
+        </developer>
+    </developers>
     <build>
         <plugins>
             <plugin>
