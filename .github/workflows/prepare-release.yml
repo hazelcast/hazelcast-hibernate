@@ -32,8 +32,8 @@ jobs:
           fi
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-          mvn --batch-mode release:prepare -Prelease -Darguments="-DskipTests" $EXTRA_ARGS
-          mvn --batch-mode release:clean
+          ./mvnw --batch-mode release:prepare -Prelease -Darguments="-DskipTests" $EXTRA_ARGS
+          ./mvnw --batch-mode release:clean
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
 

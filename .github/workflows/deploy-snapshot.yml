@@ -25,7 +25,7 @@ jobs:
           server-password: MAVEN_PASSWORD
 
       - name: Deploy snapshot
-        run: mvn deploy -Prelease-snapshot --batch-mode --update-snapshots -DskipTests -DretryFailedDeploymentCount=3
+        run: ./mvnw deploy -Prelease-snapshot --batch-mode --update-snapshots -DskipTests -DretryFailedDeploymentCount=3
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_OSS_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_OSS_PASSWORD }}
