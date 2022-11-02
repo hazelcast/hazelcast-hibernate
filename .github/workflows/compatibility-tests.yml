@@ -29,10 +29,10 @@ jobs:
           cache: 'maven'
 
       - name: Compile with default Hazelcast and Hibernate
-        run: mvn compile
+        run: ./mvnw compile
 
       - name: Run tests against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
-        run: mvn verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
+        run: ./mvnw verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
 
   test-jdks:
     if: ${{ github.event_name != 'labeled' || github.event.label.name == 'compatibility-sensitive' }}
@@ -51,7 +51,7 @@ jobs:
           cache: 'maven'
 
       - name: Compile with JDK 17
-        run: mvn compile
+        run: ./mvnw compile
 
       - name: Setup JDK
         uses: actions/setup-java@v3.6.0
@@ -61,5 +61,5 @@ jobs:
           cache: 'maven'
 
       - name: Run tests against JDK ${{ matrix.java }}
-        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} mvn verify -Dmaven.main.skip=true
+        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw verify -Dmaven.main.skip=true
 
