@@ -1,5 +1,6 @@
 package com.hazelcast.hibernate.local;
 
+import com.hazelcast.client.impl.clientside.HazelcastClientProxy;
 import com.hazelcast.cluster.Cluster;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
@@ -395,5 +396,47 @@ public class LocalRegionCacheTest {
 
         // Verify that our message listener ignores messages from local node
         verify(message, never()).getMessageObject();
+    }
+
+    @Test
+    public void testMessagesFromWhenInstanceIsClient() {
+        MapConfig mapConfig = mock(MapConfig.class);
+
+        LocalRegionCache.EvictionConfig evictionConfig = LocalRegionCache.EvictionConfig.create(someMapConfigWithEvictionConfig());
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        ITopic<Object> topic = mock(ITopic.class);
+
+        HazelcastInstance clientInstance = mock(HazelcastClientProxy.class);
+        when(clientInstance.getConfig()).thenReturn(config);
+        when(clientInstance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
+
+        // Create a new local cache
+        LocalRegionCache.builder()
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(clientInstance)
+                .withTopic(true)
+                .withEvictionConfig(evictionConfig)
+                .build();
+
+        // Obtain the message listener of the local cache
+        ArgumentCaptor<MessageListener> messageListenerArgumentCaptor = ArgumentCaptor.forClass(MessageListener.class);
+        verify(topic).addMessageListener(messageListenerArgumentCaptor.capture());
+        MessageListener messageListener = messageListenerArgumentCaptor.getValue();
+
+        Message message = mock(Message.class);
+        Member local = mock(Member.class);
+        Cluster cluster = mock(Cluster.class);
+        when(cluster.getLocalMember()).thenReturn(local);
+        when(message.getMessageObject()).thenReturn(new Invalidation());
+        when(message.getPublishingMember()).thenReturn(local);
+        when(clientInstance.getCluster()).thenReturn(cluster);
+
+        messageListener.onMessage(message);
+
+        // Verify that our message listener process messages
+        verify(message).getMessageObject();
     }
 }
