@@ -17,6 +17,7 @@ package com.hazelcast.hibernate.local;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.hazelcast.client.impl.clientside.HazelcastClientProxy;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.core.HazelcastInstance;
@@ -322,10 +323,15 @@ public class LocalRegionCache implements RegionCache {
             // Invalidation is only needed if updates came from other node(s).
             if (message.getPublishingMember() == null
                     || hazelcastInstance == null
+                    || isClient()
                     || !message.getPublishingMember().equals(hazelcastInstance.getCluster().getLocalMember())) {
                 maybeInvalidate(message.getMessageObject());
             }
         };
+    }
+
+    private boolean isClient() {
+        return hazelcastInstance instanceof HazelcastClientProxy;
     }
 
     private Optional<Comparator<?>> findVersionComparator(final DomainDataRegionConfig regionConfig) {
