@@ -41,7 +41,7 @@ public final class CacheEnvironment {
     public static final String USE_NATIVE_CLIENT = "hibernate.cache.hazelcast.use_native_client";
 
     /**
-     * Property to configure the address for the Hazelcast client to connect to
+     * Property to configure the comma-seperated addresses for the Hazelcast client to connect to.
      */
     public static final String NATIVE_CLIENT_ADDRESS = "hibernate.cache.hazelcast.native_client_address";
 
