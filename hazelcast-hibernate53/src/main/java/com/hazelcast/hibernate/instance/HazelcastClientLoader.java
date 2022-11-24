@@ -74,7 +74,8 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
             clientConfig.setClusterName(clientClusterName);
         }
         if (address != null) {
-            clientConfig.getNetworkConfig().addAddress(address);
+            String[] addresses = address.trim().split("\\s*,\\s*");
+            clientConfig.getNetworkConfig().addAddress(addresses);
         }
 
         clientConfig.getNetworkConfig()
@@ -84,12 +85,19 @@ class HazelcastClientLoader implements IHazelcastInstanceLoader {
         // By default, try to connect a cluster with intervals starting with 2 sec and multiplied by 1.5
         // at each step with max backoff of 35 seconds
         clientConfig.getConnectionStrategyConfig()
-          .setReconnectMode(getFallback(toMap(props)) ? ASYNC : ON)
-          .getConnectionRetryConfig()
-          .setInitialBackoffMillis((int) getInitialBackoff(props).toMillis())
-          .setMaxBackoffMillis((int) getMaxBackoff(props).toMillis())
-          .setMultiplier(getBackoffMultiplier(props))
-          .setClusterConnectTimeoutMillis(getClusterTimeout(props).toMillis());
+                .setReconnectMode(getFallback(toMap(props)) ? ASYNC : ON)
+                .getConnectionRetryConfig()
+                .setInitialBackoffMillis((int) getInitialBackoff(props).toMillis())
+                .setMaxBackoffMillis((int) getMaxBackoff(props).toMillis())
+                .setMultiplier(getBackoffMultiplier(props))
+                .setClusterConnectTimeoutMillis(getClusterTimeout(props).toMillis());
+    }
+
+    /**
+     * Just for testing
+     */
+    ClientConfig getClientConfig() {
+        return clientConfig;
     }
 
     private Map<String, Object> toMap(Properties props) {
