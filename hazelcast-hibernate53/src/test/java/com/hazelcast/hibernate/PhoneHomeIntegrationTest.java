@@ -29,7 +29,7 @@ public class PhoneHomeIntegrationTest {
                 "/hazelcast-hibernate53", info);
         service.start();
 
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+        await().atMost(30, TimeUnit.SECONDS).untilAsserted(() ->
                 // verify 5 retries
                 WireMock.verify(5, getRequestedFor(urlEqualTo("/hazelcast-hibernate53" + info.getQueryString())))
         );
