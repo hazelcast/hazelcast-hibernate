@@ -9,16 +9,18 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static org.awaitility.Awaitility.await;
 
 public class PhoneHomeIntegrationTest {
 
-    private final WireMockServer wireMockServer = new WireMockServer();
+    private final WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
 
     @Before
     public void setup() {
@@ -34,6 +36,7 @@ public class PhoneHomeIntegrationTest {
                 "/hazelcast-hibernate53", info);
         String url = "/hazelcast-hibernate53" + info.getQueryString();
 
+        configureFor(wireMockServer.port());
         stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HTTP_NOT_FOUND)));
 
         service.start();
