@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        hazelcast: [ '5.0.4', '5.1.6', '5.2.3', '5.3.0','5.4.0-SNAPSHOT' ]
-        hibernate: [ '5.3.30.Final', '5.4.33.Final', '5.5.9.Final', '5.6.15.Final', '6.0.2.Final', '6.1.7.Final','6.2.4.Final' ]
+        hazelcast: [ '4.2.8', '5.0.4', '5.1.6', '5.2.3', '5.3.0', '5.4.0-SNAPSHOT' ]
+        hibernate: [ '5.3.30.Final', '5.4.33.Final', '5.5.9.Final', '5.6.15.Final', '6.0.2.Final', '6.1.7.Final', '6.2.4.Final' ]
     name: Test against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
     steps:
       - uses: actions/checkout@v3
