@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.hazelcast.internal.nio.IOUtil.closeResource;
 import static java.lang.Boolean.FALSE;
+import static java.lang.Integer.getInteger;
 import static java.lang.System.getenv;
 
 /**
@@ -40,9 +41,10 @@ import static java.lang.System.getenv;
 class PhoneHomeService {
 
     private static final String SYS_PHONE_HOME_ENABLED = "hazelcast.phone.home.enabled";
+    private static final int SYS_PHONE_HOME_TIMEOUT = getInteger("hazelcast.phone.home.timeout", 3000);
     private static final String ENV_PHONE_HOME_ENABLED = "HZ_PHONE_HOME_ENABLED";
 
-    private static final Duration TIMEOUT = Duration.ofMillis(3000);
+    private static final Duration TIMEOUT = Duration.ofMillis(SYS_PHONE_HOME_TIMEOUT);
     private static final int RETRY_COUNT = 5;
     private static ScheduledThreadPoolExecutor executor;
 

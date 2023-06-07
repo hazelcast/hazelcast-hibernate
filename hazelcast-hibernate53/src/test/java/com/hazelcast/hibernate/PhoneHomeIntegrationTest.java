@@ -23,13 +23,14 @@ public class PhoneHomeIntegrationTest {
     @Before
     public void setup() {
         System.setProperty("hazelcast.phone.home.enabled", "true");
+        System.setProperty("hazelcast.phone.home.timeout", "100");
         wireMockServer.start();
     }
 
     @Test
     public void phoneHomeRequestTest() {
         PhoneHomeInfo info = new PhoneHomeInfo(true);
-        PhoneHomeService service = new PhoneHomeService("http://127.0.0.1:8080" +
+        PhoneHomeService service = new PhoneHomeService("http://127.0.0.1:" + wireMockServer.port() +
                 "/hazelcast-hibernate53", info);
         String url = "/hazelcast-hibernate53" + info.getQueryString();
 
@@ -48,6 +49,7 @@ public class PhoneHomeIntegrationTest {
     @After
     public void teardown() {
         System.setProperty("hazelcast.phone.home.enabled", "false");
+        System.setProperty("hazelcast.phone.home.timeout", "3000");
         wireMockServer.stop();
     }
 
