@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    if: contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
