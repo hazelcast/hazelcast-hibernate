@@ -7,11 +7,15 @@ on:
         description: 'Override next development version (e.g. 3.0.0-SNAPSHOT). If not set then the version will be calculated by maven release plugin'
 
 jobs:
+  compatibility-tests:
+    name: Run compatibility tests
+    uses: .github/workflows/compatibility-tests.yml
   prepare-release:
     runs-on: ubuntu-latest
     name: Prepare release
     permissions:
-          contents: write
+      contents: write
+    needs: compatibility-tests
     steps:
       - uses: actions/checkout@v3
         with:
