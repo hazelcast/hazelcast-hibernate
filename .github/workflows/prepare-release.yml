@@ -9,7 +9,7 @@ on:
 jobs:
   compatibility-tests:
     name: Run compatibility tests
-    uses: .github/workflows/compatibility-tests.yml
+    uses: ./.github/workflows/compatibility-tests.yml
   prepare-release:
     runs-on: ubuntu-latest
     name: Prepare release
