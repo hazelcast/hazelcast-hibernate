@@ -30,7 +30,6 @@
         <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jdk.version>1.8</jdk.version>
         <hazelcast.version>5.3.0</hazelcast.version>
 
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
@@ -97,9 +96,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <release>11</release>
                 </configuration>
             </plugin>
 
