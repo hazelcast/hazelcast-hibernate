@@ -36,7 +36,7 @@ jobs:
         run: ./mvnw verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
 
   test-jdks:
-    if: ${{ github.event_name != 'labeled' || github.event.label.name == 'compatibility-sensitive' }}
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
     strategy:
       matrix:
