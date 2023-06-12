@@ -32,6 +32,7 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.topic.ITopic;
 import com.hazelcast.topic.MessageListener;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.hibernate.cache.cfg.spi.CollectionDataCachingConfig;
 import org.hibernate.cache.cfg.spi.DomainDataCachingConfig;
 import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
@@ -143,6 +144,7 @@ public class LocalRegionCache implements RegionCache {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder withHazelcastInstance(HazelcastInstance hazelcastInstance) {
             this.hazelcastInstance = hazelcastInstance;
             return this;

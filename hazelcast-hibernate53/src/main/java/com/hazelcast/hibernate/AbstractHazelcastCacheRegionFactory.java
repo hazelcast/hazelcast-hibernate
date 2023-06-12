@@ -23,6 +23,7 @@ import com.hazelcast.hibernate.local.FreeHeapBasedCacheEvictor;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.cfg.spi.DomainDataRegionBuildingContext;
@@ -84,6 +85,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         );
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public HazelcastInstance getHazelcastInstance() {
         return instance;
     }
