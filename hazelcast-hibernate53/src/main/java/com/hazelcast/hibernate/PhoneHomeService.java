@@ -19,7 +19,9 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
@@ -28,7 +30,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.hazelcast.internal.nio.IOUtil.closeResource;
 import static java.lang.Boolean.FALSE;
 import static java.lang.System.getenv;
 
@@ -91,23 +92,23 @@ class PhoneHomeService {
         int retryCount = RETRY_COUNT;
         boolean succeed = false;
         while (retryCount-- > 0 && !succeed) {
-            InputStream in = null;
-            try {
-                URL url = new URL(baseUrl + phoneHomeInfo.getQueryString());
-                URLConnection conn = url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-                conn.setConnectTimeout((int) TIMEOUT.toMillis());
-                conn.setReadTimeout((int) TIMEOUT.toMillis());
-                in = new BufferedInputStream(conn.getInputStream());
+            try (InputStream ignored = new BufferedInputStream(getUrlConnection().getInputStream())) {
                 succeed = true;
             } catch (Exception e) {
                 if (logger.isFineEnabled()) {
                     logger.fine("Failed to establish home phone call. Retries left: " + retryCount, e);
                 }
-            } finally {
-                closeResource(in);
             }
         }
+    }
+
+    private URLConnection getUrlConnection() throws IOException {
+        URL url = new URL(baseUrl + phoneHomeInfo.getQueryString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+        conn.setConnectTimeout((int) TIMEOUT.toMillis());
+        conn.setReadTimeout((int) TIMEOUT.toMillis());
+        return conn;
     }
 
     void shutdown() {
