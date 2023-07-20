@@ -17,7 +17,7 @@
     <name>hazelcast-hibernate</name>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-hibernate</artifactId>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Hazelcast Platform Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
@@ -30,17 +30,16 @@
         <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jdk.version>1.8</jdk.version>
-        <hazelcast.version>5.2.1</hazelcast.version>
+        <hazelcast.version>5.3.0</hazelcast.version>
 
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>3.5.0</maven.javadoc.plugin.version>
         <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
-        <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
         <maven.findbugs.plugin.version>3.0.5</maven.findbugs.plugin.version>
-        <maven.checkstyle.plugin.version>3.2.1</maven.checkstyle.plugin.version>
+        <maven.checkstyle.plugin.version>3.3.0</maven.checkstyle.plugin.version>
         <maven.sonar.plugin.version>3.3.0.603</maven.sonar.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
 
@@ -48,7 +47,7 @@
         <slf4j.api.version>2.0.7</slf4j.api.version>
 
         <junit.version>4.13.2</junit.version>
-        <mockito.version>5.1.1</mockito.version>
+        <mockito.version>5.4.0</mockito.version>
         <wiremock.version>2.27.2</wiremock.version>
 
         <sonar.jacoco.jar>${basedir}/lib/jacocoagent.jar</sonar.jacoco.jar>
@@ -97,16 +96,15 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <release>11</release>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -334,7 +332,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.1</version>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -360,6 +358,11 @@
             <artifactId>hibernate-jpa-2.1-api</artifactId>
             <version>1.0.2.Final</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>3.0.1</version>
         </dependency>
     </dependencies>
     <profiles>
@@ -401,9 +404,9 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
-                        <version>${maven.findbugs.plugin.version}</version>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>4.7.2.1</version>
                         <executions>
                             <execution>
                                 <phase>compile</phase>
@@ -512,7 +515,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>3.0.0-M7</version>
+                        <version>3.0.1</version>
                         <configuration>
                             <tagNameFormat>v@{project.version}</tagNameFormat>
                             <scmCommentPrefix>Release -</scmCommentPrefix>
