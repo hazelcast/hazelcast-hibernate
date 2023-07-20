@@ -332,7 +332,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.1</version>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -515,7 +515,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>3.0.0-M7</version>
+                        <version>3.0.1</version>
                         <configuration>
                             <tagNameFormat>v@{project.version}</tagNameFormat>
                             <scmCommentPrefix>Release -</scmCommentPrefix>
