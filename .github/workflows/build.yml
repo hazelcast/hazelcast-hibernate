@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Checkstyle
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
