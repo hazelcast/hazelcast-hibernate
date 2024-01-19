@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '17', '20' ]
+        java: [ '17', '20' ]
     name: Test against JDK ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v4
