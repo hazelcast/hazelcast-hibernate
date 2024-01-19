@@ -97,7 +97,7 @@
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <release>11</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
 
