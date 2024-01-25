@@ -47,7 +47,7 @@
         <slf4j.api.version>2.0.11</slf4j.api.version>
 
         <junit.version>4.13.2</junit.version>
-        <mockito.version>5.9.0</mockito.version>
+        <mockito.version>5.10.0</mockito.version>
         <wiremock.version>2.27.2</wiremock.version>
 
         <sonar.jacoco.jar>${basedir}/lib/jacocoagent.jar</sonar.jacoco.jar>
@@ -97,7 +97,7 @@
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <release>11</release>
+                    <release>17</release>
                 </configuration>
             </plugin>
 
@@ -332,7 +332,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.25.1</version>
+            <version>3.25.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
