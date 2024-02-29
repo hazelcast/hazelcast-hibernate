@@ -155,7 +155,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     }
 
     @Override
-    protected void prepareForUse(final SessionFactoryOptions settings, Map<String,Object> configValues) {
+    protected void prepareForUse(final SessionFactoryOptions settings, Map<String, Object> configValues) {
         log.info("Starting up " + getClass().getSimpleName());
         if (instance == null || !instance.getLifecycleService().isRunning()) {
             instanceLoader = resolveInstanceLoader(toProperties(configValues));
@@ -193,7 +193,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         }
     }
 
-    private Properties toProperties(Map<String,Object> configValues) {
+    private Properties toProperties(Map<String, Object> configValues) {
         final Properties properties = new Properties();
         properties.putAll(configValues);
         return properties;
