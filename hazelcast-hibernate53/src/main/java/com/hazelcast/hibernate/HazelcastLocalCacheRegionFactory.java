@@ -15,6 +15,7 @@
 
 package com.hazelcast.hibernate;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.hibernate.local.LocalRegionCache;
 import com.hazelcast.hibernate.local.TimestampsRegionCache;
 import com.hazelcast.internal.util.Clock;
@@ -39,6 +40,10 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
 
     public HazelcastLocalCacheRegionFactory(PhoneHomeService phoneHomeService) {
         super(phoneHomeService);
+    }
+
+    public HazelcastLocalCacheRegionFactory(HazelcastInstance instance) {
+        super(instance);
     }
 
     @Override
