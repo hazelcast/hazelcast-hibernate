@@ -59,18 +59,24 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     private IHazelcastInstanceLoader instanceLoader;
 
     @SuppressWarnings("unused")
-    public AbstractHazelcastCacheRegionFactory() {
+    protected AbstractHazelcastCacheRegionFactory() {
         this(DefaultCacheKeysFactory.INSTANCE);
     }
 
-    public AbstractHazelcastCacheRegionFactory(CacheKeysFactory cacheKeysFactory) {
+    protected AbstractHazelcastCacheRegionFactory(CacheKeysFactory cacheKeysFactory) {
         this.cacheKeysFactory = cacheKeysFactory;
         this.phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     }
 
-    public AbstractHazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
+    protected AbstractHazelcastCacheRegionFactory(PhoneHomeService phoneHomeService) {
         this.phoneHomeService = phoneHomeService;
         cacheKeysFactory = DefaultCacheKeysFactory.INSTANCE;
+    }
+
+    protected AbstractHazelcastCacheRegionFactory(HazelcastInstance instance) {
+        this.instance = instance;
+        this.cacheKeysFactory = DefaultCacheKeysFactory.INSTANCE;
+        this.phoneHomeService = new PhoneHomeService(phoneHomeInfo());
     }
 
     @Override
@@ -149,7 +155,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
     }
 
     @Override
-    protected void prepareForUse(final SessionFactoryOptions settings, final Map configValues) {
+    protected void prepareForUse(final SessionFactoryOptions settings, Map<String, Object> configValues) {
         log.info("Starting up " + getClass().getSimpleName());
         if (instance == null || !instance.getLifecycleService().isRunning()) {
             instanceLoader = resolveInstanceLoader(toProperties(configValues));
@@ -187,7 +193,7 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
         }
     }
 
-    private Properties toProperties(final Map configValues) {
+    private Properties toProperties(Map<String, Object> configValues) {
         final Properties properties = new Properties();
         properties.putAll(configValues);
         return properties;
