@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "schedule": [
+    "after 2am on Thursday"
+  ],
+  "packageRules": [
+    {
+      "managers": ["maven"],
+      "enabled": false
+    },
+    {
+      "managers": ["github-actions"],
+      "enabled": false
+    }
+  ]
+}
