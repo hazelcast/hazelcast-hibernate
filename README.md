@@ -306,7 +306,7 @@ public class Cat implements Serializable {
 ## Releasing a new version
 
 In order to release a new version you need to run [Prepare Release](.github/workflows/prepare-release.yml) workflow to
-create na new release tag (e.g. `v1.2.3`).
+create a new release tag (e.g. `v1.2.3`).
 
 After its successful run the tag will be pushed back to the origin repository and will
 trigger [Deploy Release](.github/workflows/deploy-release.yml) workflow which will build and deploy release artifacts to
