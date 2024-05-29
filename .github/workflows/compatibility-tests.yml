@@ -37,10 +37,10 @@ jobs:
           cache: 'maven'
 
       - name: Compile with default Hazelcast and Hibernate
-        run: ./mvnw compile
+        run: ./mvnw --batch-mode compile
 
       - name: Run tests against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
-        run: ./mvnw verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
+        run: ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
 
   test-jdks:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
@@ -63,7 +63,7 @@ jobs:
           cache: 'maven'
 
       - name: Compile with JDK 17
-        run: ./mvnw compile
+        run: ./mvnw --batch-mode compile
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -73,5 +73,5 @@ jobs:
           cache: 'maven'
 
       - name: Run tests against JDK ${{ matrix.java }}
-        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }}
+        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }}
 
