@@ -103,46 +103,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-
-                        <configuration>
-                            <createSourcesJar>true</createSourcesJar>
-                            <shadeSourcesContent>true</shadeSourcesContent>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.github.ben-manes.caffeine:caffeine</include>
-                                </includes>
-                            </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>com.github.ben-manes.caffeine:caffeine</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.idx</exclude>
-                                        <exclude>META-INF/MANIFEST.MF</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.github.benmanes</pattern>
-                                    <shadedPattern>com.hazelcast.hibernate.shaded</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven.source.plugin.version}</version>
                 <executions>
@@ -214,6 +174,49 @@
                         ${surefire.argLine}
                     </argLine>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.3</version>
+                <executions>
+                    <execution>
+                        <!--
+                        This plugin is bound to the same phase as maven-source-plugin,
+                        so it must be placed AFTER that plugin for the sources jar to have the correct contents
+                        -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+
+                        <configuration>
+                            <createSourcesJar>true</createSourcesJar>
+                            <shadeSourcesContent>true</shadeSourcesContent>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.github.ben-manes.caffeine:caffeine</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>com.github.ben-manes.caffeine:caffeine</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.idx</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.github.benmanes</pattern>
+                                    <shadedPattern>com.hazelcast.hibernate.shaded</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
