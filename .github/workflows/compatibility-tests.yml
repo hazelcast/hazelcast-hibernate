@@ -10,6 +10,9 @@ on:
   workflow_dispatch:
   workflow_call:
 
+env:
+  LATEST_HZ_RELEASE: '5.4.0'
+
 jobs:
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
@@ -47,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        hazelcast: [ '5.4.0' ]
+        hazelcast: [ '${{ env.LATEST_HZ_RELEASE }}' ]
         java: [ '17', '21' ]
         include:
           - hazelcast: '5.3.7'
