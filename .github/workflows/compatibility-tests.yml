@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        hazelcast: [ '${{env.LATEST_HZ_RELEASE}}' ]
+        hazelcast: [ '$LATEST_HZ_RELEASE' ]
         java: [ '17', '21' ]
         include:
           - hazelcast: '5.3.7'
