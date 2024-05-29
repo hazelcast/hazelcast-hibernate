@@ -47,7 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '17', '21' ]
+        hazelcast: [ '5.4.0' ]
+        java: [ '17', '21' ]
+        include:
+          - hazelcast: '5.3.7'
+            java: '11'
     name: Test against JDK ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v4
@@ -69,5 +73,5 @@ jobs:
           cache: 'maven'
 
       - name: Run tests against JDK ${{ matrix.java }}
-        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw verify -Dmaven.main.skip=true
+        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }}
 
