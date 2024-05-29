@@ -50,12 +50,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        hazelcast: [ '$LATEST_HZ_RELEASE' ]
+        hazelcast: [ $LATEST_HZ_RELEASE ]
         java: [ '17', '21' ]
         include:
           - hazelcast: '5.3.7'
             java: '11'
-    name: Test against JDK ${{ matrix.java }}
+    name: Test against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup JDK 17
@@ -75,6 +75,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Run tests against JDK ${{ matrix.java }}
+      - name: Run tests against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
         run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }}
 
