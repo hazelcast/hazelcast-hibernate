@@ -19,7 +19,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: ./mvnw -B install -DskipTests -Pcheckstyle,findbugs
+        run: ./mvnw --batch-mode install -DskipTests -Pcheckstyle,findbugs
 
   build:
     needs: checkstyle
@@ -35,7 +35,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: ./mvnw verify
+        run: ./mvnw --batch-mode verify
 
       - name: Upload Test Results
         if:  ${{ always() }}

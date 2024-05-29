@@ -30,7 +30,7 @@
         <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <hazelcast.version>5.3.0</hazelcast.version>
+        <hazelcast.version>5.4.0</hazelcast.version>
 
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.4.1</maven.jar.plugin.version>
@@ -56,7 +56,7 @@
         <sonar.verbose>true</sonar.verbose>
 
         <hsqldb.version>2.7.1</hsqldb.version>
-        <hibernate.core.version>6.4.2.Final</hibernate.core.version>
+        <hibernate.core.version>6.5.2.Final</hibernate.core.version>
         <jaxb-impl.version>4.0.1</jaxb-impl.version>
         <jaxb-core.version>4.0.4</jaxb-core.version>
 
@@ -88,6 +88,12 @@
             <organization>Hazelcast</organization>
             <organizationUrl>https://hazelcast.com</organizationUrl>
         </developer>
+        <developer>
+            <id>frant-hartm</id>
+            <name>František Hartman</name>
+            <organization>Hazelcast</organization>
+            <organizationUrl>https://hazelcast.com</organizationUrl>
+        </developer>
     </developers>
     <build>
         <plugins>
@@ -97,7 +103,7 @@
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <release>17</release>
+                    <release>11</release>
                 </configuration>
             </plugin>
 
@@ -260,6 +266,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.opentest4j</groupId>
+            <artifactId>opentest4j</artifactId>
+            <version>1.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>4.2.0</version>
@@ -315,7 +327,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.orm</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.core.version}</version>
             <scope>provided</scope>

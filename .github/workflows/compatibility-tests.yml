@@ -17,8 +17,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        hazelcast: [ '4.2.8', '5.0.4', '5.1.6', '5.2.3', '5.3.0', '5.4.0-SNAPSHOT' ]
-        hibernate: [ '5.3.30.Final', '5.4.33.Final', '5.5.9.Final', '5.6.15.Final', '6.0.2.Final', '6.1.7.Final', '6.2.4.Final' ]
+        hazelcast: [ '5.3.7', '5.4.0', '5.5.0-SNAPSHOT' ]
+        # Versions marked latest stable and limited-support from https://hibernate.org/orm/releases/
+        hibernate: [
+          '5.3.36.Final',
+          '5.6.15.Final',
+          '6.2.25.Final',
+          '6.4.8.Final',
+          '6.5.2.Final'
+        ]
     name: Test against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
     steps:
       - uses: actions/checkout@v4
@@ -30,18 +37,24 @@ jobs:
           cache: 'maven'
 
       - name: Compile with default Hazelcast and Hibernate
-        run: ./mvnw compile
+        run: ./mvnw --batch-mode compile
 
       - name: Run tests against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
-        run: ./mvnw verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
+        run: ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
 
   test-jdks:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        # Run with latest Hazelcast release
+        hazelcast: [ '5.4.0' ]
         java: [ '17', '21' ]
-    name: Test against JDK ${{ matrix.java }}
+        include:
+          # And the 5.3.z release still supports Java 11
+          - hazelcast: '5.3.7'
+            java: '11'
+    name: Test against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup JDK 17
@@ -52,7 +65,7 @@ jobs:
           cache: 'maven'
 
       - name: Compile with JDK 17
-        run: ./mvnw compile
+        run: ./mvnw --batch-mode compile
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -61,6 +74,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Run tests against JDK ${{ matrix.java }}
-        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw verify -Dmaven.main.skip=true
+      - name: Run tests against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
+        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }}
 
