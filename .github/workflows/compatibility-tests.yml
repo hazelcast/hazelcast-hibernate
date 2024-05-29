@@ -10,9 +10,6 @@ on:
   workflow_dispatch:
   workflow_call:
 
-env:
-  LATEST_HZ_RELEASE: '5.4.0'
-
 jobs:
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
@@ -50,9 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        hazelcast: [ $LATEST_HZ_RELEASE ]
+        # Run with latest Hazelcast release
+        hazelcast: [ '5.4.0' ]
         java: [ '17', '21' ]
         include:
+          # And the 5.3.z release still supports Java 11
           - hazelcast: '5.3.7'
             java: '11'
     name: Test against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
