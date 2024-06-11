@@ -46,14 +46,17 @@ jobs:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         # Run with latest Hazelcast release
         hazelcast: [ '5.4.0' ]
         java: [ '17', '21' ]
+        jakarta: [ '3.2.0' ]
         include:
           # And the 5.3.z release still supports Java 11
           - hazelcast: '5.3.7'
             java: '11'
+            jakarta: '3.1.0'
     name: Test against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
     steps:
       - uses: actions/checkout@v4
@@ -75,5 +78,5 @@ jobs:
           cache: 'maven'
 
       - name: Run tests against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
-        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }}
+        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Djakarta.version=${{ matrix.jakarta }}
 

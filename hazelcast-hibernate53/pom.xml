@@ -55,7 +55,7 @@
             <!-- Part of Hibernate 6.x, required to run tests against Hibernate 5.x -->
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.2.0</version>
+            <version>${jakarta.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
