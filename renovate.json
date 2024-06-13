@@ -6,6 +6,7 @@
   "schedule": [
     "after 2am on Thursday"
   ],
+  "prConcurrentLimit": 100,
   "packageRules": [
     {
       "managers": ["maven"],
