@@ -14,6 +14,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -63,6 +64,7 @@ public class PhoneHomeTest {
         assertEquals(3, parameters.size());
         assertEquals(isLocalRegion ? "local" : "distributed", parameters.get("region-type"));
         assertEquals(resolvedPluginVersion, parameters.get("version"));
+        assertNotNull(Hibernate.class.getPackage().getImplementationVersion());
         assertEquals(Hibernate.class.getPackage().getImplementationVersion(), parameters.get("hibernate-version"));
         assertNotEquals("N/A", resolvedPluginVersion);
     }

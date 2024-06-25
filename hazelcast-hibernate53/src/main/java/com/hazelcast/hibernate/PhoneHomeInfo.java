@@ -22,9 +22,13 @@ import org.hibernate.Hibernate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * Creates query string according to plugin properties to be sent to phone home
@@ -73,9 +77,22 @@ class PhoneHomeInfo {
         // especially for the parameter keys.
         return new QueryStringBuilder()
                 .addParam("version", version)
-                .addParam("hibernate-version", Hibernate.class.getPackage().getImplementationVersion())
+                .addParam("hibernate-version", getHibernateVersion())
                 .addParam("region-type", isLocalRegion ? "local" : "distributed")
                 .build();
+    }
+
+    private static String getHibernateVersion() {
+        URL hibernateJar = Hibernate.class.getProtectionDomain().getCodeSource().getLocation();
+        try (URLClassLoader classLoader = new URLClassLoader(new URL[]{hibernateJar})) {
+            URL url = classLoader.findResource("META-INF/MANIFEST.MF");
+            Manifest manifest = new Manifest(url.openStream());
+            Attributes mainAttributes = manifest.getMainAttributes();
+            return mainAttributes.getValue("Implementation-Version");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
