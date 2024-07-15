@@ -40,7 +40,7 @@ jobs:
         run: ./mvnw --batch-mode compile
 
       - name: Run tests against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
-        run: ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }}
+        run: ./mvnw --settings settings.xml --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }} -Dhz.snapshot.internal.username=${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }} -Dhz.snapshot.internal.password=${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
 
   test-jdks:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
