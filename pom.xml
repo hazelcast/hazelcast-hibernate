@@ -58,7 +58,7 @@
         <sonar.verbose>true</sonar.verbose>
 
         <hsqldb.version>2.7.3</hsqldb.version>
-        <jaxb-impl.version>4.0.1</jaxb-impl.version>
+        <jaxb-impl.version>4.0.5</jaxb-impl.version>
         <jaxb-core.version>4.0.5</jaxb-core.version>
 
         <surefire.argLine>
