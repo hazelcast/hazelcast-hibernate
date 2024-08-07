@@ -30,7 +30,7 @@
         <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <hazelcast.version>5.4.0</hazelcast.version>
+        <hazelcast.version>5.5.0</hazelcast.version>
         <hibernate.core.version>6.5.2.Final</hibernate.core.version>
         <jakarta.version>3.2.0</jakarta.version>
 
