@@ -28,7 +28,7 @@ jobs:
         ]
     name: Test against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -59,7 +59,7 @@ jobs:
             jakarta: '3.1.0'
     name: Test against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
