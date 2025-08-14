@@ -18,7 +18,7 @@ jobs:
       contents: write
     needs: compatibility-tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: "${{ secrets.GH_PAT }}"
       - name: Setup JDK
