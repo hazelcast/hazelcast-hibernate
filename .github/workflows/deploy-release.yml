@@ -39,7 +39,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Deploy release
-        run: ./mvnw deploy -Prelease --batch-mode -DskipTests -DretryFailedDeploymentCount=3
+        run: ./mvnw deploy -Prelease --batch-mode --no-transfer-progress -DskipTests -DretryFailedDeploymentCount=3
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_OSS_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_OSS_PASSWORD }}
