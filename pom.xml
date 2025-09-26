@@ -230,7 +230,7 @@
 
     <repositories>
         <repository>
-            <id>deploy-repository</id>
+            <id>snapshot-repository</id>
             <name>Maven2 Snapshot Repository</name>
             <url>https://central.sonatype.com/repository/maven-snapshots</url>
             <releases>
@@ -255,7 +255,7 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>deploy-repository</id>
+            <id>snapshot-repository</id>
             <name>Maven2 Snapshot Repository</name>
             <url>https://central.sonatype.com/repository/maven-snapshots</url>
             <uniqueVersion>false</uniqueVersion>
@@ -536,12 +536,13 @@
                         <extensions>true</extensions>
                         <configuration>
                             <!-- server id comes from settings.xml -->
-                            <publishingServerId>deploy-repository</publishingServerId>
+                            <publishingServerId>release-repository</publishingServerId>
                             <!--
                             wait until the artifacts are actually published automatically using 'autoPublish'.
                             the default is `validated` which would then require manual publishing
                             -->
-                            <autoPublish>false</autoPublish>
+                            <waitUntil>published</waitUntil>
+                            <autoPublish>true</autoPublish>
                             <checksums>required</checksums>
                         </configuration>
                     </plugin>
