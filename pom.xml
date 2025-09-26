@@ -532,8 +532,7 @@
                             wait until the artifacts are actually published automatically using 'autoPublish'.
                             the default is `validated` which would then require manual publishing
                             -->
-                            <waitUntil>published</waitUntil>
-                            <autoPublish>true</autoPublish>
+                            <autoPublish>false</autoPublish>
                             <checksums>required</checksums>
                             <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots</centralSnapshotsUrl>
                         </configuration>
