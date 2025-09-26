@@ -253,6 +253,15 @@
         </repository>
     </repositories>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>deploy-repository</id>
+            <name>Maven2 Snapshot Repository</name>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.hazelcast</groupId>
@@ -534,7 +543,6 @@
                             -->
                             <autoPublish>false</autoPublish>
                             <checksums>required</checksums>
-                            <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots</centralSnapshotsUrl>
                         </configuration>
                     </plugin>
 
