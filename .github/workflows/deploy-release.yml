@@ -23,11 +23,11 @@ jobs:
           fi
           echo "TAG=${TAG}" >> $GITHUB_ENV
           echo "VERSION=${TAG:1}" >> $GITHUB_ENV
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: "${{ env.TAG }}"
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: 'temurin'
