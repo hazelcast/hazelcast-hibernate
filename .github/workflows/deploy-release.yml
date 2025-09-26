@@ -28,7 +28,7 @@ jobs:
 
       - name: Deploy release
         run: |
-          ./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=1.1.1
+          ./mvnw versions:set -DgenerateBackupPoms=false -DnewVersion=0.1.1
           ./mvnw deploy -Prelease --batch-mode --no-transfer-progress -DskipTests -DretryFailedDeploymentCount=3
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_OSS_USERNAME }}
