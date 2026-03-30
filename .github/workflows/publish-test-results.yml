@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Download and Extract Artifacts
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
            mkdir -p artifacts && cd artifacts
 

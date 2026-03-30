@@ -19,8 +19,6 @@ jobs:
     needs: compatibility-tests
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: "${{ secrets.GH_PAT }}"
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
