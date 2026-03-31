@@ -12,6 +12,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: release-drafter/release-drafter@v6.1.0
+      - uses: release-drafter/release-drafter@v7.1.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
