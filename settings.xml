@@ -1,9 +1,0 @@
-<settings>
-    <servers>
-        <server>
-            <id>snapshot-internal</id>
-            <username>${hz.snapshot.internal.username}</username>
-            <password>${hz.snapshot.internal.password}</password>
-        </server>
-    </servers>
-</settings>

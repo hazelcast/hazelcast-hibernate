@@ -14,6 +14,8 @@ jobs:
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -36,11 +38,24 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - uses: hazelcast/docker-actions/setup-maven-snapshot-internal@master
+        with:
+          aws-role-to-assume: ${{ secrets.AWS_HAZELCAST_OIDC_GITHUB_ACTIONS_ROLE_ARN }}
+
       - name: Compile with default Hazelcast and Hibernate
-        run: ./mvnw --batch-mode compile
+        run: |
+          ./mvnw \
+            compile \
+            --batch-mode 
 
       - name: Run tests against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
-        run: ./mvnw --settings settings.xml --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Dhibernate.core.version=${{ matrix.hibernate }} -Dhz.snapshot.internal.username=${{ secrets.HZ_SNAPSHOT_INTERNAL_USERNAME }} -Dhz.snapshot.internal.password=${{ secrets.HZ_SNAPSHOT_INTERNAL_PASSWORD }}
+        run: |
+          ./mvnw \
+            verify \
+            --batch-mode \
+            -Dhazelcast.version=${{ matrix.hazelcast }} \
+            -Dhibernate.core.version=${{ matrix.hibernate }} \
+            -Dmaven.main.skip=true
 
   test-jdks:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
@@ -68,7 +83,10 @@ jobs:
           cache: 'maven'
 
       - name: Compile with JDK 17
-        run: ./mvnw --batch-mode compile
+        run: |
+          ./mvnw \
+            compile \
+            --batch-mode 
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -78,5 +96,10 @@ jobs:
           cache: 'maven'
 
       - name: Run tests against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
-        run: JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw --batch-mode verify -Dmaven.main.skip=true -Dhazelcast.version=${{ matrix.hazelcast }} -Djakarta.version=${{ matrix.jakarta }}
-
+        run: |
+          JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw \
+            verify
+            --batch-mode \
+            -Dhazelcast.version=${{ matrix.hazelcast }} \
+            -Djakarta.version=${{ matrix.jakarta }} \
+            -Dmaven.main.skip=true
