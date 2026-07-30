@@ -31,7 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hazelcast.version>5.5.0</hazelcast.version>
-        <hibernate.core.version>6.5.2.Final</hibernate.core.version>
+        <hibernate.core.version>7.4.5.Final</hibernate.core.version>
         <jakarta.version>3.2.0</jakarta.version>
 
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
