@@ -33,10 +33,10 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
           server-id: release-repository
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
+          server-username-env-var: MAVEN_USERNAME
+          server-password-env-var: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
 
       - name: Deploy release
         run: ./mvnw deploy -Prelease --batch-mode --no-transfer-progress -DskipTests -DretryFailedDeploymentCount=3
