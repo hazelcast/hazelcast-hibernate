@@ -198,8 +198,6 @@
                         </goals>
 
                         <configuration>
-                            <!-- Replace original artifact with shaded -->
-                            <outputFile>${project.build.directory}/${project.build.finalName}.jar</outputFile>
                             <createSourcesJar>true</createSourcesJar>
                             <shadeSourcesContent>true</shadeSourcesContent>
                             <artifactSet>

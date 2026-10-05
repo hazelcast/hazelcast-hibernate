@@ -29,6 +29,7 @@ jobs:
       - uses: hazelcast/maven-release-tooling/release@main
         with:
           next-version: ${{ inputs.next-version }}
+          release-files: '**/target/hazelcast-hibernate*.jar'
         env:
           MAVEN_ARGS: --activate-profiles release
           MAVEN_USERNAME: ${{ secrets.SONATYPE_OSS_USERNAME }}
