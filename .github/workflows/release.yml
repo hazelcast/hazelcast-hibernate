@@ -26,7 +26,7 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
 
-      - uses: hazelcast/maven-release-tooling/deploy@main
+      - uses: hazelcast/maven-release-tooling/release@main
         with:
           next-version: ${{ inputs.next-version }}
         env:
