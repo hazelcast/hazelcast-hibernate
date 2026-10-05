@@ -8,8 +8,14 @@ on:
         description: 'Override next development version (e.g. if current version in master is 5.0-SNAPSHOT, the "next-version" should be 5.1-SNAPSHOT). If not set then the version will be calculated by maven versions plugin'
 
 jobs:
+  compatibility-tests:
+    name: Run compatibility tests
+    uses: ./.github/workflows/compatibility-tests.yml
+    secrets: inherit
+
   release:
     runs-on: ubuntu-latest
+    needs: compatibility-tests
     permissions:
       contents: write
     steps:
