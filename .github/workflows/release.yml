@@ -3,7 +3,7 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      next-version:
+      next-snapshot-version:
         required: false
         description: 'See https://github.com/hazelcast/maven-release-tooling/blob/main/release/action.yml'
 
@@ -35,7 +35,7 @@ jobs:
 
       - uses: hazelcast/maven-release-tooling/release@main
         with:
-          next-version: ${{ inputs.next-version }}
+          next-snapshot-version: ${{ inputs.next-snapshot-version }}
           release-files: '**/target/hazelcast-hibernate*.jar'
         env:
           MAVEN_ARGS: --activate-profiles release
