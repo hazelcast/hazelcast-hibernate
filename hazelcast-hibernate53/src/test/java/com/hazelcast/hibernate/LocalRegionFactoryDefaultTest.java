@@ -30,7 +30,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -69,8 +68,8 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
         Transaction tx = session.beginTransaction();
         try {
             for (DummyEntity dummy : list) {
-                dummy.setDate(new Date());
-                session.update(dummy);
+                dummy.setName("updated:" + dummy.getId());
+                session.merge(dummy);
             }
             tx.commit();
         } catch (Exception e) {
@@ -82,10 +81,11 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
 
         Statistics stats = sf.getStatistics();
         assertEquals((childCount + 1) * count, stats.getEntityInsertCount());
-        // twice put of entity and properties (on load and update) and once put of collection
-        assertEquals((childCount + 1) * count * 2 + count, stats.getSecondLevelCachePutCount());
+        // puts: entity and properties on insert, collection on first load, entity on merge
+        assertEquals((childCount + 1) * count + count + count, stats.getSecondLevelCachePutCount());
         assertEquals(childCount * count, stats.getEntityLoadCount());
-        assertEquals(count, stats.getSecondLevelCacheHitCount());
+        // hits: entity on get, then merge() reloads entity, collection and properties
+        assertEquals(count + (childCount + 2) * count, stats.getSecondLevelCacheHitCount());
         // collection cache miss
         assertEquals(count, stats.getSecondLevelCacheMissCount());
         stats.logSummary();

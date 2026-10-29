@@ -45,7 +45,7 @@ public class NativeClientTest
         Session session = clientSf.openSession();
         Transaction tx = session.beginTransaction();
         DummyEntity e = new DummyEntity((long) 1, "dummy:1", 123456d, new Date());
-        session.save(e);
+        session.persist(e);
         tx.commit();
         session.close();
 

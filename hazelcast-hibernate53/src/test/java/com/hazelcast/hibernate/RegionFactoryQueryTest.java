@@ -48,7 +48,7 @@ public class RegionFactoryQueryTest extends HibernateSlowTestSupport{
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
         try {
-            session.delete(toDelete);
+            session.remove(toDelete);
             tx.commit();
         } catch (Exception e) {
             tx.rollback();

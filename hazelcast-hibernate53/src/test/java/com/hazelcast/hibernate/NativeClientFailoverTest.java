@@ -48,7 +48,7 @@ public class NativeClientFailoverTest extends HibernateSlowTestSupport {
 
         Transaction tx = session.beginTransaction();
         DummyEntity e = new DummyEntity(1, "dummy:1", 123456d, new Date());
-        session.save(e);
+        session.persist(e);
         tx.commit();
         session.close();
 

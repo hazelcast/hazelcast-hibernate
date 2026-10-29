@@ -65,10 +65,10 @@ public abstract class HibernateSlowTestSupport extends HibernateTestSupport {
         try {
             for (int i = 0; i < count; i++) {
                 DummyEntity e = new DummyEntity((long) i, "dummy:" + i, i * 123456d, new Date());
-                session.save(e);
+                session.persist(e);
                 for (int j = 0; j < childCount; j++) {
                     DummyProperty p = new DummyProperty("key:" + j, e);
-                    session.save(p);
+                    session.persist(p);
                 }
             }
             tx.commit();

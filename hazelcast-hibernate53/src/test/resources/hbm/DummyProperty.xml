@@ -22,10 +22,10 @@
     <class name="DummyProperty" table="dummy_props">
         <cache usage="%1$s"/>
 
-        <id name="id" column="uid" type="long" unsaved-value="null">
+        <id name="id" column="uid" type="long" unsaved-value="0">
             <generator class="native"/>
         </id>
-        <version column="version" name="version" type="int"/>
+        <version column="version" name="version" type="int" unsaved-value="null"/>
         <property name="key" type="string" length="100"/>
 
         <many-to-one name="entity" class="com.hazelcast.hibernate.entity.DummyEntity"

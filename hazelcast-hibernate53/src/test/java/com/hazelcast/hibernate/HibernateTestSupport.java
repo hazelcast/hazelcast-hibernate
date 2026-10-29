@@ -102,7 +102,7 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
             session = sf.openSession();
             txn = session.beginTransaction();
             DummyEntity entityToDelete = session.get(DummyEntity.class, id);
-            session.delete(entityToDelete);
+            session.remove(entityToDelete);
             txn.commit();
         } catch (Exception e) {
             txn.rollback();
@@ -152,7 +152,7 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
         Transaction tx = session.beginTransaction();
         for(int i=0; i< count; i++) {
             AnnotatedEntity annotatedEntity = new AnnotatedEntity("dummy:"+i);
-            session.save(annotatedEntity);
+            session.persist(annotatedEntity);
         }
         tx.commit();
         session.close();
@@ -168,10 +168,10 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
         try {
             for (int i = 0; i < count; i++) {
                 DummyEntity e = new DummyEntity((long) i, "dummy:" + i, i * 123456d, new Date());
-                session.save(e);
+                session.persist(e);
                 for (int j = 0; j < childCount; j++) {
                     DummyProperty p = new DummyProperty("key:" + j, e);
-                    session.save(p);
+                    session.persist(p);
                 }
             }
             tx.commit();
@@ -191,7 +191,7 @@ public abstract class HibernateTestSupport extends HazelcastTestSupport {
             txn = session.beginTransaction();
             DummyEntity entityToUpdate = session.get(DummyEntity.class, id);
             entityToUpdate.setName(newName);
-            session.update(entityToUpdate);
+            session.merge(entityToUpdate);
             txn.commit();
         } catch (RuntimeException e) {
             txn.rollback();

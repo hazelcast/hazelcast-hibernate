@@ -87,7 +87,7 @@ public class CustomPropertiesTest extends HibernateTestSupport {
         assertEquals(1, hz.getCluster().getMembers().size());
         Session session = sf.openSession();
         Transaction tx = session.beginTransaction();
-        session.save(new DummyEntity(1L, "dummy", 0, new Date()));
+        session.persist(new DummyEntity(1L, "dummy", 0, new Date()));
         tx.commit();
         session.close();
         sf.close();
