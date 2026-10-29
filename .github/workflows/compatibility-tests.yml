@@ -14,8 +14,6 @@ jobs:
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -35,10 +33,6 @@ jobs:
           java-version: 17
           distribution: 'temurin'
           cache: 'maven'
-
-      - uses: hazelcast/docker-actions/setup-maven-snapshot-internal@master
-        with:
-          aws-role-to-assume: ${{ vars.AWS_HAZELCAST_OIDC_GITHUB_ACTIONS_ROLE_ARN }}
 
       - name: Compile with default Hazelcast and Hibernate
         run: |
