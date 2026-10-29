@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        hazelcast: [ '5.3.7', '5.4.0', '5.5.0-SNAPSHOT' ]
+        hazelcast: [ '5.3.7', '5.4.0', '5.5.0' ]
         # Versions marked latest stable and limited-support from https://hibernate.org/orm/releases/
         hibernate: [
           '5.3.36.Final',
@@ -98,7 +98,7 @@ jobs:
       - name: Run tests against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
         run: |
           JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw \
-            verify
+            verify \
             --batch-mode \
             -Dhazelcast.version=${{ matrix.hazelcast }} \
             -Djakarta.version=${{ matrix.jakarta }} \
