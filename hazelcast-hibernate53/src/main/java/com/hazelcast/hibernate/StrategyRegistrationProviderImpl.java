@@ -29,9 +29,10 @@ import java.util.List;
  * under a number of keys.
  */
 public class StrategyRegistrationProviderImpl implements StrategyRegistrationProvider {
+    // Hibernate 6 declares Iterable<StrategyRegistration>, 7 declares Iterable<StrategyRegistration<?>>
     @Override
-    @SuppressWarnings("unchecked")
-    public Iterable<StrategyRegistration> getStrategyRegistrations() {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterable getStrategyRegistrations() {
         final List<StrategyRegistration> strategyRegistrations = new ArrayList<>();
 
         strategyRegistrations.add(

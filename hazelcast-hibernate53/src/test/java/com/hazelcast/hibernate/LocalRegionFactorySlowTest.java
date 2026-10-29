@@ -75,7 +75,7 @@ public class LocalRegionFactorySlowTest extends HibernateSlowTestSupport {
         Session session = sf2.openSession();
         Transaction tx = session.beginTransaction();
         try {
-            session.delete(toDelete);
+            session.remove(toDelete);
             tx.commit();
         } catch (Exception e) {
             tx.rollback();

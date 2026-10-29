@@ -22,10 +22,10 @@
     <class name="DummyEntity" table="dummy_entities">
         <cache usage="%1$s"/>
 
-        <id name="id" column="uid" type="long" unsaved-value="null">
+        <id name="id" column="uid" type="long" unsaved-value="undefined">
             <generator class="assigned"/>
         </id>
-        <version column="version" name="version" type="int"/>
+        <version column="version" name="version" type="int" unsaved-value="null"/>
         <property name="name" type="string" length="100"/>
         <property name="date" column="dummy_date" type="date"/>
         <property name="value" column="dummy_value" type="double"/>

@@ -7,6 +7,10 @@ updates:
       day: "thursday"
       time: "02:00"
     open-pull-requests-limit: 100
+    ignore:
+      # The pom pins the oldest supported Hibernate; newer lines are tested in compatibility-tests.yml
+      - dependency-name: "org.hibernate.orm:hibernate-core"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

@@ -62,14 +62,14 @@ public class TopicTransactionalTest53 extends HibernateTopicTestSupport {
         Transaction transaction = session.beginTransaction();
 
         DummyProperty property = new DummyProperty("somekey");
-        session.save(property);
+        session.persist(property);
 
         DummyEntity entity = session.get(DummyEntity.class, 1L);
         HashSet<DummyProperty> updatedProperties = new HashSet<>();
         updatedProperties.add(property);
         entity.setProperties(updatedProperties);
 
-        session.update(entity);
+        session.merge(entity);
 
         transaction.commit();
         session.close();
@@ -133,7 +133,7 @@ public class TopicTransactionalTest53 extends HibernateTopicTestSupport {
         Transaction tx = session.beginTransaction();
 
         AnnotatedEntity toBeDeleted = session.byNaturalId(AnnotatedEntity.class).using("title", "dummy:1").getReference();
-        session.delete(toBeDeleted);
+        session.remove(toBeDeleted);
         tx.commit();
         session.close();
 
@@ -149,10 +149,10 @@ public class TopicTransactionalTest53 extends HibernateTopicTestSupport {
         Transaction tx = session.beginTransaction();
 
         AnnotatedEntity toBeDeleted = session.byNaturalId(AnnotatedEntity.class).using("title", "dummy:1").getReference();
-        session.delete(toBeDeleted);
+        session.remove(toBeDeleted);
 
         AnnotatedEntity toBeDeleted2 = session.byNaturalId(AnnotatedEntity.class).using("title", "dummy:0").getReference();
-        session.delete(toBeDeleted2);
+        session.remove(toBeDeleted2);
         tx.commit();
         session.close();
 

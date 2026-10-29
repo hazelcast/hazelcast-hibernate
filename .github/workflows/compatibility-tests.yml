@@ -14,19 +14,15 @@ jobs:
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
-        hazelcast: [ '5.3.7', '5.4.0', '5.5.0-SNAPSHOT' ]
+        hazelcast: [ '5.5.0', '5.6.0', '5.7.0' ]
         # Versions marked latest stable and limited-support from https://hibernate.org/orm/releases/
         hibernate: [
-          '5.3.36.Final',
-          '5.6.15.Final',
-          '6.2.25.Final',
-          '6.4.8.Final',
-          '6.5.2.Final'
+          '6.6.59.Final',
+          '7.2.25.Final',
+          '7.4.13.Final'
         ]
     name: Test against HZ ${{ matrix.hazelcast }} and HN ${{ matrix.hibernate }}
     steps:
@@ -37,10 +33,6 @@ jobs:
           java-version: 17
           distribution: 'temurin'
           cache: 'maven'
-
-      - uses: hazelcast/docker-actions/setup-maven-snapshot-internal@master
-        with:
-          aws-role-to-assume: ${{ vars.AWS_HAZELCAST_OIDC_GITHUB_ACTIONS_ROLE_ARN }}
 
       - name: Compile with default Hazelcast and Hibernate
         run: |
@@ -64,8 +56,8 @@ jobs:
       fail-fast: false
       matrix:
         # Run with latest Hazelcast release
-        hazelcast: [ '5.4.0' ]
-        java: [ '17', '21' ]
+        hazelcast: [ '5.7.0' ]
+        java: [ '17', '21', '25' ]
         jakarta: [ '3.2.0' ]
         include:
           # And the 5.3.z release still supports Java 11
@@ -98,7 +90,7 @@ jobs:
       - name: Run tests against JDK ${{ matrix.java }} and HZ ${{ matrix.hazelcast }}
         run: |
           JAVA_HOME=${JAVA_HOME_${{ matrix.java }}_x64} ./mvnw \
-            verify
+            verify \
             --batch-mode \
             -Dhazelcast.version=${{ matrix.hazelcast }} \
             -Djakarta.version=${{ matrix.jakarta }} \

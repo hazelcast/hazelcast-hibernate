@@ -70,8 +70,8 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         Transaction tx = session.beginTransaction();
         try {
             for (DummyEntity dummy : list) {
-                dummy.setDate(new Date());
-                session.update(dummy);
+                dummy.setName("updated:" + dummy.getId());
+                session.merge(dummy);
             }
             tx.commit();
         } catch (Exception e) {
@@ -86,11 +86,11 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         Map<?, ?> propCache = hz.getMap(DummyProperty.class.getName());
         Map<?, ?> propCollCache = hz.getMap(DummyEntity.class.getName() + ".properties");
         assertEquals((childCount + 1) * count, stats.getEntityInsertCount());
-        // twice put of entity and properties (on load and update) and once put of collection
-        // TODO: fix next assertion ->
-        //        assertEquals((childCount + 1) * count * 2, stats.getSecondLevelCachePutCount());
+        // puts: entity and properties on insert, collection on first load, entity on merge
+        assertEquals((childCount + 1) * count + count + count, stats.getSecondLevelCachePutCount());
         assertEquals(childCount * count, stats.getEntityLoadCount());
-        assertEquals(count, stats.getSecondLevelCacheHitCount());
+        // hits: entity on get, then merge() reloads entity, collection and properties
+        assertEquals(count + (childCount + 2) * count, stats.getSecondLevelCacheHitCount());
         // collection cache miss
         assertEquals(count, stats.getSecondLevelCacheMissCount());
         assertEquals(count, cache.size());
@@ -124,7 +124,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         Transaction tx = session.beginTransaction();
         try {
             for (DummyEntity dummy : list) {
-                session.delete(dummy);
+                session.remove(dummy);
             }
             tx.commit();
         } catch (Exception e) {
@@ -149,7 +149,8 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         boolean entitiesInQueryCache = hibernateMajorVersion() >= 6;
         assertEquals(entityCount * (queryCount - 1) * (entitiesInQueryCache ? 1 : 2), stats.getSecondLevelCacheHitCount());
         // collection cache miss
-        assertEquals(entityCount, stats.getSecondLevelCacheMissCount());
+        assertEquals(entityCount,
+                stats.getDomainDataRegionStatistics(DummyEntity.class.getName() + ".properties").getMissCount());
         assertEquals(entityCount, stats.getEntityDeleteCount());
         stats.logSummary();
     }
@@ -196,7 +197,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         DummyEntity e = new DummyEntity(1L, "test", 0d, null);
         Transaction tx = session.beginTransaction();
         try {
-            session.save(e);
+            session.persist(e);
             tx.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -226,7 +227,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
             assertNull(e.getDate());
             e.setName("dummy");
             e.setDate(new Date());
-            session.update(e);
+            session.merge(e);
             tx.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -271,7 +272,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         DummyEntity ent = session.get(DummyEntity.class, 0L);
         sf.getCache().evictEntityData("com.hazelcast.hibernate.entity.DummyEntity", 0L);
         ent.setName("updatedName");
-        session.update(ent);
+        session.merge(ent);
         tx.commit();
         session.close();
         ArrayList<DummyEntity> list = getDummyEntities(1);

@@ -69,7 +69,7 @@ public class CollectionCacheTest extends HibernateTestSupport {
         Transaction transaction = session.beginTransaction();
 
         DummyProperty someProp = new DummyProperty("some prop");
-        session.save(someProp);
+        session.persist(someProp);
 
         DummyEntity entity = new DummyEntity();
         entity.setId(1L);
@@ -77,7 +77,7 @@ public class CollectionCacheTest extends HibernateTestSupport {
         entity.setValue(27.0);
         entity.setDate(new Date(System.currentTimeMillis()));
         entity.setProperties(new HashSet<DummyProperty>(Collections.singletonList(someProp)));
-        session.save(entity);
+        session.persist(entity);
 
         transaction.commit();
         session.close();
@@ -86,21 +86,21 @@ public class CollectionCacheTest extends HibernateTestSupport {
         transaction = session.beginTransaction();
 
         DummyProperty property = new DummyProperty("somekey");
-        session.save(property);
+        session.persist(property);
 
         entity = (DummyEntity) session.get(DummyEntity.class, 1L);
         HashSet<DummyProperty> updatedProperties = new HashSet<DummyProperty>();
         updatedProperties.add(property);
         entity.setProperties(updatedProperties);
 
-        session.update(entity);
+        session.merge(entity);
 
         transaction.commit();
         session.close();
 
         session = sf.openSession();
 
-        entity = (DummyEntity) session.load(DummyEntity.class, entity.getId());
+        entity = (DummyEntity) session.getReference(DummyEntity.class, entity.getId());
         // just for making Hibernate load the object
         assertEquals("some entity", entity.getName());
 
