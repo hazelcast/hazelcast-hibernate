@@ -131,7 +131,7 @@ public class LocalRegionCacheTest {
 
     @Test
     public void testConstructionSetsVersionComparatorForVersionedCollectionData() {
-        Comparator<?> comparator = mock(Comparator.class);
+        Comparator comparator = mock(Comparator.class);
 
         DomainDataRegionConfig domainDataRegionConfig = mock(DomainDataRegionConfig.class);
         CollectionDataCachingConfig collectionDataCachingConfig = mock(CollectionDataCachingConfig.class);
