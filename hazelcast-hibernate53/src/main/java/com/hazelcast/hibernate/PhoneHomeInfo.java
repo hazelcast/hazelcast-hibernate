@@ -41,13 +41,18 @@ import java.util.Properties;
 class PhoneHomeInfo {
 
     private static final String PROPERTIES_RESOURCE = "/phone.home.properties";
+    private static final String NOT_AVAILABLE = "N/A";
 
     private String version;
     private String queryString;
 
     PhoneHomeInfo(boolean isLocalRegion) {
+        this(isLocalRegion, Hibernate.class.getPackage().getImplementationVersion());
+    }
+
+    PhoneHomeInfo(boolean isLocalRegion, String hibernateVersion) {
         this.version = resolveVersion();
-        this.queryString = buildQueryString(isLocalRegion);
+        this.queryString = buildQueryString(isLocalRegion, hibernateVersion == null ? NOT_AVAILABLE : hibernateVersion);
     }
 
     String getQueryString() {
@@ -55,25 +60,33 @@ class PhoneHomeInfo {
     }
 
     static String resolveVersion() {
+        return resolveVersion(PROPERTIES_RESOURCE);
+    }
+
+    static String resolveVersion(String resource) {
         // To resolve the version described in the pom file, filtering for
         // phone.home.properties must be enabled in the resources section
         // of the pom.xml
+        InputStream propertiesStream = PhoneHomeInfo.class.getResourceAsStream(resource);
+        if (propertiesStream == null) {
+            return NOT_AVAILABLE;
+        }
         Properties properties = new Properties();
-        try (InputStream propertiesStream = PhoneHomeInfo.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
+        try (propertiesStream) {
             properties.load(propertiesStream);
-            return properties.getProperty("project.version", "N/A");
+            return properties.getProperty("project.version", NOT_AVAILABLE);
         } catch (IOException ignored) {
-            return "N/A";
+            return NOT_AVAILABLE;
         }
     }
 
-    private String buildQueryString(boolean isLocalRegion) {
+    private String buildQueryString(boolean isLocalRegion, String hibernateVersion) {
         // Any change committed here must correspond to the phone
         // home server changes. Do not make standalone changes
         // especially for the parameter keys.
         return new QueryStringBuilder()
                 .addParam("version", version)
-                .addParam("hibernate-version", Hibernate.class.getPackage().getImplementationVersion())
+                .addParam("hibernate-version", hibernateVersion)
                 .addParam("region-type", isLocalRegion ? "local" : "distributed")
                 .build();
     }
