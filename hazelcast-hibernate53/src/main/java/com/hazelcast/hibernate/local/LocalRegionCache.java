@@ -100,6 +100,12 @@ public class LocalRegionCache implements RegionCache {
             EmptyStatement.ignore(ignored);
         }
 
+        this.versionComparator = findVersionComparator(regionConfig).orElse(null);
+        this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
+
+        this.cache = createCache(freeHeapBasedCacheEvictor, name);
+
+        // Subscribe last: the listener can run before addMessageListener returns
         if (withTopic && hazelcastInstance != null) {
             this.topic = hazelcastInstance.getTopic(name);
             this.listenerRegistrationId = topic.addMessageListener(createMessageListener());
@@ -107,11 +113,6 @@ public class LocalRegionCache implements RegionCache {
             this.topic = null;
             this.listenerRegistrationId = null;
         }
-
-        this.versionComparator = findVersionComparator(regionConfig).orElse(null);
-        this.evictionConfig = evictionConfig == null ? EvictionConfig.create(config) : evictionConfig;
-
-        this.cache = createCache(freeHeapBasedCacheEvictor, name);
     }
 
     public static Builder builder() {

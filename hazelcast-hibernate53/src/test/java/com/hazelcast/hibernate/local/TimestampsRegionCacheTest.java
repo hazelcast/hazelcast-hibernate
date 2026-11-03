@@ -19,11 +19,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -140,6 +143,19 @@ public class TimestampsRegionCacheTest {
 
         // this fails if we use system time instead of cluster time, causing the value to stay invisible until clustertime == system time (which it often isn't)
         assertThat("key should be visible and have value specified in timestamp message, with current cluster time.", (Long) target.get("QuerySpace", clusterTime), is(secondTimestamp));
+    }
+
+    @Test
+    public void shouldHandleMessageDeliveredDuringConstruction() {
+        // A message from another member can arrive before addMessageListener returns
+        doAnswer(invocation -> {
+            MessageListener<Object> listener = invocation.getArgument(0);
+            listener.onMessage(new Message<>(CACHE_NAME, new Timestamp("QuerySpace", 1L, UUID.randomUUID()), 1L, member));
+            return UUID.randomUUID();
+        }).when(topic).addMessageListener(any());
+
+        assertThatCode(() -> new TimestampsRegionCache(regionFactory, CACHE_NAME, instance, new FreeHeapBasedCacheEvictor()))
+                .doesNotThrowAnyException();
     }
 
     @SuppressWarnings("Duplicates")

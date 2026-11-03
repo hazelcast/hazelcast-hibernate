@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 import static com.hazelcast.config.MapConfig.DEFAULT_MAX_SIZE_POLICY;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyString;
@@ -353,6 +354,37 @@ public class LocalRegionCacheTest {
         verify(instance).getConfig();
         verify(instance).getTopic(eq(CACHE_NAME));
         verify(topic).addMessageListener(isNotNull());
+    }
+
+    @Test
+    public void testHandlesMessageDeliveredDuringConstruction() {
+        MapConfig mapConfig = someMapConfigWithEvictionConfig();
+
+        Config config = mock(Config.class);
+        when(config.findMapConfig(eq(CACHE_NAME))).thenReturn(mapConfig);
+
+        // A message from another member can arrive before addMessageListener returns
+        ITopic<Object> topic = mock(ITopic.class);
+        when(topic.addMessageListener(isNotNull())).thenAnswer(invocation -> {
+            MessageListener<Object> listener = invocation.getArgument(0);
+            listener.onMessage(new Message<>(CACHE_NAME, new Invalidation("key", null), 1L, mock(Member.class)));
+            return UUID.randomUUID();
+        });
+
+        Cluster cluster = mock(Cluster.class);
+        when(cluster.getLocalMember()).thenReturn(mock(Member.class));
+
+        HazelcastInstance instance = mock(HazelcastInstance.class);
+        when(instance.getConfig()).thenReturn(config);
+        when(instance.getCluster()).thenReturn(cluster);
+        when(instance.getTopic(eq(CACHE_NAME))).thenReturn(topic);
+
+        assertThatCode(() -> LocalRegionCache.builder().withRegionFactory(regionFactory)
+                .withName(CACHE_NAME)
+                .withHazelcastInstance(instance)
+                .withTopic(true)
+                .build())
+                .doesNotThrowAnyException();
     }
 
     @Test
