@@ -11,15 +11,28 @@ on:
   workflow_call:
 
 jobs:
+  get-hazelcast-versions:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
+    runs-on: ubuntu-slim
+    outputs:
+      versions: ${{ steps.versions.outputs.versions }}
+    steps:
+      - id: get-maintenance-versions
+        uses: hazelcast/hazelcast/.github/actions/get-supported-maintenance-versions@master
+      - id: versions
+        run: |
+          echo "versions=$(jq --compact-output 'map(. | tostring + ".0")' <<< '${{ steps.get-maintenance-versions.outputs.versions }}')" >> ${GITHUB_OUTPUT}
+
   build:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'compatibility-sensitive')
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+    needs: get-hazelcast-versions
     strategy:
       fail-fast: false
       matrix:
-        hazelcast: [ '5.3.7', '5.4.0', '5.5.0-SNAPSHOT' ]
+        hazelcast: ${{ fromJSON(needs.get-hazelcast-versions.outputs.versions) }}
         # Versions marked latest stable and limited-support from https://hibernate.org/orm/releases/
         hibernate: [
           '5.3.36.Final',
