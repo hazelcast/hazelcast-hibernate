@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +58,17 @@ public class PhoneHomeTest {
         verifyQueryString(false, queryString);
     }
 
+    @Test
+    public void queryStringWithoutHibernateVersionTest() {
+        String queryString = new PhoneHomeInfo(true, null).getQueryString();
+        assertEquals("N/A", toParametersMap(queryString).get("hibernate-version"));
+    }
+
+    @Test
+    public void missingPropertiesResourceTest() {
+        assertEquals("N/A", PhoneHomeInfo.resolveVersion("/missing.properties"));
+    }
+
     private void verifyQueryString(boolean isLocalRegion, String queryString) {
         Map<String, String> parameters = toParametersMap(queryString);
         String resolvedPluginVersion = PhoneHomeInfo.resolveVersion();
@@ -70,6 +83,6 @@ public class PhoneHomeTest {
     private Map<String, String> toParametersMap(String queryString) {
         return Arrays.stream(queryString.substring(1).split("&")) // trim '?' at the beginning of the query
                 .map(param -> param.split("="))
-                .collect(toMap(pair -> pair[0], pair -> pair[1]));
+                .collect(toMap(pair -> pair[0], pair -> URLDecoder.decode(pair[1], StandardCharsets.UTF_8)));
     }
 }
