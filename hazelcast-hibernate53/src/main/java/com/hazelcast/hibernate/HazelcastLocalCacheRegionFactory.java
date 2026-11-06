@@ -24,12 +24,16 @@ import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.support.RegionNameQualifier;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 
+import java.time.Duration;
+
 /**
  * Simple RegionFactory implementation to return Hazelcast based local Region implementations
  */
 public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegionFactory {
 
     private static final PhoneHomeInfo PHONE_HOME_INFO = new PhoneHomeInfo(true);
+    // Hibernate's default soft lock timeout, in the milliseconds that nextTimestamp() returns
+    private static final long SOFT_LOCK_TIMEOUT_MILLIS = Duration.ofSeconds(60).toMillis();
 
     public HazelcastLocalCacheRegionFactory() {
     }
@@ -94,5 +98,10 @@ public class HazelcastLocalCacheRegionFactory extends AbstractHazelcastCacheRegi
         return instance == null
           ? Clock.currentTimeMillis()
           : HazelcastTimestamper.nextTimestamp(instance);
+    }
+
+    @Override
+    public long getTimeout() {
+        return SOFT_LOCK_TIMEOUT_MILLIS;
     }
 }
