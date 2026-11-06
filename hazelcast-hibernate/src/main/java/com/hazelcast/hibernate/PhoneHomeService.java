@@ -64,7 +64,7 @@ class PhoneHomeService {
         }
 
     PhoneHomeService(PhoneHomeInfo phoneHomeInfo) {
-        this("http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate53", phoneHomeInfo);
+        this("http://phonehome.hazelcast.com/pingIntegrations/hazelcast-hibernate", phoneHomeInfo);
     }
 
     PhoneHomeService(String baseUrl, PhoneHomeInfo phoneHomeInfo) {

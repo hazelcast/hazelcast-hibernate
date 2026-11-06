@@ -16,12 +16,12 @@
 
     <parent>
         <groupId>com.hazelcast</groupId>
-        <artifactId>hazelcast-hibernate</artifactId>
+        <artifactId>hazelcast-hibernate-parent</artifactId>
         <version>5.3.0-SNAPSHOT</version>
     </parent>
 
-    <name>hazelcast-hibernate53</name>
-    <artifactId>hazelcast-hibernate53</artifactId>
+    <name>hazelcast-hibernate</name>
+    <artifactId>hazelcast-hibernate</artifactId>
     <packaging>jar</packaging>
     <description>Hazelcast Platform Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
@@ -29,7 +29,7 @@
     <properties>
         <!-- needed for checkstyle/findbugs -->
         <main.basedir>${project.parent.basedir}</main.basedir>
-        <jpms.module.name>com.hazelcast.hibernate53</jpms.module.name>
+        <jpms.module.name>com.hazelcast.hibernate</jpms.module.name>
     </properties>
 
     <build>

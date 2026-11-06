@@ -26,12 +26,12 @@ public class PhoneHomeIntegrationTest {
     public void phoneHomeRequestTest() {
         PhoneHomeInfo info = new PhoneHomeInfo(true);
         PhoneHomeService service = new PhoneHomeService("http://127.0.0.1:" + wireMockServer.port() +
-                "/hazelcast-hibernate53", info);
+                "/hazelcast-hibernate", info);
         service.start();
 
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
                 // verify 5 retries
-                WireMock.verify(5, getRequestedFor(urlEqualTo("/hazelcast-hibernate53" + info.getQueryString())))
+                WireMock.verify(5, getRequestedFor(urlEqualTo("/hazelcast-hibernate" + info.getQueryString())))
         );
 
         service.shutdown();
