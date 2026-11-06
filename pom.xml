@@ -141,6 +141,7 @@
                                     !org.junit,
                                     !com.hazelcast.*,
                                     org.slf4j;resolution:=optional,
+                                    org.hibernate.*;version="[6.6,8)",
                                     *
                                 </Import-Package>
                                 <Fragment-Host>com.hazelcast</Fragment-Host>

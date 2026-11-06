@@ -70,6 +70,7 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         Transaction tx = session.beginTransaction();
         try {
             for (DummyEntity dummy : list) {
+                // merge() writes only changed values, and date keeps only the day, so setting today's date changes nothing
                 dummy.setName("updated:" + dummy.getId());
                 session.merge(dummy);
             }
@@ -100,7 +101,22 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         sf.getCache().evictEntityData(DummyProperty.class);
         assertEquals(0, cache.size());
         assertEquals(0, propCache.size());
+        assertNamesSaved(count);
         stats.logSummary();
+    }
+
+    /**
+     * Evict the entity data first, so that these reads come from the database.
+     */
+    protected void assertNamesSaved(int count) {
+        Session session = sf.openSession();
+        try {
+            for (int i = 0; i < count; i++) {
+                assertEquals("updated:" + i, session.get(DummyEntity.class, (long) i).getName());
+            }
+        } finally {
+            session.close();
+        }
     }
 
     @Test

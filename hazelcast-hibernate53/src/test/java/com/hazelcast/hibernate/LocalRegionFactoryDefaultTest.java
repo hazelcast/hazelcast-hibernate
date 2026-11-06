@@ -68,6 +68,7 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
         Transaction tx = session.beginTransaction();
         try {
             for (DummyEntity dummy : list) {
+                // merge() writes only changed values, and date keeps only the day, so setting today's date changes nothing
                 dummy.setName("updated:" + dummy.getId());
                 session.merge(dummy);
             }
@@ -88,6 +89,8 @@ public class LocalRegionFactoryDefaultTest extends RegionFactoryDefaultTest {
         assertEquals(count + (childCount + 2) * count, stats.getSecondLevelCacheHitCount());
         // collection cache miss
         assertEquals(count, stats.getSecondLevelCacheMissCount());
+        sf.getCache().evictEntityData(DummyEntity.class);
+        assertNamesSaved(count);
         stats.logSummary();
     }
 }

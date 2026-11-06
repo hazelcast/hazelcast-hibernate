@@ -25,6 +25,8 @@ import com.hazelcast.hibernate.entity.DummyEntity;
 import com.hazelcast.hibernate.instance.HazelcastMockInstanceLoader;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.annotation.SlowTest;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -32,14 +34,17 @@ import org.hibernate.cache.CacheException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.internal.SessionFactoryImpl;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.util.Date;
 import java.util.Properties;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -47,6 +52,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(SlowTest.class)
 public class CustomPropertiesTest extends HibernateTestSupport {
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @SuppressWarnings("Duplicates")
     @Test
@@ -112,6 +119,21 @@ public class CustomPropertiesTest extends HibernateTestSupport {
 
     @Test
     public void testNamedInstance_noInstance() {
+        exception.expect(IllegalStateException.class);
+        exception.expectCause(allOf(isA(CacheException.class), new BaseMatcher<CacheException>() {
+            @Override
+            public boolean matches(Object item) {
+                return ((CacheException) item).getMessage().contains("No instance with name [hibernate] could be found.");
+            }
+
+            @Override
+            public void describeTo(Description description) {
+            }
+        }));
+
+        Config config = new Config();
+        config.setInstanceName("hibernate");
+
         Properties props = new Properties();
         props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
         props.put(CacheEnvironment.HAZELCAST_INSTANCE_NAME, "hibernate");
@@ -123,15 +145,24 @@ public class CustomPropertiesTest extends HibernateTestSupport {
 
         SessionFactory sf = configuration.buildSessionFactory();
         AbstractHazelcastCacheRegionFactory hazelcastRegionFactory = (AbstractHazelcastCacheRegionFactory) ((SessionFactoryImpl) sf).getCache().getRegionFactory();
-        IllegalStateException e = assertThrows(IllegalStateException.class, hazelcastRegionFactory::isStarted);
-        assertThat(e.getCause())
-                .isInstanceOf(CacheException.class)
-                .hasMessageContaining("No instance with name [hibernate] could be found.");
+        hazelcastRegionFactory.isStarted();
         sf.close();
     }
 
     @Test
     public void testNamedClient_noInstance() {
+        exception.expect(IllegalStateException.class);
+        exception.expectCause(allOf(isA(CacheException.class), new BaseMatcher<CacheException>() {
+            @Override
+            public boolean matches(Object item) {
+                return ((CacheException) item).getMessage().contains("No client with name [dev-custom] could be found.");
+            }
+
+            @Override
+            public void describeTo(Description description) {
+            }
+        }));
+
         Properties props = new Properties();
         props.setProperty(Environment.CACHE_REGION_FACTORY, HazelcastCacheRegionFactory.class.getName());
         props.setProperty(CacheEnvironment.USE_NATIVE_CLIENT, "true");
@@ -143,10 +174,7 @@ public class CustomPropertiesTest extends HibernateTestSupport {
 
         SessionFactory sf = configuration.buildSessionFactory();
         AbstractHazelcastCacheRegionFactory hazelcastRegionFactory = (AbstractHazelcastCacheRegionFactory) ((SessionFactoryImpl) sf).getCache().getRegionFactory();
-        IllegalStateException e = assertThrows(IllegalStateException.class, hazelcastRegionFactory::isStarted);
-        assertThat(e.getCause())
-                .isInstanceOf(CacheException.class)
-                .hasMessageContaining("No client with name [dev-custom] could be found.");
+        hazelcastRegionFactory.isStarted();
         sf.close();
     }
 
