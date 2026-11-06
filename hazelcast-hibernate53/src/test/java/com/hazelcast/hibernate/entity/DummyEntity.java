@@ -22,7 +22,8 @@ public class DummyEntity {
 
     private long id;
 
-    private Integer version;
+    // Starts below Hibernate's first version, 0, so that persist() can tell a new entity from a saved one
+    private int version = -1;
 
     private String name;
 
@@ -52,11 +53,11 @@ public class DummyEntity {
         this.id = id;
     }
 
-    public Integer getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

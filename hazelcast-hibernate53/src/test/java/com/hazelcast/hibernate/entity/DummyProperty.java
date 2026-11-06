@@ -19,7 +19,7 @@ public class DummyProperty {
 
     private long id;
 
-    private Integer version;
+    private int version;
 
     private String key;
 
@@ -54,11 +54,11 @@ public class DummyProperty {
         this.id = id;
     }
 
-    public Integer getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
