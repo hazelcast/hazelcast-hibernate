@@ -50,7 +50,7 @@
 
         <junit.version>4.13.2</junit.version>
         <mockito.version>5.18.0</mockito.version>
-        <wiremock.version>2.27.2</wiremock.version>
+        <wiremock.version>3.0.1</wiremock.version>
 
         <sonar.jacoco.jar>${basedir}/lib/jacocoagent.jar</sonar.jacoco.jar>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
