@@ -4,4 +4,17 @@
         <Class name="com.hazelcast.hibernate.serialization.CacheEntryImpl" />
         <Bug code="EI,EI2"/>
     </Match>
+    <Match>
+        <Or>
+            <Class name="com.hazelcast.hibernate.instance.HazelcastClientLoader" />
+            <Class name="com.hazelcast.hibernate.instance.HazelcastInstanceLoader" />
+        </Or>
+        <Method name="loadInstance" />
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="com.hazelcast.hibernate.local.LocalRegionCache" />
+        <Method name="&lt;init&gt;" />
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
 </FindBugsFilter>
