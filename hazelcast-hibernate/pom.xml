@@ -47,6 +47,10 @@
                 <includes>
                     <include>**/*.*</include>
                 </includes>
+                <!-- copied filtered above; maven-resources-plugin 3.4+ would overwrite it with the raw file -->
+                <excludes>
+                    <exclude>phone.home.properties</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>
