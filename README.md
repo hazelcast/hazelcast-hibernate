@@ -1,7 +1,7 @@
 # Hibernate Second Level Cache
 
 <a href="https://github.com/hazelcast/hazelcast-hibernate/actions?query=event%3Apush+branch%3Amaster"><img alt="GitHub Actions status" src="https://github.com/hazelcast/hazelcast-hibernate/actions/workflows/build.yml/badge.svg"></a>
-[![Maven Central](https://maven-badges.sml.io/maven-central/com.hazelcast/hazelcast-hibernate/badge.svg)](https://maven-badges.sml.io/maven-central/com.hazelcast/hazelcast-hibernate53) 
+[![Maven Central](https://maven-badges.sml.io/maven-central/com.hazelcast/hazelcast-hibernate/badge.svg)](https://maven-badges.sml.io/maven-central/com.hazelcast/hazelcast-hibernate) 
 
 Hazelcast provides a distributed second-level cache for your Hibernate entities, collections, and queries.
 
@@ -9,7 +9,9 @@ You can use an `IMap` as distributed storage(`HazelcastCacheRegionFactory`), or 
 
 ## Supported Versions
 
-- `hazelcast-hibernate53` supports Hibernate 5.3+, and Hazelcast 4+
+- `hazelcast-hibernate` supports Hibernate 6.6 and 7.x, and Hazelcast 4+
+
+<sub>Versions up to 5.2.0 were published as `hazelcast-hibernate53`.</sub>
 
 <sub>If you need Hazelcast 3.x support, you can use a 1.3.x version of each `hazelcast-hibernate` module.</sub>
 
