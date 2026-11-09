@@ -14,16 +14,16 @@
   --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>hazelcast-hibernate</name>
+    <name>hazelcast-hibernate-parent</name>
     <groupId>com.hazelcast</groupId>
-    <artifactId>hazelcast-hibernate</artifactId>
+    <artifactId>hazelcast-hibernate-parent</artifactId>
     <version>5.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Hazelcast Platform Hibernate Plugin</description>
     <url>http://www.hazelcast.com/</url>
 
     <modules>
-        <module>hazelcast-hibernate53</module>
+        <module>hazelcast-hibernate</module>
     </modules>
 
     <properties>
@@ -31,7 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hazelcast.version>5.5.0</hazelcast.version>
-        <hibernate.core.version>6.5.2.Final</hibernate.core.version>
+        <hibernate.core.version>6.6.59.Final</hibernate.core.version>
         <jakarta.version>3.2.0</jakarta.version>
 
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
@@ -43,7 +43,7 @@
         <maven.findbugs.plugin.version>3.0.5</maven.findbugs.plugin.version>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
         <maven.sonar.plugin.version>3.3.0.603</maven.sonar.plugin.version>
-        <maven.jacoco.plugin.version>0.8.13</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.16</maven.jacoco.plugin.version>
 
         <reload4j.version>1.2.26</reload4j.version>
         <slf4j.api.version>2.0.17</slf4j.api.version>
@@ -141,6 +141,7 @@
                                     !org.junit,
                                     !com.hazelcast.*,
                                     org.slf4j;resolution:=optional,
+                                    org.hibernate.*;version="[6.6,8)",
                                     *
                                 </Import-Package>
                                 <Fragment-Host>com.hazelcast</Fragment-Host>
@@ -341,7 +342,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.core.version}</version>
             <scope>provided</scope>
@@ -386,6 +387,12 @@
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
             <version>1.0.2.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
