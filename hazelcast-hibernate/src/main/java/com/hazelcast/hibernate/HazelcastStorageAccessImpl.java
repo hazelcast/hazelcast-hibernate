@@ -17,6 +17,7 @@ package com.hazelcast.hibernate;
 
 import com.hazelcast.logging.Logger;
 import org.hibernate.cache.CacheException;
+import org.hibernate.cache.spi.ExtendedStatisticsSupport;
 import org.hibernate.cache.spi.access.SoftLock;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
@@ -27,7 +28,7 @@ import java.util.function.Function;
  * A custom {@link org.hibernate.cache.spi.support.DomainDataStorageAccess} implementation delegating
  * to one of Hazelcast {@link RegionCache} implementations.
  */
-public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
+public class HazelcastStorageAccessImpl implements HazelcastStorageAccess, ExtendedStatisticsSupport {
 
     private final RegionCache delegate;
     private final boolean fallback;
@@ -58,8 +59,23 @@ public class HazelcastStorageAccessImpl implements HazelcastStorageAccess {
     }
 
     @Override
+    public long getElementCountInMemory() {
+        return delegate.getElementCountInMemory();
+    }
+
+    @Override
+    public long getElementCountOnDisk() {
+        return delegate.getElementCountOnDisk();
+    }
+
+    @Override
     public Object getFromCache(final Object key, final SharedSessionContractImplementor session) throws CacheException {
         return tryWithFallback(cache -> cache.get(key, delegate.nextTimestamp()), null);
+    }
+
+    @Override
+    public long getSizeInMemory() {
+        return delegate.getSizeInMemory();
     }
 
     @Override
