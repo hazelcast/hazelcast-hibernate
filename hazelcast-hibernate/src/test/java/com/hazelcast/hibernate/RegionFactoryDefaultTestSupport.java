@@ -21,8 +21,10 @@ import com.hazelcast.hibernate.entity.DummyProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.Version;
+import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cfg.Environment;
 import org.hibernate.query.Query;
+import org.hibernate.stat.CacheRegionStatistics;
 import org.hibernate.stat.Statistics;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +37,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -117,6 +120,28 @@ public abstract class RegionFactoryDefaultTestSupport extends HibernateStatistic
         } finally {
             session.close();
         }
+    }
+
+    @Test
+    public void testDomainDataRegionStatistics() {
+        insertDummyEntities(10);
+
+        CacheRegionStatistics stats = sf.getStatistics().getDomainDataRegionStatistics(CACHE_ENTITY);
+        assertEquals(10, stats.getElementCountInMemory());
+        assertEquals(-1, stats.getElementCountOnDisk());
+        assertNotEquals(CacheRegionStatistics.NO_EXTENDED_STAT_SUPPORT_RETURN, stats.getSizeInMemory());
+    }
+
+    @Test
+    public void testQueryRegionStatistics() {
+        insertDummyEntities(10);
+        executeQuery();
+
+        CacheRegionStatistics stats = sf.getStatistics()
+                .getQueryRegionStatistics(RegionFactory.DEFAULT_QUERY_RESULTS_REGION_UNQUALIFIED_NAME);
+        assertEquals(1, stats.getElementCountInMemory());
+        assertEquals(-1, stats.getElementCountOnDisk());
+        assertNotEquals(CacheRegionStatistics.NO_EXTENDED_STAT_SUPPORT_RETURN, stats.getSizeInMemory());
     }
 
     @Test

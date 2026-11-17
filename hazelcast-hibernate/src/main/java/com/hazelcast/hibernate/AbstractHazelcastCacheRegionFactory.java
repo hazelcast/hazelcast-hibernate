@@ -31,6 +31,7 @@ import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.internal.DefaultCacheKeysFactory;
 import org.hibernate.cache.spi.CacheKeysFactory;
 import org.hibernate.cache.spi.DomainDataRegion;
+import org.hibernate.cache.spi.QueryResultsRegion;
 import org.hibernate.cache.spi.support.DomainDataStorageAccess;
 import org.hibernate.cache.spi.support.RegionFactoryTemplate;
 import org.hibernate.cache.spi.support.StorageAccess;
@@ -89,6 +90,14 @@ public abstract class AbstractHazelcastCacheRegionFactory extends RegionFactoryT
           cacheKeysFactory,
           buildingContext
         );
+    }
+
+    @Override
+    public QueryResultsRegion buildQueryResultsRegion(final String regionName,
+                                                      final SessionFactoryImplementor sessionFactory) {
+        verifyStarted();
+        return new HazelcastQueryResultsRegionImpl(regionName, this,
+                createQueryResultsRegionStorageAccess(regionName, sessionFactory));
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP")

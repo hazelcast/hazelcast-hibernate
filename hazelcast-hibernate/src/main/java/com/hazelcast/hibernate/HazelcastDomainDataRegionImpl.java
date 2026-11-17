@@ -21,6 +21,7 @@ import org.hibernate.cache.cfg.spi.DomainDataRegionConfig;
 import org.hibernate.cache.cfg.spi.EntityDataCachingConfig;
 import org.hibernate.cache.cfg.spi.NaturalIdDataCachingConfig;
 import org.hibernate.cache.spi.CacheKeysFactory;
+import org.hibernate.cache.spi.ExtendedStatisticsSupport;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cache.spi.access.CollectionDataAccess;
 import org.hibernate.cache.spi.access.EntityDataAccess;
@@ -36,11 +37,14 @@ import org.hibernate.cache.spi.support.NaturalIdReadWriteAccess;
 import org.hibernate.cache.spi.support.NaturalIdTransactionalAccess;
 import org.hibernate.cache.spi.support.RegionFactoryTemplate;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.stat.CacheRegionStatistics;
+
+import java.util.function.ToLongFunction;
 
 /**
  * Hazelcast based timestamp using region implementation
  */
-public class HazelcastDomainDataRegionImpl extends DomainDataRegionImpl {
+public class HazelcastDomainDataRegionImpl extends DomainDataRegionImpl implements ExtendedStatisticsSupport {
 
     HazelcastDomainDataRegionImpl(final DomainDataRegionConfig regionConfig,
                                   final RegionFactoryTemplate regionFactory,
@@ -48,6 +52,21 @@ public class HazelcastDomainDataRegionImpl extends DomainDataRegionImpl {
                                   final CacheKeysFactory defaultKeysFactory,
                                   final DomainDataRegionBuildingContext buildingContext) {
         super(regionConfig, regionFactory, domainDataStorageAccess, defaultKeysFactory, buildingContext);
+    }
+
+    @Override
+    public long getElementCountInMemory() {
+        return fromStorageAccess(ExtendedStatisticsSupport::getElementCountInMemory);
+    }
+
+    @Override
+    public long getElementCountOnDisk() {
+        return fromStorageAccess(ExtendedStatisticsSupport::getElementCountOnDisk);
+    }
+
+    @Override
+    public long getSizeInMemory() {
+        return fromStorageAccess(ExtendedStatisticsSupport::getSizeInMemory);
     }
 
     @Override
@@ -163,5 +182,12 @@ public class HazelcastDomainDataRegionImpl extends DomainDataRegionImpl {
                 ((HazelcastStorageAccess) getStorageAccess()).unlockItem(key, lock);
             }
         };
+    }
+
+    private long fromStorageAccess(final ToLongFunction<ExtendedStatisticsSupport> statistic) {
+        final DomainDataStorageAccess storageAccess = getCacheStorageAccess();
+        return storageAccess instanceof ExtendedStatisticsSupport
+                ? statistic.applyAsLong((ExtendedStatisticsSupport) storageAccess)
+                : CacheRegionStatistics.NO_EXTENDED_STAT_SUPPORT_RETURN;
     }
 }
