@@ -19,7 +19,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: ./mvnw --batch-mode --no-transfer-progress install -DskipTests -Pcheckstyle,findbugs
+        run: ./mvnw --batch-mode --no-transfer-progress install -DskipTests -DskipITs -Pcheckstyle,findbugs
 
   build:
     needs: checkstyle
