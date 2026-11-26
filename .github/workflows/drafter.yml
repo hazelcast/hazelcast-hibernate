@@ -13,5 +13,5 @@ jobs:
       contents: write
     steps:
       - uses: release-drafter/release-drafter@v7.11.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          token: ${{ github.token }}
